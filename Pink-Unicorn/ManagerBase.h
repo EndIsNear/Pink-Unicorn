@@ -3,6 +3,7 @@
 
 #include <BWAPI.h>
 #include <BWAPI/Client.h>
+#include "TasksQueue.h"
 
 class ManagerBase 
 {

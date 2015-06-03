@@ -9,6 +9,7 @@ struct Task
 {
 	enum Type
 	{
+		Produce
 	};
 	enum Priority
 	{
@@ -20,6 +21,7 @@ struct Task
 	unsigned TimeLimit; // in frames
 	unsigned ID;
 	bool isComplete;
+	std::list<Task*> SubTasks;
 };
 
 class TaskQueue : public std::list<Task>

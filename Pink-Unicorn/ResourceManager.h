@@ -70,7 +70,7 @@ class ResourceManager : public ManagerBase
 
 	public:
 
-		ResourceManager() { UpdateState() }
+		ResourceManager() { UpdateState(); }
 		~ResourceManager() {}
 
 

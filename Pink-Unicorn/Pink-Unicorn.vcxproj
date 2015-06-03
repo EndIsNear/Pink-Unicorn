@@ -85,6 +85,7 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PinkUnicorn.cpp" />
+    <ClCompile Include="ProducingManager.cpp" />
     <ClCompile Include="ResourceManagerImp.cpp" />
     <ClCompile Include="TaskQueue.cpp" />
     <ClCompile Include="Utils.cpp" />
@@ -93,6 +94,7 @@
     <ClInclude Include="DebugStuff.h" />
     <ClInclude Include="ManagerBase.h" />
     <ClInclude Include="PinkUnicorn.h" />
+    <ClInclude Include="ProducingTasks.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="TasksQueue.h" />
     <ClInclude Include="Utils.h" />
