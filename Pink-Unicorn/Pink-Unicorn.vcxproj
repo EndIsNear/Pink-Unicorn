@@ -86,6 +86,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PinkUnicorn.cpp" />
     <ClCompile Include="ResourceManagerImp.cpp" />
+    <ClCompile Include="TaskQueue.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>

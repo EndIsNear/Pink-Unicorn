@@ -3,6 +3,13 @@
 using namespace BWAPI;
 
 
+
+void ResourceManager::OnFrame()
+{
+	if (Broodwar->getFrameCount() - mLastUpdateFrame > 25) // every second
+		UpdateState();
+}
+
 bool ResourceManager::Reserve(const ResourcePack &rRecPack)
 {
 	if (CanReserve(rRecPack))

@@ -2,23 +2,27 @@
 #define PINK_UNICORN_TASKS_QUEUE
 
 #include <vector>
+#include <list>
 
 typedef void (*TaskCallBack) ();
 struct Task
 {
-	enum TaskType
+	enum Type
 	{
 	};
-	enum TaskPriority
+	enum Priority
 	{
+		MAX = 0
 	};
-	TaskType mType;
-	TaskPriority mPriority;
+	Type mType;
+	Priority mPriority;
 	TaskCallBack mCallBack;
-	unsigned TimeLimit;
+	unsigned TimeLimit; // in frames
+	unsigned ID;
+	bool isComplete;
 };
 
-class TaskQueue : public std::vector<Task*>
+class TaskQueue : public std::list<Task>
 {
 private:
 	TaskQueue(){};
@@ -35,6 +39,10 @@ public:
 		}
 		return *inst;
 	}
+
+	void ReleaseCompleteTasks();
+	void GetTasksWithPriority(Task::Priority pri , std::list<Task*> &output);
+	void GetTasksWithType(Task::Type type, std::list<Task*> &output);
 
 	~TaskQueue()
 	{

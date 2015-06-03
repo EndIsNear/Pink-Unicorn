@@ -65,10 +65,15 @@ class ResourceManager : public ManagerBase
 {
 
 	public:
-		virtual void OnFrame() override {};
+		virtual void OnFrame() override;
 		virtual void CheckForNewTask() override {};
 
 	public:
+
+		ResourceManager() { UpdateState() }
+		~ResourceManager() {}
+
+
 		const ResourcePack& GetCurrentResourceState() const { return mRatePerMin; }
 		const ResourcePack& GetResourceRate() const { return mCurrent; }
 		const ResourcePack& GetReserved() const { return mReserved; }
@@ -87,6 +92,9 @@ class ResourceManager : public ManagerBase
 
 		// only for debug 
 		void CheckState(); 
+
+	private:
+		ResourceManager& operator=(const ResourceManager &o){ DEBUG_CHECK(false); /*you try to do bad things */ }
 	private:
 		int mLastUpdateFrame;
 		ResourcePack mCurrent, mReserved, mRatePerMin;
