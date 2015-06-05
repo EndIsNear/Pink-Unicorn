@@ -5,14 +5,13 @@
 #include "ManagerBase.h"
 #include "TasksQueue.h"
 #include <assert.h>
+#include "ResourceTasks.h"
 
 struct ResourcePack
 {
 	int minerals;
 	int gas;
 	int supply; // this will represent Total - Used supply
-
-	ResourcePack() : minerals(0) , gas(0), supply(0){}
 
 	bool IsCorrectState()
 	{
@@ -58,8 +57,12 @@ struct ResourcePack
 		return *this;
 	}
 
-};
 
+	static ResourcePack NeedFor(BWAPI::UnitType &type)
+	{
+		return ResourcePack{ type.mineralPrice(), type.gasPrice(), type.supplyRequired() };
+	}
+};
 
 class ResourceManager : public ManagerBase
 {
@@ -68,15 +71,25 @@ class ResourceManager : public ManagerBase
 		virtual void OnFrame() override;
 		virtual void CheckForNewTask() override {};
 
-	public:
+	
 
 		ResourceManager() { UpdateState(); }
 		~ResourceManager() {}
+
+	protected:
+
+//		void ExecuteReserveTask(ReserveResourceTask &task);
+//		void ExecuteReleaseTask(ReleaseResourceTask &task);
 
 
 		const ResourcePack& GetCurrentResourceState() const { return mRatePerMin; }
 		const ResourcePack& GetResourceRate() const { return mCurrent; }
 		const ResourcePack& GetReserved() const { return mReserved; }
+
+		unsigned GetFreeMineral(){ return mCurrent.minerals - mReserved.minerals; }
+		unsigned GetFreeGas(){ return mCurrent.gas - mReserved.gas; }
+		unsigned GetFreeSupply(){ return  mCurrent.supply- mReserved.supply; }
+
 
 		bool  Reserve(const ResourcePack &rRecPack);
 		bool	CanReserve(const ResourcePack &rRecPack);
@@ -85,7 +98,7 @@ class ResourceManager : public ManagerBase
 		//this will get actual information from bwapi and recalc ResourceRate
 		void UpdateState();
 
-		void ReleaseReserve(const ResourcePack & rRecPack);
+		void Release(const ResourcePack & rRecPack);
 	private:
 		void UpdateCurrentResource();
 		void UpdateResourceRate(const ResourcePack & rPrevPack);
@@ -100,6 +113,8 @@ class ResourceManager : public ManagerBase
 		ResourcePack mCurrent, mReserved, mRatePerMin;
 
 };
+
+
 
 
 #endif

@@ -85,17 +85,20 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PinkUnicorn.cpp" />
-    <ClCompile Include="ProducingManager.cpp" />
+    <ClCompile Include="ProductionManagerImp.cpp" />
     <ClCompile Include="ResourceManagerImp.cpp" />
-    <ClCompile Include="TaskQueue.cpp" />
+    <ClCompile Include="TaskQueueImp.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AllTasks.h" />
     <ClInclude Include="DebugStuff.h" />
     <ClInclude Include="ManagerBase.h" />
     <ClInclude Include="PinkUnicorn.h" />
-    <ClInclude Include="ProducingTasks.h" />
+    <ClInclude Include="ProductionManager.h" />
+    <ClInclude Include="ProductionTasks.h" />
     <ClInclude Include="ResourceManager.h" />
+    <ClInclude Include="ResourceTasks.h" />
     <ClInclude Include="TasksQueue.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>

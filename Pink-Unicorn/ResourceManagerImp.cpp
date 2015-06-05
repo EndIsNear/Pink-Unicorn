@@ -1,5 +1,5 @@
 #include "ResourceManager.h"
-
+#include "TasksQueue.h"
 using namespace BWAPI;
 
 
@@ -8,6 +8,21 @@ void ResourceManager::OnFrame()
 {
 	if (Broodwar->getFrameCount() - mLastUpdateFrame > 25) // every second
 		UpdateState();
+
+	TaskList tasks; 
+	TaskQueue::GetInstance().GetTasksWithType(Task::Resource, tasks);
+	tasks.sort(Task::CompTask);
+	/*
+	for (auto t : tasks)
+	{
+		if (ReleaseResourceTask *temp = dynamic_cast<ReleaseResourceTask*>(t.get()))
+			ExecuteReleaseTask(*temp);
+		else if (ReserveResourceTask*temp = dynamic_cast<ReserveResourceTask*>(t.get()))
+			ExecuteReserveTask(*temp);
+		else
+			assert(false);
+	}
+	*/
 }
 
 bool ResourceManager::Reserve(const ResourcePack &rRecPack)
@@ -75,9 +90,25 @@ void ResourceManager::CheckState()
 }
 
 
-void ResourceManager::ReleaseReserve(const ResourcePack & rRecPack)
+void ResourceManager::Release(const ResourcePack & rRecPack)
 {
 	mReserved -= rRecPack;
 }
 
+/*
+void ResourceManager::ExecuteReserveTask(ReserveResourceTask &task)
+{
+	if (CanReserve(task.mResPack))
+	{
+		Reserve(task.mResPack);
+		task.isComplete = true;
+	}
+}
 
+void ResourceManager::ExecuteReleaseTask(ReleaseResourceTask &task)
+{
+	Release(task.mResPack);
+	task.isComplete = true;
+}
+
+*/
