@@ -34,6 +34,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TaskQueueImp.cpp">
+	</ClCompile>
     <ClCompile Include="MapManagerImpl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
