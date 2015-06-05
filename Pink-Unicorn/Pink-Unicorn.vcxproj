@@ -84,6 +84,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MapManagerImpl.cpp" />
     <ClCompile Include="PinkUnicorn.cpp" />
     <ClCompile Include="ProductionManagerImp.cpp" />
     <ClCompile Include="ResourceManagerImp.cpp" />
@@ -94,6 +95,7 @@
     <ClInclude Include="AllTasks.h" />
     <ClInclude Include="DebugStuff.h" />
     <ClInclude Include="ManagerBase.h" />
+    <ClInclude Include="MapManager.h" />
     <ClInclude Include="PinkUnicorn.h" />
     <ClInclude Include="ProductionManager.h" />
     <ClInclude Include="ProductionTasks.h" />
