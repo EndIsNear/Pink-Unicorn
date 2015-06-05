@@ -12,7 +12,7 @@ void ResourceManager::OnFrame()
 	TaskList tasks; 
 	TaskQueue::GetInstance().GetTasksWithType(Task::Resource, tasks);
 	tasks.sort(Task::CompTask);
-	/*
+	
 	for (auto t : tasks)
 	{
 		if (ReleaseResourceTask *temp = dynamic_cast<ReleaseResourceTask*>(t.get()))
@@ -22,7 +22,7 @@ void ResourceManager::OnFrame()
 		else
 			assert(false);
 	}
-	*/
+	
 }
 
 bool ResourceManager::Reserve(const ResourcePack &rRecPack)
@@ -95,7 +95,7 @@ void ResourceManager::Release(const ResourcePack & rRecPack)
 	mReserved -= rRecPack;
 }
 
-/*
+
 void ResourceManager::ExecuteReserveTask(ReserveResourceTask &task)
 {
 	if (CanReserve(task.mResPack))
@@ -111,4 +111,4 @@ void ResourceManager::ExecuteReleaseTask(ReleaseResourceTask &task)
 	task.isComplete = true;
 }
 
-*/
+

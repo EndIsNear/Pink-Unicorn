@@ -4,65 +4,8 @@
 #include "DebugStuff.h"
 #include "ManagerBase.h"
 #include "TasksQueue.h"
-#include <assert.h>
 #include "ResourceTasks.h"
 
-struct ResourcePack
-{
-	int minerals;
-	int gas;
-	int supply; // this will represent Total - Used supply
-
-	bool IsCorrectState()
-	{
-		DEBUG_CHECK(minerals >= 0 && gas >= 0 && supply >= 0);
-		if (minerals >= 0 && gas >= 0 && supply >= 0)
-			return true;
-		return false;
-	}
-
-	ResourcePack& operator+=(const ResourcePack &rh)
-	{
-		DEBUG_EXP(IsCorrectState());
-
-		minerals += rh.minerals;
-		gas += rh.gas;
-		supply += rh.supply;
-
-		DEBUG_EXP(IsCorrectState());
-		return *this;
-	}
-
-	ResourcePack& operator-=(const ResourcePack &rh)
-	{
-		DEBUG_EXP(IsCorrectState());
-
-		minerals -= rh.minerals;
-		gas -= rh.gas;
-		supply -= rh.supply;
-
-		DEBUG_EXP(IsCorrectState());
-		return *this;
-	}
-
-	ResourcePack& operator/=(int frames)
-	{
-		DEBUG_EXP(IsCorrectState());
-
-		minerals /= frames;
-		gas /= frames;
-		supply /= frames;
-
-		DEBUG_EXP(IsCorrectState());
-		return *this;
-	}
-
-
-	static ResourcePack NeedFor(BWAPI::UnitType &type)
-	{
-		return ResourcePack{ type.mineralPrice(), type.gasPrice(), type.supplyRequired() };
-	}
-};
 
 class ResourceManager : public ManagerBase
 {
@@ -78,8 +21,8 @@ class ResourceManager : public ManagerBase
 
 	protected:
 
-//		void ExecuteReserveTask(ReserveResourceTask &task);
-//		void ExecuteReleaseTask(ReleaseResourceTask &task);
+		void ExecuteReserveTask(ReserveResourceTask &task);
+		void ExecuteReleaseTask(ReleaseResourceTask &task);
 
 
 		const ResourcePack& GetCurrentResourceState() const { return mRatePerMin; }

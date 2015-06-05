@@ -1,22 +1,20 @@
 #ifndef PINK_UNICORN_RESOURCE_TASKS_H
 #define PINK_UNICORN_RESOURCE_TASKS_H
 
-#include "ResourceManager.h"
+#include "ResourcePack.h"
 #include "TasksQueue.h"
 
-/*
+struct ResourcePack;
 
 class ReserveResourceTask : public Task
 {
 	public:
-		ReserveResourceTask(ResourcePack &rPack, Task::Priority pri) 
+		ReserveResourceTask(ResourcePack &rPack, Task::Priority pri)
 		{
 			mResPack = rPack;
 			mPriority = pri;
 			mType = Task::Resource;
 		}
-
-	public:
 		ResourcePack mResPack;
 };
 
@@ -33,5 +31,5 @@ public:
 public:
 	ResourcePack mResPack;
 };
-*/
+
 #endif
