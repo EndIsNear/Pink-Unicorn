@@ -3,7 +3,7 @@
 #include <BWAPI.h>
 
 #include "Utils.h"
-
+#include "MapManager.h"
 class PinkUnicorn
 {
 public:
