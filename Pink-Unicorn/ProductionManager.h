@@ -2,6 +2,7 @@
 #define PINK_UNICORN_PRODUCE_MANAGER_H
 
 #include "ManagerBase.h"
+#include "ProductionTasks.h"
 
 class ProduceManager : public ManagerBase
 {
@@ -12,7 +13,7 @@ public:
 
 
 private:
-
+	void ExecuteSingleUnitProduction(SingleUnitProduction &task);
 
 private:
 	void FiltratePosibleTasks(TaskList &l) const;

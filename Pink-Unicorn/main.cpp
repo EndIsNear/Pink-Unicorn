@@ -10,6 +10,11 @@
 
 #include "PinkUnicorn.h"
 #include "Utils.h"
+#include "ProductionManager.h"
+#include "ResourceManager.h"
+#include "ProductionTasks.h"
+#include "TasksQueue.h"
+
 
 using namespace BWAPI;
 
@@ -23,6 +28,7 @@ void reconnect()
 		std::this_thread::sleep_for(std::chrono::milliseconds{ 1000 });
 	}
 }
+
 
 int main(int argc, const char* argv[])
 {
@@ -47,6 +53,13 @@ int main(int argc, const char* argv[])
 
 		PinkUnicorn aiModule;
 
+
+		ProduceManager ProdMan;
+		ResourceManager ResMan;
+		BWAPI::UnitType ProbeType(BWAPI::UnitTypes::Protoss_Probe);
+		SingleUnitProduction OneProbeTask(ProbeType, Task::MAX );
+
+		int Workers = 0;
 		while (Broodwar->isInGame())
 		{
 			for (auto &e : Broodwar->getEvents())
@@ -99,6 +112,15 @@ int main(int argc, const char* argv[])
 					aiModule.onUnitComplete(e.getUnit());
 					break;
 				}
+			}
+			ProdMan.OnFrame();
+			ResMan.OnFrame();
+
+			if (Workers < 5)
+			{
+				
+				TaskQueue::GetInstance().push_back(TaskPtr(new SingleUnitProduction(OneProbeTask)));
+				Workers++;
 			}
 
 			drawStartPos();
