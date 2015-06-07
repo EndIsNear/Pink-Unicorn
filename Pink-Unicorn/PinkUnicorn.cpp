@@ -33,6 +33,10 @@ void PinkUnicorn::onFrame()
 			if (Broodwar->self()->supplyUsed() >= 18 && !scouting)
 			{
 				std::cout << "Start scouting.\n";
+				std::cout << "Map width: " << Broodwar->mapWidth() << std::endl;
+				std::cout << "Map height: " << Broodwar->mapHeight() << std::endl;
+				
+
 				bool isFirst = false;
 				for (auto& SL : Broodwar->getStartLocations())
 				{
@@ -85,6 +89,16 @@ void PinkUnicorn::onStart()
 	m_SupplyProviderType = Broodwar->self()->getRace().getSupplyProvider();
 	Broodwar->setCommandOptimizationLevel(2);
 
+	/*auto start = Broodwar->self()->getStartLocation();
+	//std::cout << start;
+	auto nexpos = MapManager::GetInstance().SuggestBuildingLocation(UnitTypes::Protoss_Nexus);
+	//std::cout << nexpos;
+	auto nexreg = Broodwar->getRegionAt(Position(nexpos));
+	auto center = nexreg->getCenter();
+	std::cout << nexreg->getID();
+	Broodwar->drawCircle(CoordinateType::Map, center.x, center.y, 12, Colors::Red, true);
+	Broodwar->drawTextMap(nexreg->getCenter(), "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaa");*/
+
 	// Check if this is a replay
 	if (Broodwar->isReplay())
 	{
@@ -97,7 +111,7 @@ void PinkUnicorn::onStart()
 	}
 
 	//set game speed
-	Broodwar->setLocalSpeed(0);
+	Broodwar->setLocalSpeed(1);
 	//->setFrameSkip(5);
 }
 

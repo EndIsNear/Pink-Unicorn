@@ -124,10 +124,34 @@ int main(int argc, const char* argv[])
 			}
 
 			drawStartPos();
-			drawRegions(0);
+			//drawRegions(0);
 			drawStats();
 			//drawBullets();
 			//drawVisibilityData();
+
+			auto path = MapManager::getPath(Position(Broodwar->self()->getStartLocation()), Position(TilePosition(116, 11)));
+			auto path1 = MapManager::getPath(Position(Broodwar->self()->getStartLocation()), Position(TilePosition(8, 82)));
+			for (auto p : path)
+			{
+				auto region = Broodwar->getRegionAt(p);
+				auto center = region->getCenter();
+				Broodwar->drawCircle(CoordinateType::Map, center.x, center.y, 12, Colors::Red);
+				
+			}
+
+			auto cp = MapManager::GetInstance().GetChokepointBetween(Position(Broodwar->self()->getStartLocation()), Position(TilePosition(116, 11)));
+			Broodwar->drawCircle(CoordinateType::Map, cp.x, cp.y, 28, Colors::Brown);
+
+			for (auto p : path1)
+			{
+				auto region = Broodwar->getRegionAt(p);
+				auto center = region->getCenter();
+				Broodwar->drawCircle(CoordinateType::Map, center.x, center.y, 12, Colors::Cyan);
+				
+			}
+
+			cp = MapManager::GetInstance().GetChokepointBetween(Position(Broodwar->self()->getStartLocation()), Position(TilePosition(8, 82)));
+			Broodwar->drawCircle(CoordinateType::Map, cp.x, cp.y, 28, Colors::Green);
 
 			BWAPI::BWAPIClient.update();
 			if (!BWAPI::BWAPIClient.isConnected())

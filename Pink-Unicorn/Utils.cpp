@@ -11,6 +11,7 @@ void drawStartPos()
 	for (auto& SL : Broodwar->getStartLocations())
 	{
 		Broodwar->drawEllipseMap(SL.x * 32 + 64, SL.y * 32 + 56, 72, 44, Colors::Green);
+		std::cout << SL << std::endl;
 		Broodwar->drawTextMap(SL.x * 32 + 48, SL.y * 32 + 48, "Start Position");
 	}
 }
@@ -23,7 +24,7 @@ void drawRegions(int minPriority)
 		{
 			auto center = reg->getCenter();
 			Broodwar->drawCircle(CoordinateType::Map, center.x, center.y, 12, Colors::Green);
-			Broodwar->drawTextMap(center, "%d %d IsHG:%d", reg->getID(), reg->getDefensePriority(), reg->isHigherGround());
+			Broodwar->drawTextMap(center, "ID:%d GID: %d DP:%d IW:%d", reg->getID(), reg->getRegionGroupID(), reg->getDefensePriority(), reg->isAccessible());
 		}
 	}
 }

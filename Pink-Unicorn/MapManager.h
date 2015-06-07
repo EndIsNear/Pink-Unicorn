@@ -16,7 +16,7 @@ class MapManager : public ManagerBase
 public:
 	virtual void OnFrame() override {};
 	virtual void CheckForNewTask() override {};
-
+	static Position::list getPath(Position& s, Position& e);
 	static MapManager& GetInstance()
 	{
 		if (!insta)
@@ -29,7 +29,7 @@ public:
 	const MapRegionContainer& GetExpansionLocations();
 	const MapRegion& GetClosestExpansionTo(const MapRegion& location);
 	const MapRegionContainer& GetChokepoints();
-	const MapRegion& GetClosestChokepointTo(const MapRegion& location);
+	const Position& MapManager::GetChokepointBetween(Position& start, Position& end);
 	const MapRegion& GetBaseExit();
 	const MapRegion& SuggestBuildingLocation(UnitType type);
 private:
