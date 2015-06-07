@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Tasks">
+      <UniqueIdentifier>{97b6747f-c2a5-4d3b-ace4-c4a6c10b8bd6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -27,7 +30,16 @@
     <ClCompile Include="ResourceManagerImp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ProductionManagerImp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="MapManagerImpl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourcePack.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskQueueImp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -50,7 +62,22 @@
     <ClInclude Include="DebugStuff.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ProductionManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AllTasks.h">
+      <Filter>Header Files\Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="ProductionTasks.h">
+      <Filter>Header Files\Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceTasks.h">
+      <Filter>Header Files\Tasks</Filter>
+    </ClInclude>
     <ClInclude Include="MapManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourcePack.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

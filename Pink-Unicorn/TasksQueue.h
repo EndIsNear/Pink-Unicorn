@@ -2,23 +2,59 @@
 #define PINK_UNICORN_TASKS_QUEUE
 
 #include <vector>
+#include <memory>
+#include <list>
+
+class Task;
+
+typedef std::shared_ptr<Task> TaskPtr;
+typedef std::list<TaskPtr> TaskList;
+
+
 
 typedef void (*TaskCallBack) ();
-struct Task
+class Task
 {
-	enum TaskType
+public:
+	enum Type
 	{
+		Produce,
+		Resource
 	};
-	enum TaskPriority
+	enum Priority
 	{
+		MAX = 0,
+		HIGH = 1,
+		MID = 2,
+		LOW = 3
 	};
-	TaskType mType;
-	TaskPriority mPriority;
+
+protected:
+	Task() { ID = GetNextID(); }
+	static 
+		unsigned GetNextID() { return nextID++; }
+public:
+	Type mType;
+	Priority mPriority;
 	TaskCallBack mCallBack;
-	unsigned TimeLimit;
+	unsigned mTimeLimit; // in frames
+	unsigned ID;
+	TaskList SubTasks;
+	bool isComplete;
+	bool isDenied;
+public:
+	virtual ~Task(){};
+
+	static bool CompTask(const TaskPtr& first, const TaskPtr& second)
+	{
+		return first->mPriority < second->mPriority;
+	}
+private:
+	static unsigned nextID;
 };
 
-class TaskQueue : public std::vector<Task*>
+
+class TaskQueue : public TaskList
 {
 private:
 	TaskQueue(){};
@@ -35,6 +71,10 @@ public:
 		}
 		return *inst;
 	}
+
+	void ReleaseCompleteTasks();
+	void GetTasksWithPriority(Task::Priority pri, TaskList& output);
+	void GetTasksWithType(Task::Type type, TaskList& output);
 
 	~TaskQueue()
 	{
