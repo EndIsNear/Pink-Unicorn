@@ -10,21 +10,22 @@
 class SingleUnitProduction : public Task
 {
 	public:
-		SingleUnitProduction(BWAPI::UnitType &Type, Task::Priority pri);
+		SingleUnitProduction(BWAPI::UnitType &Type, Task::Priority pri)
+		{
+			mPriority = pri;
+			Task::mType = Task::Produce;
+			mType = Type;
+			mTimeLimit = -1;
+			isDenied = false;
+			isComplete = false;
+			mCallBack = NULL;
+		}
 
-	protected:
+
+	public:
 		BWAPI::UnitType mType;
 };
 
-SingleUnitProduction::SingleUnitProduction(BWAPI::UnitType &Type, Task::Priority pri) : mType(Type)
-{
-	mPriority = pri;
-	mType = Task::Produce;
-	mTimeLimit = -1;
-	isDenied = false;
-	isComplete = false;
-	mCallBack = NULL;
-}
 
 
 

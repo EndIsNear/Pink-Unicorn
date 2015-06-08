@@ -8,6 +8,7 @@ bool scouting = false;
 
 void PinkUnicorn::onFrame()
 {
+	
 	//dispaly FPS
 	Broodwar->drawTextScreen(200, 0, "FPS: %d", Broodwar->getFPS());
 	Broodwar->drawTextScreen(200, 20, "Average FPS: %f", Broodwar->getAverageFPS());
@@ -15,7 +16,7 @@ void PinkUnicorn::onFrame()
 	if (Broodwar->isReplay() || Broodwar->isPaused() || !Broodwar->self() ||
 		Broodwar->getFrameCount() % Broodwar->getLatencyFrames() != 0)
 		return;
-
+	/*
 	for (auto &u : Broodwar->self()->getUnits())
 	{
 		if (!u->exists())
@@ -71,6 +72,7 @@ void PinkUnicorn::onFrame()
 		}
 		//m_WorkerManager->Refresh();
 	}
+	*/
 }
 
 

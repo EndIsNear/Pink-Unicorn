@@ -16,7 +16,12 @@ class ResourceManager : public ManagerBase
 
 	
 
-		ResourceManager() { UpdateState(); }
+		ResourceManager()
+			:
+			mCurrent(ResourcePack::ZeroTag()),
+			mReserved(ResourcePack::ZeroTag()),
+			mRatePerMin(ResourcePack::ZeroTag())
+		{ UpdateState(); }
 		~ResourceManager() {}
 
 	protected:
