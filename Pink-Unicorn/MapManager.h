@@ -8,8 +8,7 @@
 #include <assert.h>
 
 using namespace BWAPI;
-typedef TilePosition MapRegion;
-typedef TilePosition::list MapRegionContainer;
+typedef Position::list MapRegionContainer;
 
 class MapManager : public ManagerBase
 {
@@ -26,12 +25,12 @@ public:
 		return *insta;
 	}
 
-	const MapRegionContainer& GetExpansionLocations();
-	const MapRegion& GetClosestExpansionTo(const MapRegion& location);
-	const MapRegionContainer& GetChokepoints();
-	const Position& MapManager::GetChokepointBetween(Position& start, Position& end);
-	const MapRegion& GetBaseExit();
-	const MapRegion& SuggestBuildingLocation(UnitType type);
+	Position::list GetExpansionLocations();
+	Position GetClosestExpansionTo(const Position& location);
+	Position::list GetChokepoints();
+	Position GetChokepointBetween(Position& start, Position& end);
+	Position GetBaseExit();
+	Position SuggestBuildingLocation(UnitType type);
 private:
 	MapManager(){};
 	MapManager& operator = (const MapManager &m){};
@@ -42,14 +41,18 @@ private:
 
 	void CalculateExpansions()
 	{
-		expansions = Broodwar->getStartLocations();
+		auto starts = Broodwar->getStartLocations();
+		for (auto p : starts)
+		{
+			expansions.push_back((Position)p);
+		}
 	}
 	void CalculateChokepoints();
-	const MapRegion& SuggestPylon();
-	const MapRegion& SuggestNexus();
-	const MapRegion& SuggestCanon();
-	const MapRegion& SuggestAssimilator();
-	const MapRegion& SuggestRegular();
+	Position SuggestPylon();
+	Position SuggestNexus();
+	Position SuggestCanon();
+	Position SuggestAssimilator();
+	Position SuggestRegular();
 };
 
 

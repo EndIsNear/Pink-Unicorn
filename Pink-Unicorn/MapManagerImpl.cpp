@@ -4,12 +4,12 @@ using namespace BWAPI;
 
 MapManager * MapManager::insta = NULL;
 
-const MapRegionContainer& MapManager::GetExpansionLocations()
+Position::list MapManager::GetExpansionLocations()
 {
 	return this->expansions;
 }
 
-const MapRegion& MapManager::GetClosestExpansionTo(const MapRegion& location)
+Position MapManager::GetClosestExpansionTo(const Position& location)
 {
 	assert(expansions.size() != 0);
 
@@ -23,12 +23,12 @@ const MapRegion& MapManager::GetClosestExpansionTo(const MapRegion& location)
 	}
 	return result;
 }
-const MapRegionContainer& MapManager::GetChokepoints()
+Position::list MapManager::GetChokepoints()
 {
 	return chokepoints;
 }
 
-const Position& MapManager::GetChokepointBetween(Position& start, Position& end)
+Position MapManager::GetChokepointBetween(Position& start, Position& end)
 {
 	auto path = getPath(start, end);
 
@@ -43,25 +43,28 @@ const Position& MapManager::GetChokepointBetween(Position& start, Position& end)
 	return Position(Broodwar->self()->getStartLocation());
 }
 
-const MapRegion& MapManager::SuggestBuildingLocation(UnitType type)
+Position MapManager::SuggestBuildingLocation(UnitType type)
 {
 	auto startLocation = Broodwar->self()->getStartLocation();
 	auto res = Broodwar->getBuildLocation(type, startLocation);
 	std::cout << res;
-	return res;
+	return Position(res);
 }
+
+struct node;
+typedef std::shared_ptr<node> pNode;
 
 struct node
 {
 	Region current;
-	node* previous;
+	pNode previous;
 	node() : current(NULL), previous(NULL){};
-	node(Region c, node* p) : current(c), previous(p){};
+	node(Region c, pNode p) : current(c), previous(p){};
 	int getID() { return current->getID(); }
 	bool operator==(const node& rhs) { return current->getID() == rhs.current->getID(); }
 };
 
-Position::list assemblePath( node* end)
+Position::list assemblePath(pNode end)
 {
 	auto cur = end;
 	Position::list result = Position::list();
@@ -74,10 +77,10 @@ Position::list assemblePath( node* end)
 
 Position::list MapManager::getPath(Position& start, Position& end)
 {
-	std::queue<node*> work;
+	std::queue<pNode> work;
 	std::map<int, bool> visited;
-	auto s = new node(Broodwar->getRegionAt(start), NULL);
-	auto e = new node(Broodwar->getRegionAt(end), NULL);
+	auto s = pNode(new node(Broodwar->getRegionAt(start), NULL));
+	auto e = pNode(new node(Broodwar->getRegionAt(end), NULL));
 
 	work.push(s);
 	visited.insert(std::make_pair(s->getID(), true));
@@ -87,14 +90,15 @@ Position::list MapManager::getPath(Position& start, Position& end)
 		auto cur = work.front();
 		work.pop();
 
-		if (*cur == *e)
+		if (*(cur.get()) == *e)
 		{
 			return assemblePath(cur);
 		}
 
-		for (Region c : cur->current->getNeighbors())
+		auto neighbours = cur->current->getNeighbors();
+		for (Region c : neighbours)
 		{
-			auto a = new node(c, cur);
+			auto a = pNode(new node(c, cur));
 			if (c->getRegionGroupID() == cur->current->getRegionGroupID() &&
 				visited.find(c->getID()) == visited.end()) // if they are walkable neighbour and not visited
 			{
