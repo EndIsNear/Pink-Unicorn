@@ -11,7 +11,7 @@ Position::list MapManager::GetExpansionLocations()
 
 Position MapManager::GetClosestExpansionTo(const Position& location)
 {
-	assert(expansions.size() != 0);
+	DEBUG_CHECK(expansions.size() != 0);
 
 	auto result = expansions[0];
 	for (auto exp : expansions)

@@ -14,16 +14,18 @@ class SingleUnitProduction : public Task
 		{
 			mPriority = pri;
 			Task::mType = Task::Produce;
-			mType = Type;
+			mUnitType = Type;
 			mTimeLimit = -1;
 			mIsDenied = false;
 			mIsComplete = false;
+			mAllIsCommit = false;
 			mCallBack = NULL;
 		}
 
 
 	public:
-		BWAPI::UnitType mType;
+		bool mAllIsCommit; // all sub tasks are  commit
+		BWAPI::UnitType mUnitType;
 };
 
 

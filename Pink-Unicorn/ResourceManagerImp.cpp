@@ -8,31 +8,28 @@ void ResourceManager::OnFrame()
 {
 	if (Broodwar->getFrameCount() - mLastUpdateFrame > 25) // every second
 		UpdateState();
-
-	TaskList tasks; 
-	TaskQueue::GetInstance().GetTasksWithType(Task::Resource, tasks);
-	tasks.sort(Task::CompTask);
-	
-	for (auto t : tasks)
+	else
 	{
-		if (ReleaseResourceTask *temp = dynamic_cast<ReleaseResourceTask*>(t.get()))
-			ExecuteReleaseTask(*temp);
-		else if (ReserveResourceTask*temp = dynamic_cast<ReserveResourceTask*>(t.get()))
-			ExecuteReserveTask(*temp);
-		else
-			assert(false);
+		TaskList tasks;
+		TaskQueue::GetInstance().GetTasksWithType(Task::Resource, tasks);
+		//tasks.sort(Task::CompTask);
+
+		for (auto t : tasks)
+		{
+			if (ReleaseResourceTask *temp = dynamic_cast<ReleaseResourceTask*>(t.get()))
+				ExecuteReleaseTask(*temp);
+			else if (ReserveResourceTask*temp = dynamic_cast<ReserveResourceTask*>(t.get()))
+				ExecuteReserveTask(*temp);
+			else
+				DEBUG_CHECK(false);
+		}
 	}
-	
 }
 
 bool ResourceManager::Reserve(const ResourcePack &rRecPack)
 {
-	if (CanReserve(rRecPack))
-	{
 		mReserved += rRecPack;
 		return true;
-	}
-	return false;
 }
 
 
@@ -70,11 +67,12 @@ void ResourceManager::UpdateResourceRate(const ResourcePack & rPrevPack)
 
 
 	int currenFrame = Broodwar->getFrameCount();
-
-	ResourcePack mRatePerMin = mCurrent;
+	/* to do implement 
+	mRatePerMin = mCurrent;
 	mRatePerMin -= rPrevPack;
 
 	mRatePerMin /= currenFrame - mLastUpdateFrame;
+	*/
 	mLastUpdateFrame = currenFrame;
 
 
@@ -93,11 +91,13 @@ void ResourceManager::CheckState()
 void ResourceManager::Release(const ResourcePack & rRecPack)
 {
 	mReserved -= rRecPack;
+	UpdateCurrentResource();
 }
 
 
 void ResourceManager::ExecuteReserveTask(ReserveResourceTask &task)
 {
+	DEBUG_CHECK(task.mIsComplete == false);
 	if (CanReserve(task.mResPack))
 	{
 		Reserve(task.mResPack);
@@ -107,6 +107,7 @@ void ResourceManager::ExecuteReserveTask(ReserveResourceTask &task)
 
 void ResourceManager::ExecuteReleaseTask(ReleaseResourceTask &task)
 {
+	DEBUG_CHECK(task.mIsComplete == false);
 	Release(task.mResPack);
 	task.mIsComplete = true;
 }

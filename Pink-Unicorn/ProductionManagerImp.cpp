@@ -1,7 +1,7 @@
 #include "ProductionManager.h"
 #include "ResourceTasks.h"
 #include "TasksQueue.h"
-#include "assert.h"
+#include "DebugStuff.h"
 using namespace BWAPI;
 using namespace Filter;
 
@@ -12,38 +12,42 @@ void ProduceManager::OnFrame()
 	
 	TaskList tasks;
 	TaskQueue::GetInstance().GetTasksWithType(Task::Produce, tasks);
-	tasks.sort(Task::CompTask);
+	//tasks.sort(Task::CompTask);
 
 	for (auto t : tasks)
 	{
 		if (SingleUnitProduction *temp = dynamic_cast<SingleUnitProduction*>(t.get()))
 			ExecuteSingleUnitProduction(*temp);
 		else
-			assert(false);
+			DEBUG_CHECK(false);
 	}
 }
 
 
 void ProduceManager::ExecuteSingleUnitProduction(SingleUnitProduction &task)
 {
-	if (task.mSubTasks.empty())
+	if (task.mAllIsCommit && Task::AllSubTasksAreDone(task.mSubTasks) && !task.mIsComplete)
 	{
 		auto self = Broodwar->self();
-		auto ProductionUnits = self->getUnits().getUnitsInRadius(1000000, (GetType == task.mType.whatBuilds().first) && IsIdle);
+		auto ProductionUnits = self->getUnits().getUnitsInRadius(1000000, (GetType == task.mUnitType.whatBuilds().first) && IsIdle);
 		if (!ProductionUnits.empty())
 		{
 			auto pu = ProductionUnits.begin();
-			(*pu)->train(task.mType);
+			if(	(*pu)->train(task.mUnitType))
+				task.mIsComplete = true;
 			// release resource
-			ResourcePack rp = ResourcePack::NeedFor(task.mType);
+			ResourcePack rp = ResourcePack::NeedFor(task.mUnitType);
 			TaskQueue::GetInstance().push_back(TaskPtr( new ReleaseResourceTask(rp)));
 		}
 	}
-	else
+	else if (task.mAllIsCommit == false)
 	{
 		// for now just reserve resource
-		ResourcePack rp = ResourcePack::NeedFor(task.mType);
-		TaskQueue::GetInstance().push_back(TaskPtr(new ReserveResourceTask(rp, task.mPriority)));
+		ResourcePack rp = ResourcePack::NeedFor(task.mUnitType);
+		auto reserve = TaskPtr(new ReserveResourceTask(rp, task.mPriority));
+		TaskQueue::GetInstance().push_back(reserve);
+		task.mSubTasks.push_back(reserve);
+		task.mAllIsCommit = true;
 	}
 }
 

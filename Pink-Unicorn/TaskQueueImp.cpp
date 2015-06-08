@@ -7,9 +7,15 @@ TaskQueue* TaskQueue::inst = NULL;
 
 void TaskQueue::ReleaseCompleteTasks()
 {
-	for (auto it = begin(); it != end(); it++)
+	if (empty())
+		return;
+	for (auto it = begin(); it != end();)
+	{
 		if ((*it)->mIsComplete)
-				erase(it);
+			it = erase(it);
+		else
+			it++;
+	}
 }
 
 void TaskQueue::GetTasksWithPriority(Task::Priority pri, TaskList& output)
@@ -19,10 +25,10 @@ void TaskQueue::GetTasksWithPriority(Task::Priority pri, TaskList& output)
 			output.push_back(it);
 }
 
-void  TaskQueue::GetTasksWithType(Task::Type type, TaskList& output)
+void  TaskQueue::GetTasksWithType(Task::Type type, TaskList& output, bool bOnlyNotComplete /*true by default*/)
 {
 	for (auto it : *this)
-	if (it->mType == type)
+	if (it->mType == type && it->mIsComplete == !bOnlyNotComplete)
 			output.push_back(it);
 }
 

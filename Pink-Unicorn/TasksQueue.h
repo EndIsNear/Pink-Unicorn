@@ -49,6 +49,16 @@ public:
 	{
 		return first->mPriority < second->mPriority;
 	}
+
+	static bool AllSubTasksAreDone(TaskList &l)
+	{
+		for (auto it : l)
+		{
+			if (it->mIsComplete == false)
+				return false;
+		}
+		return true;
+	}
 private:
 	static unsigned nextID;
 };
@@ -74,7 +84,7 @@ public:
 
 	void ReleaseCompleteTasks();
 	void GetTasksWithPriority(Task::Priority pri, TaskList& output);
-	void GetTasksWithType(Task::Type type, TaskList& output);
+	void GetTasksWithType(Task::Type type, TaskList& output, bool bOnlyNotComplete = true);
 
 	~TaskQueue()
 	{

@@ -83,6 +83,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DebugStuff.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MapManagerImpl.cpp" />
     <ClCompile Include="PinkUnicorn.cpp" />

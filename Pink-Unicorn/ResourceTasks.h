@@ -14,6 +14,7 @@ class ReserveResourceTask : public Task
 			mResPack = rPack;
 			mPriority = pri;
 			mType = Task::Resource;
+			mIsComplete = false;
 		}
 		ResourcePack mResPack;
 };
@@ -26,6 +27,7 @@ public:
 		mResPack = rPack;
 		mPriority = Task::MAX;
 		mType = Task::Resource;
+		mIsComplete = false;
 	}
 
 public:
