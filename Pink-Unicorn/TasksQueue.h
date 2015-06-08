@@ -19,7 +19,8 @@ public:
 	enum Type
 	{
 		Produce,
-		Resource
+		Resource,
+		Explore
 	};
 	enum Priority
 	{

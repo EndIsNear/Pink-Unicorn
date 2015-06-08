@@ -90,6 +90,7 @@
     <ClCompile Include="ProductionManagerImp.cpp" />
     <ClCompile Include="ResourceManagerImp.cpp" />
     <ClCompile Include="ResourcePack.cpp" />
+    <ClCompile Include="SpyManagerImpl.cpp" />
     <ClCompile Include="TaskQueueImp.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
@@ -104,6 +105,7 @@
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="ResourcePack.h" />
     <ClInclude Include="ResourceTasks.h" />
+    <ClInclude Include="SpyManager.h" />
     <ClInclude Include="TasksQueue.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
