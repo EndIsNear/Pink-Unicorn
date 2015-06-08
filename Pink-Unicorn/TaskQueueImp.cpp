@@ -8,7 +8,7 @@ TaskQueue* TaskQueue::inst = NULL;
 void TaskQueue::ReleaseCompleteTasks()
 {
 	for (auto it = begin(); it != end(); it++)
-		if ((*it)->isComplete)
+		if ((*it)->mIsComplete)
 				erase(it);
 }
 

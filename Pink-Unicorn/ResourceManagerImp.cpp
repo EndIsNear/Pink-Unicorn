@@ -101,14 +101,14 @@ void ResourceManager::ExecuteReserveTask(ReserveResourceTask &task)
 	if (CanReserve(task.mResPack))
 	{
 		Reserve(task.mResPack);
-		task.isComplete = true;
+		task.mIsComplete = true;
 	}
 }
 
 void ResourceManager::ExecuteReleaseTask(ReleaseResourceTask &task)
 {
 	Release(task.mResPack);
-	task.isComplete = true;
+	task.mIsComplete = true;
 }
 
 

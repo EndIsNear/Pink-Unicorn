@@ -86,7 +86,6 @@ void PinkUnicorn::onStart()
 
 	// Set the command optimization level so that common commands can be grouped
 	// and reduce the bot's APM (Actions Per Minute).
-	m_SupplyProviderType = Broodwar->self()->getRace().getSupplyProvider();
 	Broodwar->setCommandOptimizationLevel(2);
 
 	/*auto start = Broodwar->self()->getStartLocation();

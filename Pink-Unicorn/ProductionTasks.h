@@ -16,8 +16,8 @@ class SingleUnitProduction : public Task
 			Task::mType = Task::Produce;
 			mType = Type;
 			mTimeLimit = -1;
-			isDenied = false;
-			isComplete = false;
+			mIsDenied = false;
+			mIsComplete = false;
 			mCallBack = NULL;
 		}
 

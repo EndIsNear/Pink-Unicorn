@@ -1,7 +1,7 @@
 #ifndef DEBUG_STUFF_H
 #define DEBUG_STUFF_H
 
-#include <assert.h>#include <assert.h>
+#include <assert.h>
 
 #define DEBUG
 #ifdef DEBUG

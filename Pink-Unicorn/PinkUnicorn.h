@@ -26,9 +26,6 @@ public:
 	virtual void onUnitRenegade(BWAPI::Unit unit);
 	virtual void onSaveGame(std::string gameName);
 	virtual void onUnitComplete(BWAPI::Unit unit);
-private:
-	//size_t			m_FrameCnt;
-	BWAPI::UnitType m_SupplyProviderType;
 };
 
 #endif //OUR_AI_MODULE_H

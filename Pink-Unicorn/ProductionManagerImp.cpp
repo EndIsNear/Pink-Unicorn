@@ -26,7 +26,7 @@ void ProduceManager::OnFrame()
 
 void ProduceManager::ExecuteSingleUnitProduction(SingleUnitProduction &task)
 {
-	if (task.SubTasks.empty())
+	if (task.mSubTasks.empty())
 	{
 		auto self = Broodwar->self();
 		auto ProductionUnits = self->getUnits().getUnitsInRadius(1000000, (GetType == task.mType.whatBuilds().first) && IsIdle);

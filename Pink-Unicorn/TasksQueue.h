@@ -30,7 +30,7 @@ public:
 	};
 
 protected:
-	Task() { ID = GetNextID(); }
+	Task() { mID = GetNextID(); }
 	static 
 		unsigned GetNextID() { return nextID++; }
 public:
@@ -38,10 +38,10 @@ public:
 	Priority mPriority;
 	TaskCallBack mCallBack;
 	unsigned mTimeLimit; // in frames
-	unsigned ID;
-	TaskList SubTasks;
-	bool isComplete;
-	bool isDenied;
+	unsigned mID;
+	TaskList mSubTasks;
+	bool mIsComplete;
+	bool mIsDenied;
 public:
 	virtual ~Task(){};
 
