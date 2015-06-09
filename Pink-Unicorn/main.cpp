@@ -14,6 +14,7 @@
 #include "ResourceManager.h"
 #include "ProductionTasks.h"
 #include "TasksQueue.h"
+#include "WorkerManager.h"
 
 
 using namespace BWAPI;
