@@ -12,7 +12,7 @@
 class SingleUnitProduction : public Task
 {
 	public:
-		SingleUnitProduction(BWAPI::UnitType &Type, Task::Priority pri)
+		SingleUnitProduction(BWAPI::UnitType Type, Task::Priority pri)
 		{
 			mPriority = pri;
 			Task::mType = Task::Produce;
@@ -22,7 +22,6 @@ class SingleUnitProduction : public Task
 
 
 	public:
-		BWAPI::Unit mUnit;
 		bool mAllIsCommit; // all sub tasks are  commit
 		BWAPI::UnitType mUnitType;
 };

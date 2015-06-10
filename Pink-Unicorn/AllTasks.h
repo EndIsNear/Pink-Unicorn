@@ -1,9 +1,8 @@
 #ifndef ALL_TASKS_H
 #define ALL_TASKS_H
 
+#include "ProductionTasks.h"
+#include "ResourceTasks.h"
+#include "TakeUnitControlsTasks.h"
 
-class ReserveResourceTask;
-class ReleaseResourceTask;
-class SingleUnitProduction;
-class UnitsProductionTask;
 #endif

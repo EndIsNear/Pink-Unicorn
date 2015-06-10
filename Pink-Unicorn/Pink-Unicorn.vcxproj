@@ -84,8 +84,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DebugStuff.cpp" />
+    <ClCompile Include="GameAnalyzer.cpp" />
+    <ClCompile Include="MacroManagerImp.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="MapManagerImpl.cpp" />
     <ClCompile Include="PinkUnicorn.cpp" />
     <ClCompile Include="ProductionManagerImp.cpp" />
     <ClCompile Include="ResourceManagerImp.cpp" />
@@ -98,6 +99,8 @@
   <ItemGroup>
     <ClInclude Include="AllTasks.h" />
     <ClInclude Include="DebugStuff.h" />
+    <ClInclude Include="GameAnalyzer.h" />
+    <ClInclude Include="MacroManager.h" />
     <ClInclude Include="ManagerBase.h" />
     <ClInclude Include="MapManager.h" />
     <ClInclude Include="PinkUnicorn.h" />
