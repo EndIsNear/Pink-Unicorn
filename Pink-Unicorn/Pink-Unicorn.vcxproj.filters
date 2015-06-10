@@ -91,6 +91,7 @@
     </ClInclude>
     <ClInclude Include="TakeUnitControlsTasks.h">
       <Filter>Header Files\Tasks</Filter>
+   </ClInclude>
     <ClInclude Include="SpyManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
