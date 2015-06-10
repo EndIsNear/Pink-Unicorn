@@ -67,10 +67,6 @@ public:
 	{
 		mPriority = pri;
 		Task::mType = Task::Explore;
-		mTimeLimit = -1;
-		mIsDenied = false;
-		mIsComplete = false;
-		mCallBack = NULL;
 
 		this->location = l;
 		this->unit = controlUnit;
