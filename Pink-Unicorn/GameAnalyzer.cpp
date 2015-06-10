@@ -35,14 +35,13 @@ double GameAnalyzer::GetArmyValue()
 	return pureVal * BalanceKoef;
 }
 
-double GetMapControlValue()
+double GameAnalyzer::GetMapControlValue()
 {
 	return 1.;
 }
 
-
 const double maxPosibleSypply = 200.;
-double GetSupplyValue()
+double GameAnalyzer::GetSupplyValue()
 {
 	double currTotal = Broodwar->self()->supplyTotal();
 	double currUsed = Broodwar->self()->supplyTotal();

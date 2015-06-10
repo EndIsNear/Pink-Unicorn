@@ -109,6 +109,7 @@
     <ClInclude Include="PinkUnicorn.h" />
     <ClInclude Include="ProductionManager.h" />
     <ClInclude Include="ProductionTasks.h" />
+    <ClInclude Include="RequirementTasks.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="ResourcePack.h" />
     <ClInclude Include="ResourceTasks.h" />

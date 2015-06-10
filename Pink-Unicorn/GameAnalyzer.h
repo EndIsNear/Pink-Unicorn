@@ -20,7 +20,7 @@ class GameAnalyzer
 		double GetMapControlValue();
 		double GetSupplyValue();
 	private:
-		int GetWorkersInProductionTasks() ;
+		int GetWorkersInProductionTasks();
 private:
 	static  GameAnalyzer *inst;
 	

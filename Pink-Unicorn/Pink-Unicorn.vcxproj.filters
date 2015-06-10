@@ -128,5 +128,8 @@
     <ClInclude Include="BuildingTasks.h">
       <Filter>Header Files\Tasks</Filter>
     </ClInclude>
+    <ClInclude Include="RequirementTasks.h">
+      <Filter>Header Files\Tasks</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
