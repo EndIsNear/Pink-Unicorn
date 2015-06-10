@@ -11,7 +11,6 @@
 #include "PinkUnicorn.h"
 
 
-
 using namespace BWAPI;
 
 bool show_bullets;

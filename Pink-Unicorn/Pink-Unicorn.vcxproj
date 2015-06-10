@@ -90,8 +90,10 @@
     <ClCompile Include="ProductionManagerImp.cpp" />
     <ClCompile Include="ResourceManagerImp.cpp" />
     <ClCompile Include="ResourcePack.cpp" />
+    <ClCompile Include="SpyManagerImpl.cpp" />
     <ClCompile Include="TaskQueueImp.cpp" />
     <ClCompile Include="Utils.cpp" />
+    <ClCompile Include="WorkerManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AllTasks.h" />
@@ -105,8 +107,10 @@
     <ClInclude Include="ResourcePack.h" />
     <ClInclude Include="ResourceTasks.h" />
     <ClInclude Include="TakeUnitControlsTasks.h" />
+    <ClInclude Include="SpyManager.h" />
     <ClInclude Include="TasksQueue.h" />
     <ClInclude Include="Utils.h" />
+    <ClInclude Include="WorkerManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
