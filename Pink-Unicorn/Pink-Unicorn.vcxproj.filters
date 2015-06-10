@@ -83,5 +83,8 @@
     <ClInclude Include="ResourcePack.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TakeUnitControlsTasks.h">
+      <Filter>Header Files\Tasks</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

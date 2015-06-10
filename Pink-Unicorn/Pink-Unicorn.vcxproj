@@ -104,6 +104,7 @@
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="ResourcePack.h" />
     <ClInclude Include="ResourceTasks.h" />
+    <ClInclude Include="TakeUnitControlsTasks.h" />
     <ClInclude Include="TasksQueue.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>

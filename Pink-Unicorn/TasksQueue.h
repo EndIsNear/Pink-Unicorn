@@ -12,33 +12,43 @@ typedef std::list<TaskPtr> TaskList;
 
 
 
-typedef void (*TaskCallBack) ();
+typedef void(*TaskCallBack) (TaskPtr);
 class Task
 {
 public:
 	enum Type
 	{
+		None,
 		Produce,
-		Resource
+		Resource,
+		TakeControl
 	};
 	enum Priority
 	{
 		MAX = 0,
 		HIGH = 1,
 		MID = 2,
-		LOW = 3
+		LOW = 3,
+		Zero = UINT_MAX
 	};
 
 protected:
-	Task() { mID = GetNextID(); }
+	Task() :
+		mID(GetNextID()),
+		mType(None),
+		mPriority(Zero),
+		mCallBack(NULL),
+		mIsComplete(false),
+		mIsDenied(false){}
 	static 
 		unsigned GetNextID() { return nextID++; }
 public:
+	const unsigned mID;
+
 	Type mType;
 	Priority mPriority;
 	TaskCallBack mCallBack;
-	unsigned mTimeLimit; // in frames
-	unsigned mID;
+//	unsigned mTimeLimit; // in frames
 	TaskList mSubTasks;
 	bool mIsComplete;
 	bool mIsDenied;

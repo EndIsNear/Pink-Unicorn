@@ -2,12 +2,12 @@
 #define OUR_AI_MODULE_H
 #include <BWAPI.h>
 
-#include "Utils.h"
-#include "MapManager.h"
+#include "ManagerBase.h"
 class PinkUnicorn
 {
+	ManagersCollection mManagers;
 public:
-	PinkUnicorn(){}
+	PinkUnicorn();
 	~PinkUnicorn(){}
 	virtual void onStart();
 	virtual void onEnd(bool isWinner);

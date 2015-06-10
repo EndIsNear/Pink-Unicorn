@@ -1,4 +1,12 @@
 #include "PinkUnicorn.h"
+
+#include "Utils.h"
+#include "MapManager.h"
+#include "ProductionManager.h"
+#include "ResourceManager.h"
+#include "ProductionTasks.h"
+#include "TasksQueue.h"
+
 #include <iostream>
 
 using namespace BWAPI;
@@ -6,12 +14,25 @@ using namespace Filter;
 
 bool scouting = false;
 
+
+PinkUnicorn::PinkUnicorn()
+{
+	mManagers.push_back(new ResourceManager);
+	mManagers.push_back(new ProduceManager);
+	mManagers.push_back(new MapManager());
+}
+
+
 void PinkUnicorn::onFrame()
 {
 	
 	//dispaly FPS
-	Broodwar->drawTextScreen(200, 0, "FPS: %d", Broodwar->getFPS());
-	Broodwar->drawTextScreen(200, 20, "Average FPS: %f", Broodwar->getAverageFPS());
+	//Broodwar->drawTextScreen(200, 0, "FPS: %d", Broodwar->getFPS());
+	//Broodwar->drawTextScreen(200, 20, "Average FPS: %f", Broodwar->getAverageFPS());
+	
+
+	for (auto m : mManagers)
+		m->OnFrame();
 
 	if (Broodwar->isReplay() || Broodwar->isPaused() || !Broodwar->self() ||
 		Broodwar->getFrameCount() % Broodwar->getLatencyFrames() != 0)
@@ -309,11 +330,15 @@ void PinkUnicorn::onUnitRenegade(BWAPI::Unit unit)
 
 void PinkUnicorn::onSaveGame(std::string gameName)
 {
+
 	Broodwar << "The game was saved to \"" << gameName << "\"" << std::endl;
 }
 
 void PinkUnicorn::onUnitComplete(BWAPI::Unit unit)
 {
+	for (auto m : mManagers)
+		m->OnUnitComplete(unit);
+
 	if (Broodwar->isReplay())
 	{
 		return;

@@ -10,6 +10,7 @@ class ProduceManager : public ManagerBase
 public:
 	virtual void OnFrame() override;
 	virtual void CheckForNewTask() override{};
+	virtual void OnUnitComplete(BWAPI::Unit unit) override;
 
 
 private:

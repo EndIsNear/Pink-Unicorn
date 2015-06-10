@@ -7,6 +7,8 @@
 
 #include "TasksQueue.h"
 
+
+
 class SingleUnitProduction : public Task
 {
 	public:
@@ -15,15 +17,12 @@ class SingleUnitProduction : public Task
 			mPriority = pri;
 			Task::mType = Task::Produce;
 			mUnitType = Type;
-			mTimeLimit = -1;
-			mIsDenied = false;
-			mIsComplete = false;
 			mAllIsCommit = false;
-			mCallBack = NULL;
 		}
 
 
 	public:
+		BWAPI::Unit mUnit;
 		bool mAllIsCommit; // all sub tasks are  commit
 		BWAPI::UnitType mUnitType;
 };

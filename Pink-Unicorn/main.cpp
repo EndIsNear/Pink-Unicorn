@@ -9,11 +9,7 @@
 
 
 #include "PinkUnicorn.h"
-#include "Utils.h"
-#include "ProductionManager.h"
-#include "ResourceManager.h"
-#include "ProductionTasks.h"
-#include "TasksQueue.h"
+
 
 
 using namespace BWAPI;
@@ -54,12 +50,6 @@ int main(int argc, const char* argv[])
 		PinkUnicorn aiModule;
 
 
-		ProduceManager ProdMan;
-		ResourceManager ResMan;
-		BWAPI::UnitType ProbeType(BWAPI::UnitTypes::Protoss_Probe);
-		SingleUnitProduction OneProbeTask(ProbeType, Task::MAX );
-
-		int Workers = 0;
 		while (Broodwar->isInGame())
 		{
 			for (auto &e : Broodwar->getEvents())
@@ -113,22 +103,15 @@ int main(int argc, const char* argv[])
 					break;
 				}
 			}
-			ProdMan.OnFrame();
-			ResMan.OnFrame();
 
-			if (Workers < 5)
-			{
-				
-				TaskQueue::GetInstance().push_back(TaskPtr(new SingleUnitProduction(OneProbeTask)));
-				Workers++;
-			}
 
-			drawStartPos();
+
+		//	drawStartPos();
 			//drawRegions(0);
-			drawStats();
+		//	drawStats();
 			//drawBullets();
 			//drawVisibilityData();
-
+			/*
 			auto path = MapManager::getPath(Position(Broodwar->self()->getStartLocation()), Position(TilePosition(116, 11)));
 			auto path1 = MapManager::getPath(Position(Broodwar->self()->getStartLocation()), Position(TilePosition(8, 82)));
 			for (auto p : path)
@@ -149,10 +132,10 @@ int main(int argc, const char* argv[])
 				Broodwar->drawCircle(CoordinateType::Map, center.x, center.y, 12, Colors::Cyan);
 				
 			}
-
+			
 			cp = MapManager::GetInstance().GetChokepointBetween(Position(Broodwar->self()->getStartLocation()), Position(TilePosition(8, 82)));
 			Broodwar->drawCircle(CoordinateType::Map, cp.x, cp.y, 28, Colors::Green);
-
+			*/
 			BWAPI::BWAPIClient.update();
 			if (!BWAPI::BWAPIClient.isConnected())
 			{

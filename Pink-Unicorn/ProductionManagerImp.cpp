@@ -2,6 +2,7 @@
 #include "ResourceTasks.h"
 #include "TasksQueue.h"
 #include "DebugStuff.h"
+#include "TakeUnitControlsTasks.h"
 using namespace BWAPI;
 using namespace Filter;
 
@@ -21,6 +22,14 @@ void ProduceManager::OnFrame()
 		else
 			DEBUG_CHECK(false);
 	}
+}
+
+void ProduceManager::OnUnitComplete(BWAPI::Unit unit)
+{
+	if (unit->getType().isWorker())
+		TaskQueue::GetInstance().push_back(TaskPtr(new TakeWorkerTask(unit)));
+	if (unit->getType().isBuilding() == false)
+		TaskQueue::GetInstance().push_back(TaskPtr( new TakeArmyUnitTask(unit)));
 }
 
 

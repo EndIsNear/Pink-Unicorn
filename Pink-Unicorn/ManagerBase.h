@@ -10,6 +10,9 @@ class ManagerBase
 public:
 	virtual void OnFrame() = 0;
 	virtual void CheckForNewTask() = 0;
+	virtual void OnUnitComplete(BWAPI::Unit unit){}
 };
 
+
+typedef std::vector<ManagerBase*> ManagersCollection;
 #endif
