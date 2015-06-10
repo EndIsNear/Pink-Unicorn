@@ -22,6 +22,7 @@ public:
 		Produce,
 		Resource,
 		TakeControl,
+		GetControl,
 		Explore
 	};
 	enum Priority

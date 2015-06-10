@@ -40,6 +40,15 @@ double GetMapControlValue()
 	return 1.;
 }
 
+
+const double maxPosibleSypply = 200.;
+double GetSupplyValue()
+{
+	double currTotal = Broodwar->self()->supplyTotal();
+	double currUsed = Broodwar->self()->supplyTotal();
+	return currTotal / currUsed - std::max(currTotal / maxPosibleSypply, 0.15);// max  15 % advance
+}
+
 int GameAnalyzer::GetWorkersInProductionTasks()
 {
 	TaskList l;

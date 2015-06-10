@@ -3,8 +3,7 @@
 
 #include "DebugStuff.h"
 #include "ManagerBase.h"
-#include "TasksQueue.h"
-#include "ResourceTasks.h"
+
 
 
 class ResourceManager : public ManagerBase

@@ -83,6 +83,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BuildingManagerImp.cpp" />
     <ClCompile Include="DebugStuff.cpp" />
     <ClCompile Include="GameAnalyzer.cpp" />
     <ClCompile Include="MacroManagerImp.cpp" />
@@ -98,6 +99,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AllTasks.h" />
+    <ClInclude Include="BuildingManager.h" />
+    <ClInclude Include="BuildingTasks.h" />
     <ClInclude Include="DebugStuff.h" />
     <ClInclude Include="GameAnalyzer.h" />
     <ClInclude Include="MacroManager.h" />

@@ -18,6 +18,7 @@ class GameAnalyzer
 		double GetUnitProductionValue();
 		double GetArmyValue();
 		double GetMapControlValue();
+		double GetSupplyValue();
 	private:
 		int GetWorkersInProductionTasks() ;
 private:
