@@ -51,7 +51,7 @@ double GameAnalyzer::GetSupplyValue()
 int GameAnalyzer::GetWorkersInProductionTasks()
 {
 	TaskList l;
-	TaskQueue::GetInstance().GetTasksWithType(Task::Produce, l, false);
+	TaskQueue::GetInstance().GetTasksWithType(Task::Produce, l, true);
 	int cnt = 0;
 	for (auto it : l)
 	{

@@ -11,9 +11,12 @@ class BuildingTask : public Task
 		BuildingTask(BWAPI::UnitType Type, Task::Priority pri, BWAPI::Position *pos = NULL)
 		{
 			mPriority = pri;
-			Task::mType = Task::Produce;
+			Task::mType = Task::Building;
 			mUnitType = Type;
-			mpPosition = PositionPtr(new BWAPI::Position(*pos));
+			if (pos)
+				mpPosition = PositionPtr(new BWAPI::Position(*pos));
+			else
+				mpPosition = PositionPtr(NULL);
 			mAllIsCommit = false;
 			mExecutor = NULL;
 		}

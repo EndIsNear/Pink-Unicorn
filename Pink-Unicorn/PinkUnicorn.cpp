@@ -7,6 +7,8 @@
 #include "WorkerManager.h"
 #include "ProductionTasks.h"
 #include "TasksQueue.h"
+#include "MacroManager.h"
+#include "BuildingManager.h"
 
 #include <iostream>
 
@@ -21,6 +23,8 @@ PinkUnicorn::PinkUnicorn()
 	mManagers.push_back(new WorkerManager);
 	mManagers.push_back(new ResourceManager);
 	mManagers.push_back(new ProduceManager);
+	mManagers.push_back(new MacroManager);
+	mManagers.push_back(new BuildingManager);
 //	mManagers.push_back(new &MapManager::GetInstance());
 }
 

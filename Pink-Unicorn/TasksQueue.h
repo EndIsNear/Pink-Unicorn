@@ -24,6 +24,7 @@ public:
 		TakeControl,
 		GetControl,
 		Requirement,
+		Building,
 		Explore
 	};
 	enum Priority
