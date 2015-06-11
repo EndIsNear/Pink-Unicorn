@@ -7,21 +7,27 @@ using namespace BWAPI;
 
 void WorkerManager::OnStart()
 {
-	for (auto &u : Broodwar->self()->getUnits())
+	for (auto &unit : Broodwar->self()->getUnits())
 	{
-		if (u->getType().isResourceDepot())
+		if (unit->getType().isResourceDepot())
 		{
-			AddUnit(u);
+			AddUnit(unit);
 		}
 	}
 
-	for (auto &u : Broodwar->self()->getUnits())
+	auto& crnMineral = m_expands[0].minerals.begin();
+
+	for (auto &unit : Broodwar->self()->getUnits())
 	{
-		if (u->getType().isWorker())
+		if (unit->getType().isWorker())
 		{
-			if (u->isIdle())
+			if (unit->gather(*crnMineral))
 			{
-				AddUnit(u);
+				crnMineral++;
+			}
+			else
+			{
+				Broodwar << Broodwar->getLastError() << std::endl;
 			}
 		}
 	}
@@ -31,15 +37,25 @@ void WorkerManager::AddUnit(Unit unit)
 {
 	if (unit->getType().isWorker())
 	{
-		auto nearBases = unit->getUnitsInRadius(128, Filter::IsResourceDepot);
+		auto nearBase = unit->getClosestUnit(Filter::IsResourceDepot);
 		for (auto& expand : m_expands)
 		{
-			for (auto& nearBase : nearBases)
+			if (expand.base == nearBase)
 			{
-				if (expand.base == nearBase)
-					expand.workers.insert(unit);
+				expand.workers.insert(unit);
+				//TODO: check max workers per mineral/gas
+				if (unit->gather(unit->getClosestUnit(Filter::IsMineralField || Filter::IsRefinery)))
+				{
+					return;
+				}
+				else
+				{
+					Broodwar << Broodwar->getLastError() << std::endl;
+				}
 			}
 		}
+
+		
 	}
 	else if (unit->getType().isResourceDepot())
 	{
