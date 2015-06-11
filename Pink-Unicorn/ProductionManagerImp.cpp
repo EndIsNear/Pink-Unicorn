@@ -26,9 +26,12 @@ void ProduceManager::OnFrame()
 
 void ProduceManager::OnUnitComplete(BWAPI::Unit unit)
 {
+	if (Broodwar->getFrameCount() < 25)
+		return;
+
 	if (unit->getType().isWorker())
 		TaskQueue::GetInstance().push_back(TaskPtr(new TakeWorkerTask(unit)));
-	if (unit->getType().isBuilding() == false)
+	else if (unit->getType().isBuilding() == false)
 		TaskQueue::GetInstance().push_back(TaskPtr( new TakeArmyUnitTask(unit)));
 }
 

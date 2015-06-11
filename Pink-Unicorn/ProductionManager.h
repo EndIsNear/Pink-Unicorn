@@ -11,7 +11,6 @@ public:
 	virtual void CheckForNewTask() override{};
 	virtual void OnUnitComplete(BWAPI::Unit unit) override;
 
-
 private:
 	void ExecuteSingleUnitProduction(SingleUnitProduction &task);
 
