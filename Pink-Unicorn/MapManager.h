@@ -16,7 +16,15 @@ public:
 	virtual void OnFrame() override {};
 	virtual void CheckForNewTask() override {};
 	static Position::list getPath(Position& s, Position& e);
-	MapManager(){};
+	static MapManager& GetInstance()
+	{
+		if (!insta)
+		{
+			insta = new MapManager;
+		}
+		return *insta;
+	}
+
 
 	Position::list GetExpansionLocations();
 	Position GetClosestExpansionTo(const Position& location);
@@ -25,7 +33,7 @@ public:
 	Position GetBaseExit();
 	Position SuggestBuildingLocation(UnitType type);
 private:
-	
+	MapManager(){};
 	MapManager& operator = (const MapManager &m){};
 	static MapManager * insta;
 

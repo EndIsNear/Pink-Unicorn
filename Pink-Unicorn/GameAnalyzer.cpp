@@ -35,9 +35,17 @@ double GameAnalyzer::GetArmyValue()
 	return pureVal * BalanceKoef;
 }
 
-double GetMapControlValue()
+double GameAnalyzer::GetMapControlValue()
 {
 	return 1.;
+}
+
+const double maxPosibleSypply = 200.;
+double GameAnalyzer::GetSupplyValue()
+{
+	double currTotal = Broodwar->self()->supplyTotal();
+	double currUsed = Broodwar->self()->supplyTotal();
+	return currTotal / currUsed - std::max(currTotal / maxPosibleSypply, 0.15);// max  15 % advance
 }
 
 int GameAnalyzer::GetWorkersInProductionTasks()

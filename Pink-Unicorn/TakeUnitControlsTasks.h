@@ -11,14 +11,13 @@ using namespace BWAPI;
 class TakeUnitTask : public Task
 {
 public:
-	TakeUnitTask(BWAPI::Unit &u/*this is pointer but just in case*/) : unit(u)
+	TakeUnitTask(BWAPI::Unit &u/*this is pointer but just in case*/) : mUnit(u)
 	{
 		mPriority = Task::MAX;
 		mType = Task::TakeControl;
-		mIsComplete = false;
 	}
 public:
-	BWAPI::Unit unit;
+	BWAPI::Unit mUnit;
 };
 
 class TakeWorkerTask : public TakeUnitTask
@@ -31,6 +30,21 @@ class TakeArmyUnitTask : public TakeUnitTask
 {
 	public:
 		TakeArmyUnitTask(BWAPI::Unit &u) :TakeUnitTask(u){}
+};
+
+class GetUnitTask : public Task
+{
+	public:
+		GetUnitTask(BWAPI::UnitType unitType, BWAPI::Unit		*pUnit, Task::Priority pri)
+		{
+			mPriority = pri;
+			mType = Task::GetControl;
+			mIsComplete = false;
+			mUnitType = unitType;
+			mpUnit = pUnit;
+		}
+		BWAPI::UnitType mUnitType;
+		BWAPI::Unit		*mpUnit; 
 };
 
 #endif

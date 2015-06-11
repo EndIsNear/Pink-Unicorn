@@ -4,5 +4,6 @@
 #include "ProductionTasks.h"
 #include "ResourceTasks.h"
 #include "TakeUnitControlsTasks.h"
-
+#include "BuildingTasks.h"
+#include "RequirementTasks.h"
 #endif

@@ -21,7 +21,7 @@ PinkUnicorn::PinkUnicorn()
 	mManagers.push_back(new WorkerManager);
 	mManagers.push_back(new ResourceManager);
 	mManagers.push_back(new ProduceManager);
-	mManagers.push_back(new MapManager());
+//	mManagers.push_back(new &MapManager::GetInstance());
 }
 
 
