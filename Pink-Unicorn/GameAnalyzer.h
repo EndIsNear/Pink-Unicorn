@@ -21,6 +21,7 @@ class GameAnalyzer
 		double GetSupplyValue();
 	private:
 		int GetWorkersInProductionTasks();
+		int GetSupplyInProductionTasks();
 private:
 	static  GameAnalyzer *inst;
 	

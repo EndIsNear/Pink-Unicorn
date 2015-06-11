@@ -16,7 +16,7 @@ void BuildingManager::OnFrame()
 void BuildingManager::ExecuteBuildTask(BuildingTask &task)
 {
 	TaskQueue &tq = TaskQueue::GetInstance();
-	if (task.mExecutor)
+	if (task.mExecutor )
 	{
 		if (task.mbTryToReserved &&  Task::AllSubTasksAreDone(task.mSubTasks) && !task.mIsComplete)
 		{
@@ -32,8 +32,9 @@ void BuildingManager::ExecuteBuildTask(BuildingTask &task)
 			task.mSubTasks.push_back(reserve);
 		}
 	}
-	else
+	else if (task.mbExecutorTaskIsCommit)
 	{
 		tq.push_back(TaskPtr(new GetUnitTask(BWAPI::UnitTypes::Protoss_Probe, &task.mExecutor, task.mPriority)));
+		task.mbExecutorTaskIsCommit = true;
 	}
 }

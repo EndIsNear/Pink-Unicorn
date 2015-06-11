@@ -17,14 +17,16 @@ class BuildingTask : public Task
 				mpPosition = PositionPtr(new BWAPI::Position(*pos));
 			else
 				mpPosition = PositionPtr(NULL);
-			mAllIsCommit = false;
+			mbAllIsCommit = false;
+			mbExecutorTaskIsCommit = false;
 			mExecutor = NULL;
 		}
 
 
 public:
 	PositionPtr mpPosition;
-	bool mAllIsCommit; // all sub tasks are  commit
+	bool mbAllIsCommit; // all sub tasks are  commit
+	bool mbExecutorTaskIsCommit;
 	BWAPI::UnitType mUnitType;
 	bool mbTryToReserved;
 	BWAPI::Unit mExecutor;

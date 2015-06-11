@@ -40,18 +40,36 @@ double GameAnalyzer::GetMapControlValue()
 	return 1.;
 }
 
-const double maxPosibleSypply = 200.;
+const double maxPosibleSypply = 400.;
 double GameAnalyzer::GetSupplyValue()
 {
-	double currTotal = Broodwar->self()->supplyTotal();
+	double currTotal = Broodwar->self()->supplyTotal() + GetSupplyInProductionTasks();
 	double currUsed = Broodwar->self()->supplyTotal();
 	return currTotal / currUsed - std::max(currTotal / maxPosibleSypply, 0.15);// max  15 % advance
 }
 
+int GameAnalyzer::GetSupplyInProductionTasks()
+{
+	TaskList l;
+	TaskQueue::GetInstance().GetTasksWithType(Task::Building, l);
+	int cnt = 0;
+	for (auto it : l)
+	{
+		if (BuildingTask *temp = dynamic_cast<BuildingTask*>(it.get()))
+		if (temp->mUnitType == BWAPI::UnitTypes::Protoss_Pylon)
+			cnt++;
+	}
+	return cnt;
+}
+
+
+
+
+
 int GameAnalyzer::GetWorkersInProductionTasks()
 {
 	TaskList l;
-	TaskQueue::GetInstance().GetTasksWithType(Task::Produce, l, true);
+	TaskQueue::GetInstance().GetTasksWithType(Task::Produce, l);
 	int cnt = 0;
 	for (auto it : l)
 	{
