@@ -1,20 +1,29 @@
 #ifndef WORKER_MANAGER_H
 #define WORKER_MANAGER_H
 
-using namespace BWAPI;
-
 class WorkerManager : public ManagerBase
 {
 public:
-	WorkerManager();
-	~WorkerManager();
-	virtual void OnFrame();
-	virtual void CheckForNewTask();
+	WorkerManager()
+	{
+	
+	}
+	~WorkerManager()
+	{
+	
+	}
+	virtual void OnFrame(){}
+	virtual void CheckForNewTask(){}
+
+	void OnStart();
 
 	//adding worker, base or gas station
-	void AddUnit(Unit unit);
+	//first unit have to be base
+	void AddUnit(Unit);
 	//release the nearest worker
-	Unit ReleaseWorker(Position pos);
+	//Unit ReleaseWorker(Position pos){}
+
+	void CheckForNewWorker(){}
 
 	void SetWorkPerMin(size_t workers)
 	{
@@ -31,8 +40,10 @@ private:
 		Unit base;
 		//workers for this base
 		Unitset workers;
-		//near gas stations
-		Unitset gasStations;
+
+		//res neat to the base
+		Unitset gasStations;//stations and geysers
+		Unitset minerals;
 	};
 
 	size_t m_workers;

@@ -4,6 +4,7 @@
 #include "MapManager.h"
 #include "ProductionManager.h"
 #include "ResourceManager.h"
+#include "WorkerManager.h"
 #include "ProductionTasks.h"
 #include "TasksQueue.h"
 
@@ -17,6 +18,7 @@ bool scouting = false;
 
 PinkUnicorn::PinkUnicorn()
 {
+	mManagers.push_back(new WorkerManager);
 	mManagers.push_back(new ResourceManager);
 	mManagers.push_back(new ProduceManager);
 	mManagers.push_back(new MapManager());
@@ -133,6 +135,9 @@ void PinkUnicorn::onStart()
 	//set game speed
 	Broodwar->setLocalSpeed(1);
 	//->setFrameSkip(5);
+
+	//WorkerManager onStart
+	dynamic_cast<WorkerManager *>(mManagers[0])->OnStart();
 }
 
 void PinkUnicorn::onEnd(bool isWinner)
