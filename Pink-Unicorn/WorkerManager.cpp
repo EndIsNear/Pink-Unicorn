@@ -38,14 +38,29 @@ void WorkerManager::OnFrame()
 {
 	TaskList tasks;
 	TaskQueue::GetInstance().GetTasksWithType(Task::TakeControl, tasks);
-
+	TaskQueue::GetInstance().GetTasksWithType(Task::GetControl, tasks);
 	for (auto task : tasks)
 	{
-		auto& tmp = dynamic_cast<TakeWorkerTask*>(task.get())->mUnit;
-		if (tmp->isCompleted())
+		if (auto tmp = dynamic_cast<TakeWorkerTask*>(task.get()))
 		{
-			AddUnit(tmp);
-			task->mIsComplete = true;
+			if (tmp->mUnit->isCompleted())
+			{
+				AddUnit(tmp->mUnit);
+				task->mIsComplete = true;
+			}
+		}
+		else if (GetUnitTask * tmp = dynamic_cast<GetUnitTask*>(task.get()))
+		{
+			// todo sa6o si svyr6i rabotata 
+			if (tmp->mUnitType.isWorker())
+			{
+				// basi grozni kod
+				auto worker = m_expands[0].workers.begin();
+				auto w = *worker;
+				*tmp->mpUnit = w;
+				m_expands[0].workers.erase(0);
+				tmp->mIsComplete = true;
+			}
 		}
 	}
 }

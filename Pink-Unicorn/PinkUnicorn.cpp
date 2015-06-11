@@ -43,6 +43,8 @@ void PinkUnicorn::onFrame()
 	if (Broodwar->isReplay() || Broodwar->isPaused() || !Broodwar->self() ||
 		Broodwar->getFrameCount() % Broodwar->getLatencyFrames() != 0)
 		return;
+
+	TaskQueue::GetInstance().ReleaseCompleteTasks();
 	/*
 	for (auto &u : Broodwar->self()->getUnits())
 	{

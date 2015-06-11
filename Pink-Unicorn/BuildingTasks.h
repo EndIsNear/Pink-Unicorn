@@ -20,6 +20,7 @@ class BuildingTask : public Task
 			mbAllIsCommit = false;
 			mbExecutorTaskIsCommit = false;
 			mExecutor = NULL;
+			mbTryToReserved = false;
 		}
 
 
