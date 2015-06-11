@@ -12,7 +12,7 @@ public:
 	{
 	
 	}
-	virtual void OnFrame(){}
+	virtual void OnFrame();
 	virtual void CheckForNewTask(){}
 
 	void OnStart();
