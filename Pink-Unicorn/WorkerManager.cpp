@@ -5,18 +5,6 @@ using namespace BWAPI;
 
 #include "WorkerManager.h"
 
-void WorkerManager::OnFrame()
-{
-	TaskList tasks;
-	TaskQueue::GetInstance().GetTasksWithType(Task::Produce, tasks);
-
-	for (auto task : tasks)
-	{
-		if (task->mType == Task::TakeControl)
-			AddUnit(dynamic_cast<TakeWorkerTask*>(task.get())->mUnit);
-	}
-}
-
 void WorkerManager::OnStart()
 {
 	for (auto &unit : Broodwar->self()->getUnits())
@@ -36,11 +24,28 @@ void WorkerManager::OnStart()
 			if (unit->gather(*crnMineral))
 			{
 				crnMineral++;
+				m_expands[0].workers.insert(unit);
 			}
 			else
 			{
 				Broodwar << Broodwar->getLastError() << std::endl;
 			}
+		}
+	}
+}
+
+void WorkerManager::OnFrame()
+{
+	TaskList tasks;
+	TaskQueue::GetInstance().GetTasksWithType(Task::TakeControl, tasks);
+
+	for (auto task : tasks)
+	{
+		auto& tmp = dynamic_cast<TakeWorkerTask*>(task.get())->mUnit;
+		if (tmp->isCompleted())
+		{
+			AddUnit(tmp);
+			task->mIsComplete = true;
 		}
 	}
 }
@@ -56,6 +61,14 @@ void WorkerManager::AddUnit(Unit unit)
 			{
 				expand.workers.insert(unit);
 				//TODO: check max workers per mineral/gas
+				//for (auto& mineral : expand.minerals)
+				//{
+				//	if (mineral->isBeingGathered())
+				//	{
+				//		unit->gather(mineral);
+				//		return;
+				//	}
+				//}
 				if (unit->gather(unit->getClosestUnit(Filter::IsMineralField)))
 				{
 					return;
