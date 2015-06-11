@@ -12,6 +12,7 @@ public:
 	virtual void OnFrame() = 0;
 	virtual void CheckForNewTask() = 0;
 	virtual void OnUnitComplete(BWAPI::Unit unit){}
+	virtual void OnStart(){};
 };
 
 

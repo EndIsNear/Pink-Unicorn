@@ -44,7 +44,7 @@ void WorkerManager::AddUnit(Unit unit)
 			{
 				expand.workers.insert(unit);
 				//TODO: check max workers per mineral/gas
-				if (unit->gather(unit->getClosestUnit(Filter::IsMineralField || Filter::IsRefinery)))
+				if (unit->gather(unit->getClosestUnit(Filter::IsMineralField)))
 				{
 					return;
 				}

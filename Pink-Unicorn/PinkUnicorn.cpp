@@ -101,43 +101,26 @@ void PinkUnicorn::onFrame()
 
 void PinkUnicorn::onStart()
 {
+	if (Broodwar->isReplay())
+	{
+		return;
+	}
+		
 	Broodwar->sendText("Hello world!");
 	Broodwar << "The map is " << Broodwar->mapName() << "!" << std::endl;
 	Broodwar->enableFlag(Flag::UserInput);
-	// Uncomment the following line and the bot will know about everything through the fog of war (cheat).
-	//Broodwar->enableFlag(Flag::CompleteMapInformation);
+	for (auto m : mManagers)
+		m->OnStart();
 
 	// Set the command optimization level so that common commands can be grouped
 	// and reduce the bot's APM (Actions Per Minute).
 	Broodwar->setCommandOptimizationLevel(2);
 
-	/*auto start = Broodwar->self()->getStartLocation();
-	//std::cout << start;
-	auto nexpos = MapManager::GetInstance().SuggestBuildingLocation(UnitTypes::Protoss_Nexus);
-	//std::cout << nexpos;
-	auto nexreg = Broodwar->getRegionAt(Position(nexpos));
-	auto center = nexreg->getCenter();
-	std::cout << nexreg->getID();
-	Broodwar->drawCircle(CoordinateType::Map, center.x, center.y, 12, Colors::Red, true);
-	Broodwar->drawTextMap(nexreg->getCenter(), "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaa");*/
-
 	// Check if this is a replay
-	if (Broodwar->isReplay())
-	{
-		return;
-	}
-	else
-	{
-		if (Broodwar->enemy()) // First make sure there is an enemy
-			Broodwar << "The matchup is " << Broodwar->self()->getRace() << " vs " << Broodwar->enemy()->getRace() << std::endl;
-	}
-
 	//set game speed
 	Broodwar->setLocalSpeed(1);
-	//->setFrameSkip(5);
+	//Broodwar->setFrameSkip(5);
 
-	//WorkerManager onStart
-	dynamic_cast<WorkerManager *>(mManagers[0])->OnStart();
 }
 
 void PinkUnicorn::onEnd(bool isWinner)
@@ -146,76 +129,6 @@ void PinkUnicorn::onEnd(bool isWinner)
 		Broodwar << "I won the game" << std::endl;
 	else
 		Broodwar << "I lost the game" << std::endl;
-}
-
-void onFrame2()
-{
-	//// Iterate through all the units that we own
-	//for (auto &u : Broodwar->self()->getUnits())
-	//{
-	//	else if (u->getType().isResourceDepot()) // A resource depot is a Command Center, Nexus, or Hatchery
-	//	{
-	//		// Order the depot to construct more workers! But only when it is idle.
-	//		if (u->isIdle() && !u->train(u->getType().getRace().getWorker()))
-	//		{
-	//			// If that fails, draw the error at the location so that you can visibly see what went wrong!
-	//			// However, drawing the error once will only appear for a single frame
-	//			// so create an event that keeps it on the screen for some frames
-	//			Position pos = u->getPosition();
-	//			//Error lastErr = Broodwar->getLastError();
-	//			//Broodwar->registerEvent([pos, lastErr](Game*){ Broodwar->drawTextMap(pos, "%c%s", Text::White, lastErr.c_str()); },   // action
-	//			//	nullptr,    // condition
-	//			//	Broodwar->getLatencyFrames());  // frames to run
-
-	//			// Retrieve the supply provider type in the case that we have run out of supplies
-	//			static int lastChecked = 0;
-
-	//			// If we are supply blocked and haven't tried constructing more recently
-	//			if (Broodwar->self()->supplyTotal() - Broodwar->self()->supplyUsed() < 2 &&
-	//				lastChecked + 400 < Broodwar->getFrameCount() &&
-	//				Broodwar->self()->incompleteUnitCount(m_SupplyProviderType) == 0)
-	//			{
-	//				lastChecked = Broodwar->getFrameCount();
-
-	//				// Retrieve a unit that is capable of constructing the supply needed
-	//				Unit supplyBuilder = u->getClosestUnit(GetType == m_SupplyProviderType.whatBuilds().first &&
-	//					(IsIdle || IsGatheringMinerals) &&
-	//					IsOwned);
-	//				// If a unit was found
-	//				if (supplyBuilder)
-	//				{
-	//					if (m_SupplyProviderType.isBuilding())
-	//					{
-	//						TilePosition targetBuildLocation = Broodwar->getBuildLocation(m_SupplyProviderType, supplyBuilder->getTilePosition());
-	//						UnitType supplyProviderType = supplyProviderType;
-	//						if (targetBuildLocation)
-	//						{
-	//							// Register an event that draws the target build location
-	//							Broodwar->registerEvent([targetBuildLocation, supplyProviderType](Game*)
-	//							{
-	//								Broodwar->drawBoxMap(Position(targetBuildLocation),
-	//									Position(targetBuildLocation + supplyProviderType.tileSize()),
-	//									Colors::Blue);
-	//							},
-	//								nullptr,  // condition
-	//								m_SupplyProviderType.buildTime() + 100);  // frames to run
-
-	//							// Order the builder to construct the supply structure
-	//							supplyBuilder->build(m_SupplyProviderType, targetBuildLocation);
-	//						}
-	//					}
-	//					else
-	//					{
-	//						// Train the supply provider (Overlord) if the provider is not a structure
-	//						supplyBuilder->train(m_SupplyProviderType);
-	//					}
-	//				} // closure: supplyBuilder is valid
-	//			} // closure: insufficient supply
-	//		} // closure: failed to train idle unit
-
-	//	}
-
-	//} // closure: unit iterator
 }
 
 void PinkUnicorn::onSendText(std::string text)
