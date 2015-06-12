@@ -26,7 +26,7 @@ void ProduceManager::OnFrame()
 
 void ProduceManager::OnUnitComplete(BWAPI::Unit unit)
 {
-	if (Broodwar->getFrameCount() < 25)
+	if (Broodwar->getFrameCount() < 2)
 		return;
 
 	if (unit->getType().isWorker())
