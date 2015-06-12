@@ -11,5 +11,8 @@ void showPlayers();
 void showForces();
 
 
+bool IsRoboticUnit(BWAPI::UnitType type);
+bool IsStargateUnit(BWAPI::UnitType type);
+bool IsGatewayUnit(BWAPI::UnitType type);
 
 #endif //UTILS_H

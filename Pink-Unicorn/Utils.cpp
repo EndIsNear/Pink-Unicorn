@@ -87,3 +87,36 @@ void showForces()
 			Broodwar << "  - Player [" << p->getID() << "]: " << p->getName() << std::endl;
 	}
 }
+
+
+bool IsRoboticUnit(BWAPI::UnitType type)
+{
+	if (type == BWAPI::UnitTypes::Protoss_Zealot ||
+		type == BWAPI::UnitTypes::Protoss_Dragoon ||
+		type == BWAPI::UnitTypes::Protoss_High_Templar ||
+		type == BWAPI::UnitTypes::Protoss_Dark_Templar)
+		return true;
+	return false;
+}
+
+bool IsStargateUnit(BWAPI::UnitType type)
+{
+	if (type == BWAPI::UnitTypes::Protoss_Scout ||
+		type == BWAPI::UnitTypes::Protoss_Corsair ||
+		type == BWAPI::UnitTypes::Protoss_Arbiter ||
+		type == BWAPI::UnitTypes::Protoss_Carrier)
+		return true;
+	return false;
+}
+
+bool IsGatewayUnit(BWAPI::UnitType type)
+{
+	if (type == BWAPI::UnitTypes::Protoss_Reaver ||
+		type == BWAPI::UnitTypes::Protoss_Shuttle ||
+		type == BWAPI::UnitTypes::Protoss_Observer)
+		return true;
+	return false;
+}
+
+
+
