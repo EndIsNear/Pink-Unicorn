@@ -51,15 +51,35 @@ void WorkerManager::OnFrame()
 		}
 		else if (GetUnitTask * tmp = dynamic_cast<GetUnitTask*>(task.get()))
 		{
-			// todo sa6o si svyr6i rabotata 
-			if (tmp->mUnitType.isWorker())
+			if (!tmp->mUnitType.isWorker())
+				return;
+
+
+			//TODO: use position in getUnitTask (just uncoment)
+			
+			//Position wantedPos = tmp->mPosition;
+			auto& bestExp = m_expands[0];
+			//int minDist = bestExp.base->getDistance(wantedPos);
+			//for (auto& expand : m_expands)
+			//{
+			//	auto tmp = expand.base->getDistance(wantedPos);
+			//	if (minDist > tmp)
+			//	{
+			//		bestExp = expand;
+			//		minDist = tmp;
+			//	}
+			//}
+			
+			// basi grozniq kod
+			for (auto& worker : bestExp.workers)
 			{
-				// basi grozni kod
-				auto worker = m_expands[0].workers.begin();
-				auto w = *worker;
-				*tmp->mpUnit = w;
-				m_expands[0].workers.erase(0);
-				tmp->mIsComplete = true;
+				if (!worker->isCarryingMinerals() && !worker->isCarryingGas())
+				{
+					*(tmp->mpUnit) = worker;
+					bestExp.workers.erase(worker);
+					tmp->mIsComplete = true;
+					return;
+				}
 			}
 		}
 	}
