@@ -14,7 +14,7 @@ struct ExpansionLocation
 	Position resourseGroupCenter;
 	int radius;
 
-	ExpansionLocation(TilePosition b = TilePositions::None, Position rgc = Positions::None, int r = 200) : 
+	ExpansionLocation(const TilePosition& b = TilePositions::None, const Position& rgc = Positions::None, int r = 200) : 
 		baseLocation(b), resourseGroupCenter(rgc), radius(r) {};
 };
 
@@ -25,7 +25,7 @@ public:
 	void OnUnitComplete(Unit unit);
 	void OnUnitDestroy(Unit unit);
 	virtual void CheckForNewTask() override {};
-	static Position::list getPath(Position& s, Position& e);
+	static Position::list getPath(const Position& s, const Position& e);
 	static MapManager& GetInstance()
 	{
 		if (!insta)
@@ -40,7 +40,7 @@ public:
 	Position::list GetChokepoints();
 	Position GetChokepointBetween(Position& start, Position& end);
 	Position GetBaseExit();
-	TilePosition SuggestBuildingLocation(UnitType type, TilePosition preferredPosition = start, int radius = 64, bool creep = false);
+	TilePosition SuggestBuildingLocation(UnitType type, const TilePosition& preferredPosition = start, int radius = 64, bool creep = false);
 private:
 	MapManager(){
 		start = Broodwar->self()->getStartLocation();
@@ -59,17 +59,17 @@ private:
 	TilePosition nextPylonBuildSpot;
 
 	void ScanPylonBuildGrid();
-	void InsertToPylonGrid(TilePosition pos);
-	Position GetResourseGroupCenter(TilePosition expansionLocation = start);
+	void InsertToPylonGrid(const TilePosition& pos);
+	Position GetResourseGroupCenter(const TilePosition& expansionLocation = start);
 	void CalculateExpansions();
 	void CalculateChokepoints();
-	void getNextPylonBuildSpot();
-	void getNextPylon();
-	TilePosition SuggestPylon(TilePosition location);
-	TilePosition SuggestNexus(TilePosition location);
-	TilePosition SuggestCanon(TilePosition location);
-	TilePosition SuggestAssimilator(TilePosition location);
-	TilePosition SuggestRegular(UnitType type, TilePosition location);
+	void getNextPylonBuildSpot(const TilePosition& location);
+	void getNextPylon(const TilePosition& location);
+	TilePosition SuggestPylon(const TilePosition& location);
+	TilePosition SuggestNexus(const TilePosition& location);
+	TilePosition SuggestCanon(const TilePosition& location);
+	TilePosition SuggestAssimilator(const TilePosition& location);
+	TilePosition SuggestRegular(UnitType type, const TilePosition& location);
 };
 
 #endif //MAP_MANAGER_H

@@ -83,7 +83,7 @@ Position MapManager::GetChokepointBetween(Position& start, Position& end)
 	return Position(Broodwar->self()->getStartLocation());
 }
 
-TilePosition MapManager::SuggestBuildingLocation(UnitType type, TilePosition preferredPosition, int radius, bool creep)
+TilePosition MapManager::SuggestBuildingLocation(UnitType type, const TilePosition& preferredPosition, int radius, bool creep)
 {
 	auto res = Broodwar->getBuildLocation(type, preferredPosition, radius, creep);
 
@@ -134,7 +134,7 @@ Position::list assemblePath(pNode end)
 	return result;
 }
 
-Position::list MapManager::getPath(Position& start, Position& end)
+Position::list MapManager::getPath(const Position& start, const Position& end)
 {
 	std::queue<pNode> work;
 	std::map<int, bool> visited;
@@ -177,19 +177,24 @@ void MapManager::CalculateChokepoints()
 	auto mapWidth = Broodwar->mapWidth();
 }
 
-void MapManager::InsertToPylonGrid(TilePosition pos)
+void MapManager::InsertToPylonGrid(const TilePosition& pos)
 {
 	Broodwar->drawTextMap((Position)pos, "%d %d", pos.x, pos.y);
-	auto workers = Broodwar->getUnitsInRadius(Position(start), 2000, Filter::IsWorker);
-	auto w = *workers.begin();
 
-	if (Broodwar->canBuildHere(pos, UnitTypes::Protoss_Pylon, w) && Broodwar->isExplored(pos))
+	auto workers = Broodwar->getUnitsInRadius(Position(start), 2000, Filter::IsWorker);
+	if (!workers.empty())
 	{
-		pylonLocationsGrid.insert(pos);
-		//Broodwar->drawCircle(CoordinateType::Map, pos.x * 32, pos.y * 32, 10, Colors::Green);
-	}
-	else {
-		//Broodwar->drawCircle(CoordinateType::Map, pos.x * 32, pos.y * 32, 10, Colors::Red);
+		Unit w;
+		w = *workers.begin();
+
+		if (Broodwar->canBuildHere(pos, UnitTypes::Protoss_Pylon, w) && Broodwar->isExplored(pos))
+		{
+			pylonLocationsGrid.insert(pos);
+			//Broodwar->drawCircle(CoordinateType::Map, pos.x * 32, pos.y * 32, 10, Colors::Green);
+		}
+		else {
+			//Broodwar->drawCircle(CoordinateType::Map, pos.x * 32, pos.y * 32, 10, Colors::Red);
+		}
 	}
 }
 
@@ -198,9 +203,9 @@ void MapManager::ScanPylonBuildGrid()
 	auto mapWidth = Broodwar->mapWidth();
 	auto mapHeight = Broodwar->mapHeight();
 
-	for (int i = 0; i < mapWidth; i += 7)
+	for (int i = 0; i < mapWidth; i += 8)
 	{
-		for (int j = 0; j < mapHeight; j += 10)
+		for (int j = 0; j < mapHeight; j += 9)
 		{
 			InsertToPylonGrid(TilePosition(i, j));
 			InsertToPylonGrid(TilePosition(i + 2, j));
@@ -208,7 +213,7 @@ void MapManager::ScanPylonBuildGrid()
 	}
 }
 
-Position MapManager::GetResourseGroupCenter(TilePosition expansionLocation)
+Position MapManager::GetResourseGroupCenter(const TilePosition& expansionLocation)
 {
 	auto resourses = Broodwar->getUnitsInRadius(Position(expansionLocation), 250, Filter::IsResourceContainer);
 	auto center = Position(expansionLocation);
@@ -234,43 +239,53 @@ void MapManager::CalculateExpansions()
 	}
 }
 
-void MapManager::getNextPylonBuildSpot()
+using namespace std::placeholders;
+
+void MapManager::getNextPylonBuildSpot(const TilePosition& location)
 {
-	nextPylonBuildSpot = *std::min_element(pylonLocationsGrid.begin(), pylonLocationsGrid.end(), [](TilePosition l, TilePosition r){
-		return l.getDistance(start) < r.getDistance(start);
-	});
+	if (!pylonLocationsGrid.empty())
+	{
+		auto pred = std::bind([](const TilePosition& target, const TilePosition& l, const TilePosition& r){
+			return l.getDistance(target) < r.getDistance(target);
+		}, location, _1, _2);
+		nextPylonBuildSpot = *std::min_element(pylonLocationsGrid.begin(), pylonLocationsGrid.end(), pred);
+	}
 }
-void MapManager::getNextPylon()
+void MapManager::getNextPylon(const TilePosition& location)
 {
-	nextPylon = *std::min_element(builtPylons.begin(), builtPylons.end(), [](TilePosition l, TilePosition r){
-		return l.getDistance(start) < r.getDistance(start);
-	});
+	if (!builtPylons.empty())
+	{
+		auto pred = std::bind([](const TilePosition& target, const TilePosition& l, const TilePosition& r){
+			return l.getDistance(target) < r.getDistance(target);
+		}, location, _1, _2);
+		nextPylonBuildSpot = *std::min_element(builtPylons.begin(), builtPylons.end(), pred);
+	}
 }
 
-TilePosition MapManager::SuggestPylon(TilePosition location)
+TilePosition MapManager::SuggestPylon(const TilePosition& location)
 {
-	getNextPylonBuildSpot();
+	getNextPylonBuildSpot(location);
 	pylonLocationsGrid.erase(nextPylonBuildSpot); 
 	return nextPylonBuildSpot;
 }
 
-TilePosition MapManager::SuggestRegular(UnitType type, TilePosition location)
+TilePosition MapManager::SuggestRegular(UnitType type, const TilePosition& location)
 {
-	getNextPylon();
+	getNextPylon(location);
 	return Broodwar->getBuildLocation(type, location); // TODO check if that works
 }
 
-TilePosition MapManager::SuggestAssimilator(TilePosition location)
+TilePosition MapManager::SuggestAssimilator(const TilePosition& location)
 {
 	return TilePositions::Invalid;
 }
 
-TilePosition MapManager::SuggestCanon(TilePosition location)
+TilePosition MapManager::SuggestCanon(const TilePosition& location)
 {
 	return TilePositions::Invalid;
 }
 
-TilePosition MapManager::SuggestNexus(TilePosition location)
+TilePosition MapManager::SuggestNexus(const TilePosition& location)
 {
 	return TilePositions::Invalid;
 }
