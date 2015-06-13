@@ -88,6 +88,7 @@
     <ClCompile Include="GameAnalyzer.cpp" />
     <ClCompile Include="MacroManagerImp.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MapManagerImpl.cpp" />
     <ClCompile Include="PinkUnicorn.cpp" />
     <ClCompile Include="ProductionManagerImp.cpp" />
     <ClCompile Include="ResourceManagerImp.cpp" />

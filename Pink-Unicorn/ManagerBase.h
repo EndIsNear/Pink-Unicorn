@@ -13,6 +13,7 @@ public:
 	virtual void CheckForNewTask(){};
 	virtual void OnUnitComplete(BWAPI::Unit unit){}
 	virtual void OnStart(){};
+	virtual void OnUnitDestroy(){};
 };
 
 

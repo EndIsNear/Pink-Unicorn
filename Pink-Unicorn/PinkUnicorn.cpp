@@ -25,7 +25,7 @@ PinkUnicorn::PinkUnicorn()
 	mManagers.push_back(new ProduceManager);
 	mManagers.push_back(new MacroManager);
 	mManagers.push_back(new BuildingManager);
-//	mManagers.push_back(new &MapManager::GetInstance());
+	mManagers.push_back(&MapManager::GetInstance());
 }
 
 
@@ -124,7 +124,7 @@ void PinkUnicorn::onStart()
 
 	// Check if this is a replay
 	//set game speed
-	Broodwar->setLocalSpeed(1);
+	Broodwar->setLocalSpeed(0);
 	//Broodwar->setFrameSkip(5);
 
 }
@@ -234,6 +234,9 @@ void PinkUnicorn::onUnitDestroy(BWAPI::Unit unit)
 	{
 		return;
 	}
+	
+	for (auto m : mManagers)
+		m->OnUnitDestroy();
 }
 
 void PinkUnicorn::onUnitMorph(BWAPI::Unit unit)

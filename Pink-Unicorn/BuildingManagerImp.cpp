@@ -35,7 +35,7 @@ void BuildingManager::ExecuteBuildTask(BuildingTask &task)
 	}
 	else if (task.mExecutor)
 	{
-		TilePosition buildTile = Broodwar->getBuildLocation(task.mUnitType, Broodwar->self()->getStartLocation());
+		TilePosition buildTile = MapManager::GetInstance().SuggestBuildingLocation(UnitTypes::Protoss_Pylon);//Broodwar->getBuildLocation(task.mUnitType, Broodwar->self()->getStartLocation());
 		task.mExecutor->build(task.mUnitType, task.mpPosition.get() ? TilePosition(task.mpPosition->x, task.mpPosition->y) : buildTile);
 		task.mIsComplete = true;
 		auto exe = TaskPtr(new TakeWorkerTask(task.mExecutor));
