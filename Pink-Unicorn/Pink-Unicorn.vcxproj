@@ -99,9 +99,7 @@
     <ClCompile Include="WorkerManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AllTasks.h" />
     <ClInclude Include="BuildingManager.h" />
-    <ClInclude Include="BuildingTasks.h" />
     <ClInclude Include="DebugStuff.h" />
     <ClInclude Include="GameAnalyzer.h" />
     <ClInclude Include="MacroManager.h" />
@@ -109,12 +107,8 @@
     <ClInclude Include="MapManager.h" />
     <ClInclude Include="PinkUnicorn.h" />
     <ClInclude Include="ProductionManager.h" />
-    <ClInclude Include="ProductionTasks.h" />
-    <ClInclude Include="RequirementTasks.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="ResourcePack.h" />
-    <ClInclude Include="ResourceTasks.h" />
-    <ClInclude Include="TakeUnitControlsTasks.h" />
     <ClInclude Include="SpyManager.h" />
     <ClInclude Include="TasksQueue.h" />
     <ClInclude Include="Utils.h" />

@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\Tasks">
-      <UniqueIdentifier>{97b6747f-c2a5-4d3b-ace4-c4a6c10b8bd6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Managers">
       <UniqueIdentifier>{6c553f20-0ff3-4176-a46a-8336aad5a73c}</UniqueIdentifier>
     </Filter>
@@ -77,18 +74,6 @@
     <ClInclude Include="PinkUnicorn.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AllTasks.h">
-      <Filter>Header Files\Tasks</Filter>
-    </ClInclude>
-    <ClInclude Include="ProductionTasks.h">
-      <Filter>Header Files\Tasks</Filter>
-    </ClInclude>
-    <ClInclude Include="ResourceTasks.h">
-      <Filter>Header Files\Tasks</Filter>
-    </ClInclude>
-    <ClInclude Include="TakeUnitControlsTasks.h">
-      <Filter>Header Files\Tasks</Filter>
-    </ClInclude>
     <ClInclude Include="ProductionManager.h">
       <Filter>Header Files\Managers</Filter>
     </ClInclude>
@@ -127,12 +112,6 @@
     </ClInclude>
     <ClInclude Include="BuildingManager.h">
       <Filter>Header Files\Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="BuildingTasks.h">
-      <Filter>Header Files\Tasks</Filter>
-    </ClInclude>
-    <ClInclude Include="RequirementTasks.h">
-      <Filter>Header Files\Tasks</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

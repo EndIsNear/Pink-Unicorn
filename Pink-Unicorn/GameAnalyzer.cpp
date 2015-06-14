@@ -1,6 +1,4 @@
 #include "GameAnalyzer.h"
-#include "TasksQueue.h"
-#include "AllTasks.h"
 
 using  namespace BWAPI;
 using  namespace Filter;

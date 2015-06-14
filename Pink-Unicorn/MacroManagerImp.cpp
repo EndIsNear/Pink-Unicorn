@@ -1,7 +1,6 @@
 #include "MacroManager.h"
 #include "GameAnalyzer.h"
-#include "AllTasks.h"
-#include "TasksQueue.h"
+
 using namespace BWAPI;
 
 void MacroManager::OnFrame()

@@ -6,7 +6,6 @@
 #include "ResourceManager.h"
 #include "WorkerManager.h"
 #include "ProductionTasks.h"
-#include "TasksQueue.h"
 #include "MacroManager.h"
 #include "BuildingManager.h"
 
@@ -24,8 +23,8 @@ PinkUnicorn::PinkUnicorn()
 	mManagers.push_back(new ResourceManager);
 	mManagers.push_back(new ProduceManager);
 	mManagers.push_back(new MacroManager);
-	mManagers.push_back(new BuildingManager);
-	mManagers.push_back(&MapManager::GetInstance());
+	//mManagers.push_back(new BuildingManager);
+	//mManagers.push_back(&MapManager::GetInstance());
 }
 
 
@@ -33,8 +32,8 @@ void PinkUnicorn::onFrame()
 {
 	
 	//dispaly FPS
-	//Broodwar->drawTextScreen(200, 0, "FPS: %d", Broodwar->getFPS());
-	//Broodwar->drawTextScreen(200, 20, "Average FPS: %f", Broodwar->getAverageFPS());
+	Broodwar->drawTextScreen(200, 0, "FPS: %d", Broodwar->getFPS());
+	Broodwar->drawTextScreen(200, 20, "Average FPS: %f", Broodwar->getAverageFPS());
 	
 
 	for (auto m : mManagers)

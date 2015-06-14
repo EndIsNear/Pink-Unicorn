@@ -1,8 +1,8 @@
 #include "ProductionManager.h"
 #include "ResourceTasks.h"
-#include "TasksQueue.h"
 #include "DebugStuff.h"
 #include "TakeUnitControlsTasks.h"
+
 using namespace BWAPI;
 using namespace Filter;
 

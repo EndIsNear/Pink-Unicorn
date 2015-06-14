@@ -1,5 +1,5 @@
 #include "ResourceManager.h"
-#include "TasksQueue.h"
+
 using namespace BWAPI;
 
 
