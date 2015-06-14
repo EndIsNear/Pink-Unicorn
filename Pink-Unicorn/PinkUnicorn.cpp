@@ -233,7 +233,7 @@ void PinkUnicorn::onUnitDestroy(BWAPI::Unit unit)
 	}
 	
 	for (auto m : mManagers)
-		m->OnUnitDestroy();
+		m->OnUnitDestroy(unit);
 }
 
 void PinkUnicorn::onUnitMorph(BWAPI::Unit unit)

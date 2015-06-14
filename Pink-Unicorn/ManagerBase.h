@@ -10,7 +10,7 @@ public:
 	virtual void OnFrame() = 0;
 	virtual void OnUnitComplete(BWAPI::Unit unit){}
 	virtual void OnStart(){};
-	virtual void OnUnitDestroy(){};
+	virtual void OnUnitDestroy(BWAPI::Unit unit){};
 	virtual void ReleaseInst() = 0;
 };
 
