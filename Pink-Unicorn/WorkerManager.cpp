@@ -36,53 +36,7 @@ void WorkerManager::OnStart()
 
 void WorkerManager::OnFrame()
 {
-	TaskList tasks;
-	TaskQueue::GetInstance().GetTasksWithType(Task::TakeControl, tasks);
-	TaskQueue::GetInstance().GetTasksWithType(Task::GetControl, tasks);
-	for (auto task : tasks)
-	{
-		if (auto tmp = dynamic_cast<TakeWorkerTask*>(task.get()))
-		{
-			if (tmp->mUnit->isCompleted())
-			{
-				AddUnit(tmp->mUnit);
-				task->mIsComplete = true;
-			}
-		}
-		else if (GetUnitTask * tmp = dynamic_cast<GetUnitTask*>(task.get()))
-		{
-			if (!tmp->mUnitType.isWorker())
-				return;
 
-
-			//TODO: use position in getUnitTask (just uncoment)
-			
-			//Position wantedPos = tmp->mPosition;
-			auto& bestExp = m_expands[0];
-			//int minDist = bestExp.base->getDistance(wantedPos);
-			//for (auto& expand : m_expands)
-			//{
-			//	auto tmp = expand.base->getDistance(wantedPos);
-			//	if (minDist > tmp)
-			//	{
-			//		bestExp = expand;
-			//		minDist = tmp;
-			//	}
-			//}
-			
-			// basi grozniq kod
-			for (auto& worker : bestExp.workers)
-			{
-				if (!worker->isCarryingMinerals() && !worker->isCarryingGas())
-				{
-					*(tmp->mpUnit) = worker;
-					bestExp.workers.erase(worker);
-					tmp->mIsComplete = true;
-					return;
-				}
-			}
-		}
-	}
 }
 
 void WorkerManager::AddUnit(Unit unit)
@@ -129,5 +83,34 @@ void WorkerManager::AddUnit(Unit unit)
 	else if (unit->getType().isRefinery())
 	{
 		//Filter::IsResourceDepot
+	}
+}
+
+Unit WorkerManager::ReleaseWorker(Position pos)
+{
+	//TODO: use position in getUnitTask (just uncoment)
+
+	//Position wantedPos = tmp->mPosition;
+	auto& bestExp = m_expands[0];
+	//int minDist = bestExp.base->getDistance(wantedPos);
+	//for (auto& expand : m_expands)
+	//{
+	//	auto tmp = expand.base->getDistance(wantedPos);
+	//	if (minDist > tmp)
+	//	{
+	//		bestExp = expand;
+	//		minDist = tmp;
+	//	}
+	//}
+
+	// basi grozniq kod
+	for (auto& worker : bestExp.workers)
+	{
+		//TODO: Smarter check for free worker
+		if (!worker->isCarryingMinerals() && !worker->isCarryingGas())
+		{
+			bestExp.workers.erase(worker);
+			return worker;
+		}
 	}
 }

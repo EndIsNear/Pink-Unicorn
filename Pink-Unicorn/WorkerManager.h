@@ -4,26 +4,18 @@
 class WorkerManager : public ManagerBase
 {
 public:
-	WorkerManager()
-	{
-	
-	}
-	~WorkerManager()
-	{
-	
-	}
-	virtual void OnFrame();
-	virtual void CheckForNewTask(){}
+	WorkerManager(){}
+	~WorkerManager(){}
+	virtual void OnFrame() override;
 
-	void OnStart();
+	void OnStart() override;
 
 	//adding worker, base or gas station
 	//first unit have to be base
 	void AddUnit(Unit);
-	//release the nearest worker
-	//Unit ReleaseWorker(Position pos){}
 
-	void CheckForNewWorker(){}
+	//release a worker near to the wanted position
+	Unit ReleaseWorker(Position pos);
 
 	void SetWorkPerMin(size_t workers)
 	{
