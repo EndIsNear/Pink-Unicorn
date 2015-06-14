@@ -14,11 +14,11 @@ public:
 		return *inst;
 	}
 
-	double GetResourceProductionValue();
-	double GetUnitProductionValue();
-	double GetArmyValue();
-	double GetMapControlValue();
-	double GetSupplyValue();
+	//double GetResourceProductionValue();
+	//double GetUnitProductionValue();
+	//double GetArmyValue();
+	//double GetMapControlValue();
+	//double GetSupplyValue();
 private:
 	static  GameAnalyzer *inst;
 	

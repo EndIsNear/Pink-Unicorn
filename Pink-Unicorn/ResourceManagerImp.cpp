@@ -6,24 +6,7 @@ using namespace BWAPI;
 
 void ResourceManager::OnFrame()
 {
-	if (Broodwar->getFrameCount() - mLastUpdateFrame > 25) // every second
-		UpdateState();
-	else
-	{
-		TaskList tasks;
-		TaskQueue::GetInstance().GetTasksWithType(Task::Resource, tasks);
-		//tasks.sort(Task::CompTask);
 
-		for (auto t : tasks)
-		{
-			if (ReleaseResourceTask *temp = dynamic_cast<ReleaseResourceTask*>(t.get()))
-				ExecuteReleaseTask(*temp);
-			else if (ReserveResourceTask*temp = dynamic_cast<ReserveResourceTask*>(t.get()))
-				ExecuteReserveTask(*temp);
-			else
-				DEBUG_CHECK(false);
-		}
-	}
 }
 
 bool ResourceManager::Reserve(const ResourcePack &rRecPack)
@@ -33,7 +16,7 @@ bool ResourceManager::Reserve(const ResourcePack &rRecPack)
 }
 
 
-bool	ResourceManager::CanReserve(const ResourcePack &rRecPack)
+bool ResourceManager::CanReserve(const ResourcePack &rRecPack)
 {
 	if (mReserved.minerals + rRecPack.minerals <= mCurrent.minerals &&
 			mReserved.gas + rRecPack.gas <= mCurrent.gas &&
@@ -95,21 +78,19 @@ void ResourceManager::Release(const ResourcePack & rRecPack)
 }
 
 
-void ResourceManager::ExecuteReserveTask(ReserveResourceTask &task)
-{
-	DEBUG_CHECK(task.mIsComplete == false);
-	if (CanReserve(task.mResPack))
-	{
-		Reserve(task.mResPack);
-		task.mIsComplete = true;
-	}
-}
-
-void ResourceManager::ExecuteReleaseTask(ReleaseResourceTask &task)
-{
-	DEBUG_CHECK(task.mIsComplete == false);
-	Release(task.mResPack);
-	task.mIsComplete = true;
-}
-
-
+//void ResourceManager::ExecuteReserveTask(ReserveResourceTask &task)
+//{
+//	DEBUG_CHECK(task.mIsComplete == false);
+//	if (CanReserve(task.mResPack))
+//	{
+//		Reserve(task.mResPack);
+//		task.mIsComplete = true;
+//	}
+//}
+//
+//void ResourceManager::ExecuteReleaseTask(ReleaseResourceTask &task)
+//{
+//	DEBUG_CHECK(task.mIsComplete == false);
+//	Release(task.mResPack);
+//	task.mIsComplete = true;
+//}

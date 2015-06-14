@@ -3,15 +3,13 @@
 
 #include "DebugStuff.h"
 #include "ManagerBase.h"
-
-
+#include "ResourcePack.h"
 
 class ResourceManager : public ManagerBase
 {
 
 	public:
 		virtual void OnFrame() override;
-		virtual void CheckForNewTask() override {};
 
 	
 
@@ -25,8 +23,8 @@ class ResourceManager : public ManagerBase
 
 	protected:
 
-		void ExecuteReserveTask(ReserveResourceTask &task);
-		void ExecuteReleaseTask(ReleaseResourceTask &task);
+		//void ExecuteReserveTask(ReserveResourceTask &task);
+		//void ExecuteReleaseTask(ReleaseResourceTask &task);
 
 
 		const ResourcePack& GetCurrentResourceState() const { return mRatePerMin; }
