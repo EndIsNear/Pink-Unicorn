@@ -8,7 +8,6 @@ class BuildingManager : public ManagerBase
 	public:
 		BuildingManager(){};
 		virtual void OnFrame() override;
-		void ExecuteBuildTask(BuildingTask &task);
 };
 
 #endif
