@@ -5,9 +5,22 @@ using namespace BWAPI;
 
 class WorkerManager : public ManagerBase
 {
+	//singleton
+	WorkerManager(){};
+	WorkerManager(const WorkerManager&) = delete;
+	WorkerManager& operator= (const WorkerManager&) = delete;
+	static WorkerManager * m_instance;
+
 public:
-	WorkerManager(){}
-	~WorkerManager(){}
+	static WorkerManager& GetInstance()
+	{
+		if (!m_instance)
+		{
+			m_instance = new WorkerManager;
+		}
+		return *m_instance;
+	}
+
 
 	virtual void OnStart() override;
 	virtual void OnFrame() override;
@@ -18,7 +31,7 @@ public:
 	void AddUnit(Unit);
 
 	//release a worker near to the wanted position
-	Unit ReleaseWorker(Position pos);
+	bool ReleaseWorker(Position pos, Unit& result);
 
 	void SetWorkPerMin(size_t workers)
 	{

@@ -14,15 +14,14 @@
 using namespace BWAPI;
 using namespace Filter;
 
-bool scouting = false;
 
 
 PinkUnicorn::PinkUnicorn()
 {
-	mManagers.push_back(new WorkerManager);
-	mManagers.push_back(new ResourceManager);
-	mManagers.push_back(new ProduceManager);
-	mManagers.push_back(new MacroManager);
+	mManagers.push_back(&WorkerManager::GetInstance());
+	//mManagers.push_back(new ResourceManager);
+	//mManagers.push_back(new ProduceManager);
+	//mManagers.push_back(new MacroManager);
 	//mManagers.push_back(new BuildingManager);
 	//mManagers.push_back(&MapManager::GetInstance());
 }
@@ -98,7 +97,6 @@ void PinkUnicorn::onFrame()
 				u->train(u->getType().getRace().getWorker());
 			}
 		}
-		//m_WorkerManager->Refresh();
 	}
 	*/
 }

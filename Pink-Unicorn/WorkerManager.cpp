@@ -2,8 +2,9 @@
 #include "BWAPI.h"
 #include "ManagerBase.h"
 
-
 #include "WorkerManager.h"
+
+WorkerManager*  WorkerManager::m_instance = NULL;
 
 void WorkerManager::OnStart()
 {
@@ -86,7 +87,7 @@ void WorkerManager::AddUnit(Unit unit)
 	}
 }
 
-Unit WorkerManager::ReleaseWorker(Position pos)
+bool WorkerManager::ReleaseWorker(Position pos, Unit& result)
 {
 	//TODO: use position in getUnitTask (just uncoment)
 
@@ -110,7 +111,9 @@ Unit WorkerManager::ReleaseWorker(Position pos)
 		if (!worker->isCarryingMinerals() && !worker->isCarryingGas())
 		{
 			bestExp.workers.erase(worker);
-			return worker;
+			result = worker;
+			return true;
 		}
 	}
+	return false;
 }
