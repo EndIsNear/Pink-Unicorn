@@ -6,22 +6,19 @@
 class GameAnalyzer
 {
 	GameAnalyzer(){};
-	public:
-		static GameAnalyzer& GetInstance()
-		{
-			if (inst)
-				inst = new GameAnalyzer;
-			return *inst;
-		}
+public:
+	static GameAnalyzer& GetInstance()
+	{
+		if (inst)
+			inst = new GameAnalyzer;
+		return *inst;
+	}
 
-		double GetResourceProductionValue();
-		double GetUnitProductionValue();
-		double GetArmyValue();
-		double GetMapControlValue();
-		double GetSupplyValue();
-	private:
-		int GetWorkersInProductionTasks();
-		int GetSupplyInProductionTasks();
+	double GetResourceProductionValue();
+	double GetUnitProductionValue();
+	double GetArmyValue();
+	double GetMapControlValue();
+	double GetSupplyValue();
 private:
 	static  GameAnalyzer *inst;
 	
