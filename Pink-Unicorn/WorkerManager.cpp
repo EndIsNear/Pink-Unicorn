@@ -1,7 +1,7 @@
 #include <vector>
 #include "BWAPI.h"
 #include "ManagerBase.h"
-using namespace BWAPI;
+
 
 #include "WorkerManager.h"
 

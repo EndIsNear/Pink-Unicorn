@@ -1,14 +1,17 @@
 #ifndef WORKER_MANAGER_H
 #define WORKER_MANAGER_H
 
+using namespace BWAPI;
+
 class WorkerManager : public ManagerBase
 {
 public:
 	WorkerManager(){}
 	~WorkerManager(){}
+
+	virtual void OnStart() override;
 	virtual void OnFrame() override;
 
-	void OnStart() override;
 
 	//adding worker, base or gas station
 	//first unit have to be base
