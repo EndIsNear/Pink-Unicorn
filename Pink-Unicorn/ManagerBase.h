@@ -4,13 +4,14 @@
 #include <BWAPI.h>
 #include <BWAPI/Client.h>
 
-class ManagerBase 
+class ManagerBase
 {
 public:
 	virtual void OnFrame() = 0;
 	virtual void OnUnitComplete(BWAPI::Unit unit){}
 	virtual void OnStart(){};
 	virtual void OnUnitDestroy(){};
+	virtual void ReleaseInst() = 0;
 };
 
 

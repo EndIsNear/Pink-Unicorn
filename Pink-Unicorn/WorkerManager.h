@@ -21,6 +21,20 @@ public:
 		return *m_instance;
 	}
 
+	static void _ReleaseInst()
+	{
+		if (m_instance)
+		{
+			delete m_instance;
+			m_instance = NULL;
+		}
+	}
+
+	virtual void ReleaseInst()
+	{ 
+		WorkerManager::_ReleaseInst();
+	};
+
 
 	virtual void OnStart() override;
 	virtual void OnFrame() override;

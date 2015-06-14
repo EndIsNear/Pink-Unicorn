@@ -19,8 +19,8 @@ using namespace Filter;
 PinkUnicorn::PinkUnicorn()
 {
 	mManagers.push_back(&WorkerManager::GetInstance());
+	mManagers.push_back(&ProduceManager::GetInstance());
 	//mManagers.push_back(new ResourceManager);
-	//mManagers.push_back(new ProduceManager);
 	//mManagers.push_back(new MacroManager);
 	//mManagers.push_back(new BuildingManager);
 	//mManagers.push_back(&MapManager::GetInstance());

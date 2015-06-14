@@ -8,7 +8,11 @@ class PinkUnicorn
 	ManagersCollection mManagers;
 public:
 	PinkUnicorn();
-	~PinkUnicorn(){}
+	~PinkUnicorn()
+	{
+		for (auto m : mManagers)
+			m->ReleaseInst();
+	}
 	virtual void onStart();
 	virtual void onEnd(bool isWinner);
 	virtual void onFrame();

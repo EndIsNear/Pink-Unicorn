@@ -3,8 +3,9 @@
 #include "ManagerBase.h"
 
 #include "WorkerManager.h"
+#include "ProductionManager.h"
 
-WorkerManager*  WorkerManager::m_instance = NULL;
+WorkerManager * WorkerManager::m_instance = NULL;
 
 void WorkerManager::OnStart()
 {
@@ -33,6 +34,7 @@ void WorkerManager::OnStart()
 			}
 		}
 	}
+	//ProduceManager::GetInstance().ProduceSingleUnitFrom(UnitTypes::Protoss_Probe, m_expands[0].base);
 }
 
 void WorkerManager::OnFrame()
