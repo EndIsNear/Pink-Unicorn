@@ -34,7 +34,7 @@ void WorkerManager::OnStart()
 			}
 		}
 	}
-	//ProduceManager::GetInstance().ProduceSingleUnitFrom(UnitTypes::Protoss_Probe, m_expands[0].base);
+	ProduceManager::GetInstance().ProduceSingleUnitFrom(UnitTypes::Protoss_Probe, m_expands[0].base);
 }
 
 void WorkerManager::OnFrame()

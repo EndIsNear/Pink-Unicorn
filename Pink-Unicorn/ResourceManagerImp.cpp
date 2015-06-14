@@ -2,7 +2,7 @@
 
 using namespace BWAPI;
 
-
+ResourceManager * ResourceManager::m_instance = NULL;
 
 void ResourceManager::OnFrame()
 {
@@ -78,19 +78,19 @@ void ResourceManager::Release(const ResourcePack & rRecPack)
 }
 
 
-//void ResourceManager::ExecuteReserveTask(ReserveResourceTask &task)
-//{
-//	DEBUG_CHECK(task.mIsComplete == false);
-//	if (CanReserve(task.mResPack))
-//	{
-//		Reserve(task.mResPack);
-//		task.mIsComplete = true;
-//	}
-//}
-//
-//void ResourceManager::ExecuteReleaseTask(ReleaseResourceTask &task)
-//{
-//	DEBUG_CHECK(task.mIsComplete == false);
-//	Release(task.mResPack);
-//	task.mIsComplete = true;
-//}
+bool ResourceManager::ExecuteReserveTask(unsigned min, unsigned gas, unsigned sup)
+{
+	ResourcePack tmp(min, gas, sup);
+	if (CanReserve(tmp))
+	{
+		Reserve(tmp);
+		return true;
+	}
+	return false;
+}
+
+void ResourceManager::ExecuteReleaseTask(unsigned min, unsigned gas, unsigned sup)
+{
+	ResourcePack tmp(min, gas, sup);
+	Release(tmp);
+}
