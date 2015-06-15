@@ -24,6 +24,8 @@ bool BuildingManager::Build(UnitType building)
 				TilePosition buildPos = MapManager::GetInstance().SuggestBuildingLocation(UnitTypes::Protoss_Pylon);
 				if (Broodwar->canBuildHere(buildPos, building, worker))
 				{
+					if (building == UnitTypes::Protoss_Pylon)
+						m_SupplyInProgress += SupplyPerPylon;
 					worker->build(building, buildPos);
 					m_BuildingsInProgress.push_back(BuildingPair(building, worker));
 				}
@@ -37,7 +39,8 @@ void BuildingManager::CheckNewBuildings(Unit building)
 {
 	for (size_t i = 0; i < m_BuildingsInProgress.size(); ++i)
 	{
-		if (building->getType() == m_BuildingsInProgress[i].first)// && m_BuildingsInProgress[i].second->isIdle()
+		if (building->getType() == m_BuildingsInProgress[i].first 
+			&& building->getDistance(m_BuildingsInProgress[i].second) < 32)
 		{
 			WorkerManager::GetInstance().AddUnit(m_BuildingsInProgress[i].second);
 			ResourceManager::GetInstance().ReleaseRes(building->getType().mineralPrice(), building->getType().gasPrice(), 0);
@@ -45,3 +48,4 @@ void BuildingManager::CheckNewBuildings(Unit building)
 		}
 	}
 }
+

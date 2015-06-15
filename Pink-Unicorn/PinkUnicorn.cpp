@@ -97,7 +97,7 @@ void PinkUnicorn::onFrame()
 		}
 	}
 	*/
-	if (Broodwar->self()->supplyTotal() - Broodwar->self()->supplyUsed() < 3)
+	if (Broodwar->self()->supplyTotal() + BuildingManager::GetInstance().GetSupplyInProgress() - Broodwar->self()->supplyUsed() < 3)
 	{
 		BuildingManager::GetInstance().Build(UnitTypes::Protoss_Pylon);
 	}

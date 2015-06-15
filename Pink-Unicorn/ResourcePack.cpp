@@ -4,7 +4,7 @@
 
 bool ResourcePack::IsCorrectState()
 {
-	DEBUG_CHECK(minerals >= 0 && gas >= 0 && supply >= 0);
+	DEBUG_CHECK(minerals >= 0 && gas >= 0);
 	if (minerals >= 0 && gas >= 0 && supply >= 0)
 		return true;
 	return false;
