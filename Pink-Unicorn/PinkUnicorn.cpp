@@ -14,15 +14,13 @@
 using namespace BWAPI;
 using namespace Filter;
 
-
-
 PinkUnicorn::PinkUnicorn()
 {
 	mManagers.push_back(&WorkerManager::GetInstance());
 	mManagers.push_back(&ProduceManager::GetInstance());
 	mManagers.push_back(&ResourceManager::GetInstance());
+	mManagers.push_back(&BuildingManager::GetInstance());
 	//mManagers.push_back(new MacroManager);
-	//mManagers.push_back(new BuildingManager);
 	//mManagers.push_back(&MapManager::GetInstance());
 }
 
@@ -99,6 +97,11 @@ void PinkUnicorn::onFrame()
 		}
 	}
 	*/
+	if (Broodwar->self()->supplyTotal() - Broodwar->self()->supplyUsed() < 3)
+	{
+		BuildingManager::GetInstance().Build(UnitTypes::Protoss_Pylon);
+	}
+
 }
 
 
@@ -219,9 +222,15 @@ void PinkUnicorn::onUnitHide(BWAPI::Unit unit)
 
 void PinkUnicorn::onUnitCreate(BWAPI::Unit unit)
 {
+	if (Broodwar->getFrameCount() < 2)
+		return;
 	if (Broodwar->isReplay())
 	{
 		return;
+	}
+	if (unit->getType().isBuilding())//check isMine ?
+	{
+		BuildingManager::GetInstance().CheckNewBuildings(unit);
 	}
 }
 

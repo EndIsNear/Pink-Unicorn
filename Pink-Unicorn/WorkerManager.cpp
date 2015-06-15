@@ -34,12 +34,11 @@ void WorkerManager::OnStart()
 			}
 		}
 	}
-	ProduceManager::GetInstance().ProduceSingleUnitFrom(UnitTypes::Protoss_Probe, m_expands[0].base);
 }
 
 void WorkerManager::OnFrame()
 {
-
+	ProduceManager::GetInstance().ProduceSingleUnitFrom(UnitTypes::Protoss_Probe, m_expands[0].base);
 }
 
 void WorkerManager::AddUnit(Unit unit)
@@ -112,8 +111,8 @@ bool WorkerManager::ReleaseWorker(Position pos, Unit& result)
 		//TODO: Smarter check for free worker
 		if (!worker->isCarryingMinerals() && !worker->isCarryingGas())
 		{
-			bestExp.workers.erase(worker);
 			result = worker;
+			bestExp.workers.erase(worker);
 			return true;
 		}
 	}

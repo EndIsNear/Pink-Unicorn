@@ -46,12 +46,9 @@ public:
 
 	virtual void OnFrame() override;
 
-	~ResourceManager() {}
-
+	bool ReserveRes(unsigned, unsigned, unsigned);
+	void ReleaseRes(unsigned, unsigned, unsigned);
 protected:
-	bool ExecuteReserveTask(unsigned, unsigned, unsigned);
-	void ExecuteReleaseTask(unsigned, unsigned, unsigned);
-
 	const ResourcePack& GetCurrentResourceState() const { return mRatePerMin; }
 	const ResourcePack& GetResourceRate() const { return mCurrent; }
 	const ResourcePack& GetReserved() const { return mReserved; }

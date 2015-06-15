@@ -78,7 +78,7 @@ void ResourceManager::Release(const ResourcePack & rRecPack)
 }
 
 
-bool ResourceManager::ExecuteReserveTask(unsigned min, unsigned gas, unsigned sup)
+bool ResourceManager::ReserveRes(unsigned min, unsigned gas, unsigned sup)
 {
 	ResourcePack tmp(min, gas, sup);
 	if (CanReserve(tmp))
@@ -89,7 +89,7 @@ bool ResourceManager::ExecuteReserveTask(unsigned min, unsigned gas, unsigned su
 	return false;
 }
 
-void ResourceManager::ExecuteReleaseTask(unsigned min, unsigned gas, unsigned sup)
+void ResourceManager::ReleaseRes(unsigned min, unsigned gas, unsigned sup)
 {
 	ResourcePack tmp(min, gas, sup);
 	Release(tmp);
