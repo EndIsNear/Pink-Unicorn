@@ -13,9 +13,8 @@ void MapManager::OnFrame()
 	if (Broodwar->getFrameCount() % 50 == 0)
 	{
 		ScanPylonBuildGrid();
-		CalculateExpansions();
+		//CalculateExpansions();
 	}
-	ScanPylonBuildGrid();
 	//auto e = SuggestBuildingLocation(UnitTypes::Protoss_Pylon);
 	//Sleep(200);
 	//std::cout << e << std::endl;
@@ -205,9 +204,9 @@ void MapManager::ScanPylonBuildGrid()
 	auto mapWidth = Broodwar->mapWidth();
 	auto mapHeight = Broodwar->mapHeight();
 
-	for (int i = 0; i < mapWidth; i += 3)
+	for (int i = 0; i < mapWidth; i += 9)
 	{
-		for (int j = 0; j < mapHeight; j += 3)
+		for (int j = 0; j < mapHeight; j += 8)
 		{
 			InsertToPylonGrid(TilePosition(i, j));
 			InsertToPylonGrid(TilePosition(i + 2, j));
