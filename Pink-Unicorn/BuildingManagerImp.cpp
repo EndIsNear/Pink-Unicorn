@@ -12,7 +12,19 @@ void BuildingManager::OnFrame()
 
 }
 
+bool BuildingManager::BuildBaseExit(UnitType building)
+{
+	TilePosition pos = (Broodwar->self()->getStartLocation() + TilePosition(MapManager::GetInstance().GetBaseExit())) / 2;
+	return BuildNearTo(building, pos);
+
+}
+
 bool BuildingManager::Build(UnitType building)
+{
+	return BuildNearTo(building, Broodwar->self()->getStartLocation());
+}
+
+bool BuildingManager::BuildNearTo(UnitType building, TilePosition pos)
 {
 	if (building.isBuilding() && Broodwar->canMake(building))
 	{
@@ -21,7 +33,7 @@ bool BuildingManager::Build(UnitType building)
 			Unit worker;
 			if (WorkerManager::GetInstance().ReleaseWorker(Position(), worker))
 			{
-				TilePosition buildPos = MapManager::GetInstance().SuggestBuildingLocation(UnitTypes::Protoss_Pylon);
+				TilePosition buildPos = MapManager::GetInstance().SuggestBuildingLocation(UnitTypes::Protoss_Pylon, pos);
 				if (Broodwar->canBuildHere(buildPos, building, worker))
 				{
 					worker->build(building, buildPos);

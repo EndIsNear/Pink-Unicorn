@@ -45,7 +45,10 @@ public:
 	virtual void OnFrame() override;
 
 
-	bool Build(UnitType building);
+	bool Build(UnitType building);//near to start location
+	bool BuildNearTo(UnitType building, TilePosition pos);
+	bool BuildBaseExit(UnitType building);
+
 	void CheckNewBuildings(Unit building);
 
 	void OnUnitComplete(Unit unit)
