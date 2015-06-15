@@ -38,7 +38,7 @@ void WorkerManager::OnStart()
 
 void WorkerManager::OnFrame()
 {
-	ProduceManager::GetInstance().ProduceSingleUnitFrom(UnitTypes::Protoss_Probe, m_expands[0].base);
+
 }
 
 void WorkerManager::AddUnit(Unit unit)
@@ -118,3 +118,25 @@ bool WorkerManager::ReleaseWorker(Position pos, Unit& result)
 	}
 	return false;
 }
+
+int WorkerManager::GetNeededWorkers()
+{
+	int res = 0;
+	for (auto& b : m_expands)
+	{
+		res += m_maxMin * b.minerals.size() - b.workers.size();
+	}
+	return res;
+}
+
+int WorkerManager::GetNeededWorkersForBase(Unit base)
+{
+	for (auto& b : m_expands)
+	{
+		if (b.base == base)
+			return m_maxMin * b.minerals.size() - b.workers.size();
+	}
+	return 0;
+}
+
+

@@ -8,6 +8,7 @@
 #include "ProductionTasks.h"
 #include "MacroManager.h"
 #include "BuildingManager.h"
+#include "StrategyManager.h"
 
 #include <iostream>
 
@@ -16,6 +17,7 @@ using namespace Filter;
 
 PinkUnicorn::PinkUnicorn()
 {
+	mManagers.push_back(&StrategyManager::GetInstance());
 	mManagers.push_back(&WorkerManager::GetInstance());
 	mManagers.push_back(&ProduceManager::GetInstance());
 	mManagers.push_back(&ResourceManager::GetInstance());
@@ -40,7 +42,6 @@ void PinkUnicorn::onFrame()
 		Broodwar->getFrameCount() % Broodwar->getLatencyFrames() != 0)
 		return;
 
-	TaskQueue::GetInstance().ReleaseCompleteTasks();
 	/*
 	for (auto &u : Broodwar->self()->getUnits())
 	{
@@ -97,11 +98,6 @@ void PinkUnicorn::onFrame()
 		}
 	}
 	*/
-	if (Broodwar->self()->supplyTotal() + BuildingManager::GetInstance().GetSupplyInProgress() - Broodwar->self()->supplyUsed() < 3)
-	{
-		BuildingManager::GetInstance().Build(UnitTypes::Protoss_Pylon);
-	}
-
 }
 
 
