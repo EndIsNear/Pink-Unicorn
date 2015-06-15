@@ -25,6 +25,7 @@ public:
 	virtual void OnUnitDestroy(Unit unit);
 	virtual void ReleaseInst() override{
 		delete insta;
+		insta = NULL;
 	};
 	static Position::list getPath(const Position& s, const Position& e);
 	static MapManager& GetInstance()
