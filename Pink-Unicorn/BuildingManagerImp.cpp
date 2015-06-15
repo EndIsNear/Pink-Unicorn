@@ -48,4 +48,3 @@ void BuildingManager::CheckNewBuildings(Unit building)
 		}
 	}
 }
-

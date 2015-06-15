@@ -43,6 +43,8 @@ public:
 	virtual void OnStart() override;
 	virtual void OnFrame() override;
 
+	int GetNeededWorkers();
+	int GetNeededWorkersForBase(Unit base);
 
 	//adding worker, base or gas station
 	//first unit have to be base
