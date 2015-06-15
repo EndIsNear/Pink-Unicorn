@@ -1,7 +1,7 @@
 #ifndef PINK_UNICORN_BUILDING_MANAGER_H
 #define PINK_UNICORN_BUILDING_MANAGER_H
 
-const int SupplyPerPylon = 8;
+const int SupplyPerPylon = 16;
 
 using namespace BWAPI;
 typedef std::pair<UnitType, Unit> BuildingPair;
@@ -45,7 +45,10 @@ public:
 	virtual void OnFrame() override;
 
 
-	bool Build(UnitType building);
+	bool Build(UnitType building);//near to start location
+	bool BuildNearTo(UnitType building, TilePosition pos);
+	bool BuildBaseExit(UnitType building);
+
 	void CheckNewBuildings(Unit building);
 
 	void OnUnitComplete(Unit unit)

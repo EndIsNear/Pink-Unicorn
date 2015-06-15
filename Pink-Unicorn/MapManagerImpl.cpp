@@ -15,6 +15,7 @@ void MapManager::OnFrame()
 		ScanPylonBuildGrid();
 		//CalculateExpansions();
 	}
+	//GetBaseExit();
 	//auto e = SuggestBuildingLocation(UnitTypes::Protoss_Pylon);
 	//Sleep(200);
 	//std::cout << e << std::endl;
@@ -83,6 +84,25 @@ Position MapManager::GetChokepointBetween(Position& start, Position& end)
 		}
 	}
 	return Position(Broodwar->self()->getStartLocation());
+}
+
+Position getOuterStartLocation()
+{
+	for (auto s : Broodwar->getStartLocations())
+	{
+		if (s != Broodwar->self()->getStartLocation())
+		{
+			return Position(s);
+		}
+	}
+	return Positions::Invalid;
+}
+
+Position MapManager::GetBaseExit()
+{
+	auto res = GetChokepointBetween(Position(Broodwar->self()->getStartLocation()), getOuterStartLocation());
+	//Broodwar->drawCircle(CoordinateType::Map, res.x, res.y, 20, Colors::Red);
+	return res;
 }
 
 TilePosition MapManager::SuggestBuildingLocation(UnitType type, const TilePosition& preferredPosition, int radius, bool creep)
