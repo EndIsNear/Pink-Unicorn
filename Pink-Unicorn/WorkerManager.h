@@ -6,7 +6,11 @@ using namespace BWAPI;
 class WorkerManager : public ManagerBase
 {
 	//singleton
-	WorkerManager(){};
+	WorkerManager()
+	{
+		m_maxMin = 3;
+		m_maxGas = 0;
+	};
 	WorkerManager(const WorkerManager&) = delete;
 	WorkerManager& operator= (const WorkerManager&) = delete;
 	static WorkerManager * m_instance;
@@ -49,11 +53,11 @@ public:
 
 	void SetWorkPerMin(size_t workers)
 	{
-		m_mineralWorkers = workers;
+		m_maxMin = workers;
 	}
 	void SetWorkPerGas(size_t workers)
 	{
-		m_gasWorkers = workers;
+		m_maxGas = workers;
 	}
 
 private:
@@ -68,9 +72,6 @@ private:
 		Unitset minerals;
 	};
 
-	size_t m_workers;
-	size_t m_mineralWorkers;
-	size_t m_gasWorkers;
 	//max workers per mineral depo
 	size_t m_maxMin;
 	//max workers per gas station

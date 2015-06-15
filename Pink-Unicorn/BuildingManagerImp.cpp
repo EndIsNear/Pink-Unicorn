@@ -24,9 +24,9 @@ bool BuildingManager::Build(UnitType building)
 				TilePosition buildPos = MapManager::GetInstance().SuggestBuildingLocation(UnitTypes::Protoss_Pylon);
 				if (Broodwar->canBuildHere(buildPos, building, worker))
 				{
+					worker->build(building, buildPos);
 					if (building == UnitTypes::Protoss_Pylon)
 						m_SupplyInProgress += SupplyPerPylon;
-					worker->build(building, buildPos);
 					m_BuildingsInProgress.push_back(BuildingPair(building, worker));
 				}
 			}
