@@ -14,6 +14,8 @@
 using namespace BWAPI;
 using namespace Filter;
 
+
+
 PinkUnicorn::PinkUnicorn()
 {
 	mManagers.push_back(&WorkerManager::GetInstance());
@@ -97,11 +99,6 @@ void PinkUnicorn::onFrame()
 		}
 	}
 	*/
-	if (Broodwar->self()->supplyTotal() + BuildingManager::GetInstance().GetSupplyInProgress() - Broodwar->self()->supplyUsed() < 3)
-	{
-		BuildingManager::GetInstance().Build(UnitTypes::Protoss_Pylon);
-	}
-
 }
 
 
@@ -223,7 +220,7 @@ void PinkUnicorn::onUnitHide(BWAPI::Unit unit)
 void PinkUnicorn::onUnitCreate(BWAPI::Unit unit)
 {
 	if (Broodwar->getFrameCount() < 2)
-		return;
+		 return;
 	if (Broodwar->isReplay())
 	{
 		return;
