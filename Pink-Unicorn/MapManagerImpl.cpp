@@ -6,14 +6,16 @@ using namespace BWAPI;
 
 MapManager * MapManager::insta = NULL;
 TilePosition MapManager::start = TilePositions::None;
+Unit MapManager::testWorker = NULL;
 
 void MapManager::OnFrame()
 {
-	if (Broodwar->getFrameCount() % 800 == 0)
+	if (Broodwar->getFrameCount() % 50 == 0)
 	{
 		ScanPylonBuildGrid();
+		CalculateExpansions();
 	}
-
+	ScanPylonBuildGrid();
 	//auto e = SuggestBuildingLocation(UnitTypes::Protoss_Pylon);
 	//Sleep(200);
 	//std::cout << e << std::endl;
@@ -40,9 +42,9 @@ void MapManager::OnUnitDestroy(Unit unit)
 		pylonLocationsGrid.insert(tile);
 	}
 }
-Position::list MapManager::GetExpansionLocations()
+TilePosition::list MapManager::GetExpansionLocations()
 {
-	auto result = Position::list();
+	auto result = TilePosition::list();
 	for (auto exp : expansions)
 	{
 		result.push_back(exp.baseLocation);
@@ -57,12 +59,12 @@ Position MapManager::GetClosestExpansionTo(const Position& location)
 	auto result = expansions[0].baseLocation;
 	for (auto exp : expansions)
 	{
-		if (location.getDistance(result) > location.getDistance(exp.baseLocation))
+		if (location.getDistance(Position(result)) > location.getDistance(Position(exp.baseLocation)))
 		{
 			result = exp.baseLocation;
 		}
 	}
-	return result;
+	return Position(result);
 }
 Position::list MapManager::GetChokepoints()
 {
@@ -182,21 +184,20 @@ void MapManager::InsertToPylonGrid(const TilePosition& pos)
 {
 	Broodwar->drawTextMap((Position)pos, "%d %d", pos.x, pos.y);
 
-	auto workers = Broodwar->getUnitsInRadius(Position(start), 2000, Filter::IsWorker);
-	if (!workers.empty())
+	if (testWorker && !testWorker->exists())
 	{
-		Unit w;
-		w = *workers.begin();
-
-		if (Broodwar->canBuildHere(pos, UnitTypes::Protoss_Pylon, w) && Broodwar->isExplored(pos))
-		{
-			pylonLocationsGrid.insert(pos);
-			//Broodwar->drawCircle(CoordinateType::Map, pos.x * 32, pos.y * 32, 10, Colors::Green);
-		}
-		else {
-			//Broodwar->drawCircle(CoordinateType::Map, pos.x * 32, pos.y * 32, 10, Colors::Red);
-		}
+		getTestWorker();
 	}
+
+	if (Broodwar->canBuildHere(pos, UnitTypes::Protoss_Pylon, testWorker) && Broodwar->isExplored(pos))
+	{
+		pylonLocationsGrid.insert(pos);
+		//Broodwar->drawCircle(CoordinateType::Map, pos.x * 32, pos.y * 32, 10, Colors::Green);
+	}
+	else {
+		//Broodwar->drawCircle(CoordinateType::Map, pos.x * 32, pos.y * 32, 10, Colors::Red);
+	}
+	
 }
 
 void MapManager::ScanPylonBuildGrid()
@@ -204,9 +205,9 @@ void MapManager::ScanPylonBuildGrid()
 	auto mapWidth = Broodwar->mapWidth();
 	auto mapHeight = Broodwar->mapHeight();
 
-	for (int i = 0; i < mapWidth; i += 8)
+	for (int i = 0; i < mapWidth; i += 3)
 	{
-		for (int j = 0; j < mapHeight; j += 9)
+		for (int j = 0; j < mapHeight; j += 3)
 		{
 			InsertToPylonGrid(TilePosition(i, j));
 			InsertToPylonGrid(TilePosition(i + 2, j));
@@ -238,6 +239,11 @@ void MapManager::CalculateExpansions()
 		if (p == Broodwar->self()->getStartLocation())
 			expansions.push_back(ExpansionLocation(p, GetResourseGroupCenter(p)));
 	}
+
+	expansions.push_back(ExpansionLocation(TilePosition(35, 54)));
+	expansions.push_back(ExpansionLocation(TilePosition(65, 78)));
+	expansions.push_back(ExpansionLocation(TilePosition(95, 42)));
+	expansions.push_back(ExpansionLocation(TilePosition(59, 18)));
 }
 
 using namespace std::placeholders;
@@ -251,6 +257,10 @@ void MapManager::getNextPylonBuildSpot(const TilePosition& location)
 		}, location, _1, _2);
 		nextPylonBuildSpot = *std::min_element(pylonLocationsGrid.begin(), pylonLocationsGrid.end(), pred);
 	}
+	else
+	{
+		nextPylonBuildSpot = TilePositions::Invalid;
+	}
 }
 void MapManager::getNextPylon(const TilePosition& location)
 {
@@ -259,7 +269,11 @@ void MapManager::getNextPylon(const TilePosition& location)
 		auto pred = std::bind([](const TilePosition& target, const TilePosition& l, const TilePosition& r){
 			return l.getDistance(target) < r.getDistance(target);
 		}, location, _1, _2);
-		nextPylonBuildSpot = *std::min_element(builtPylons.begin(), builtPylons.end(), pred);
+		nextPylon = *std::min_element(builtPylons.begin(), builtPylons.end(), pred);
+	}
+	else
+	{
+		nextPylon = TilePositions::Invalid;
 	}
 }
 

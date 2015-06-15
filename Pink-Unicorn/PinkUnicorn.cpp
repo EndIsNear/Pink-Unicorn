@@ -21,7 +21,7 @@ PinkUnicorn::PinkUnicorn()
 	mManagers.push_back(&ResourceManager::GetInstance());
 	mManagers.push_back(&BuildingManager::GetInstance());
 	//mManagers.push_back(new MacroManager);
-	//mManagers.push_back(&MapManager::GetInstance());
+	mManagers.push_back(&MapManager::GetInstance());
 }
 
 
@@ -124,7 +124,7 @@ void PinkUnicorn::onStart()
 
 	// Check if this is a replay
 	//set game speed
-	Broodwar->setLocalSpeed(0);
+	Broodwar->setLocalSpeed(2);
 	//Broodwar->setFrameSkip(5);
 
 }
