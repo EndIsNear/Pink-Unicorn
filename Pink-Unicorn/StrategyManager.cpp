@@ -37,7 +37,7 @@ void StrategyManager::UpdateSupply()
 	int freePop = std::max(static_cast<int>(Broodwar->self()->supplyTotal() * (WantedFreePopPercents / 100)), 15);
 	if (Broodwar->self()->supplyTotal() + BuildingManager::GetInstance().GetSupplyInProgress() - Broodwar->self()->supplyUsed() < freePop)
 	{
-		BuildingManager::GetInstance().Build(UnitTypes::Protoss_Pylon);
+		BuildingManager::GetInstance().BuildBaseExit(UnitTypes::Protoss_Pylon);
 	}
 }
 

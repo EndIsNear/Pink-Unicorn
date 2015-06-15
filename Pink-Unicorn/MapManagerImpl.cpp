@@ -15,7 +15,7 @@ void MapManager::OnFrame()
 		ScanPylonBuildGrid();
 		//CalculateExpansions();
 	}
-	GetBaseExit();
+	//GetBaseExit();
 	//auto e = SuggestBuildingLocation(UnitTypes::Protoss_Pylon);
 	//Sleep(200);
 	//std::cout << e << std::endl;
