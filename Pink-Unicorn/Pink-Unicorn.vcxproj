@@ -99,6 +99,8 @@
     <ClCompile Include="WorkerManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="2dVector.h" />
+    <ClInclude Include="Agent.h" />
     <ClInclude Include="BuildingManager.h" />
     <ClInclude Include="DebugStuff.h" />
     <ClInclude Include="GameAnalyzer.h" />

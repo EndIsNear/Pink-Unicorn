@@ -5,6 +5,7 @@
 #include <BWAPI.h>
 #include <BWAPI/Client.h>
 #include "ManagerBase.h"
+#include "2dVector.h"
 
 using namespace BWAPI;
 using namespace Filter;
@@ -44,7 +45,7 @@ protected:
 class AgentStayAway : public Agent, public DoSomeThingInRange
 {
 public:
-	AgentStayAway(Unit u, int dist, PtrUnitFilter filter = IsEnemy) :Agent(u), DoSomeThingInRange(dist, filter){}
+	AgentStayAway(Unit u, int dist, double moveWithDist, PtrUnitFilter filter = IsEnemy) :Agent(u), DoSomeThingInRange(dist, filter), mdMoveWithDist(moveWithDist){}
 
 	virtual void OnDraw() override
 	{
@@ -54,14 +55,18 @@ public:
 	virtual bool OnFrame() override
 	{
 		bool bResult = false;
-		auto enemy = Broodwar->getUnitsInRadius(mUnit->getPosition(), mDist, mFilter);
-		if (enemy.size())
+		auto units = mUnit->getUnitsInRadius( mDist, mFilter);
+		if (units.size())
 		{
 			// i must go away
-			auto ep = enemy.getPosition();
+			auto ep = units.getPosition();
 			auto d = ep.getDistance(mUnit->getPosition());
 			auto GoToPos = mUnit->getPosition() - ep;
-			GoToPos = GoToPos * 3;
+			Vector2D vDir(GoToPos.x, GoToPos.y);
+			vDir.Normalize();
+			vDir = vDir * mdMoveWithDist;
+			GoToPos.x = vDir.x;
+			GoToPos.y = vDir.y;
 			GoToPos = mUnit->getPosition() + GoToPos;
 			mUnit->move(GoToPos);
 			Broodwar->drawCircle(CoordinateType::Map, GoToPos.x, GoToPos.y, 25, Colors::Green);
@@ -71,6 +76,9 @@ public:
 		return bResult;
 	}
 
+	void SetMoveWithDist(double dist) { mdMoveWithDist = dist; }
+protected:
+	double mdMoveWithDist;
 
 };
 
@@ -102,25 +110,84 @@ public:
 	virtual bool OnFrame() override
 	{
 		bool bResult = false;
-		if (mUnit->getGroundWeaponCooldown() == 0)
+		if(mUnit->isAttackFrame() || mUnit->isAttacking() || mUnit->isStartingAttack())
+		{
+			bResult = true;
+		}
+		else
 		{
 			auto inRange = mUnit->getUnitsInRadius(mDist, mFilter);
 			auto swit = mUnit->getUnitsInRadius(mSwitchRange, mFilter);
-			if (swit.size())
+			if (inRange.size() || swit.size())
 			{
-				mUnit->attack(LowHP(inRange));
+				Unit eu;
+				if (swit.size())
+					eu = LowHP(inRange);
+				else if (inRange.size())
+					eu = Closest(mUnit->getPosition(), inRange);
+
+				if (mUnit->getTarget() != eu || mUnit->getLastCommand().getType() != UnitCommandTypes::Attack_Unit)
+					mUnit->attack(eu);
 				bResult = true;
 			}
-			else if (inRange.size())
-			{
-				mUnit->attack(Closest(mUnit->getPosition(), inRange));
+			if (mUnit->getLastCommand().getType() == UnitCommandTypes::Attack_Unit)
 				bResult = true;
-			}
 		}
 		return bResult;
 	}
 protected:
 	int mSwitchRange;
+};
+
+double CalcScore(Unitset set)
+{
+	double result = 0;
+	for (auto it : set)
+	{
+		switch (it->getType())
+		{
+			// todo implemented
+		default:
+			result += it->getType().mineralPrice() + it->getType().gasPrice();
+			break;
+		}
+	}
+	return result;
+}
+
+class AssessTheEnemy : public Agent, public DoSomeThingInRange
+{
+public:
+	AssessTheEnemy(Unit u, int dist, PtrUnitFilter filter = IsEnemy) :Agent(u), DoSomeThingInRange(dist, filter){}
+
+	virtual void OnDraw() override
+	{
+		Broodwar->drawCircle(CoordinateType::Map, mUnit->getPosition().x, mUnit->getPosition().y, mDist, Colors::Purple);
+	}
+
+	virtual bool OnFrame() override
+	{
+		bool bResult = false;
+		double myArmyValue = CalcScore(mUnit->getUnitsInRadius(mDist, IsAlly));
+		auto enemyArmy = mUnit->getUnitsInRadius(mDist, mFilter);
+		double enemyArmyValue = CalcScore(enemyArmy);
+		if (myArmyValue + 200 < enemyArmyValue)
+		{
+			auto ep = enemyArmy.getPosition();
+			auto d = ep.getDistance(mUnit->getPosition());
+			auto GoToPos = mUnit->getPosition() - ep;
+			Vector2D vDir(GoToPos.x, GoToPos.y);
+			vDir.Normalize();
+			vDir = vDir * 50;
+			GoToPos.x = vDir.x;
+			GoToPos.y = vDir.y;
+			GoToPos = mUnit->getPosition() + GoToPos;
+			mUnit->move(GoToPos);
+			Broodwar->drawCircle(CoordinateType::Map, GoToPos.x, GoToPos.y, 25, Colors::Green);
+			bResult = true;
+		}
+		return bResult;
+	}
 };
 
 class AgentStayToghether : public Agent, public DoSomeThingInRange
@@ -136,7 +203,7 @@ public:
 	virtual bool OnFrame() override
 	{
 		bool bResult = false;
-		if (!mUnit->isMoving() && mUnit->getGroundWeaponCooldown() == 0) // try to stay together
+		if (!mUnit->isMoving()) // try to stay together
 		{
 			auto friends = Broodwar->getUnitsInRadius(mUnit->getPosition(), mDist, mFilter);
 			mUnit->move(friends.getPosition());
@@ -160,7 +227,7 @@ public:
 
 	virtual bool OnFrame() override
 	{
-		if (mUnit->isIdle())
+		if(mUnit->isIdle())
 			mUnit->move(mPos);
 		return true;
 	}
@@ -207,9 +274,11 @@ class DragoonControl : public ControlPattern
 public:
 	DragoonControl(Unit drag) : ControlPattern(drag)
 	{
-		Agents.push_back(new AgentStayAway(drag, 50));
+		Agents.push_back(new AssessTheEnemy(drag, 500));
+		Agents.push_back(new AgentStayAway(drag, 50, 100, IsEnemy));
 		Agents.push_back(new AgentAttackInRange(drag, 250, 150));
-		Agents.push_back(new AgentStayToghether(drag, 200));
+		Agents.push_back(new AgentStayAway(drag, 10, 5, IsAlly));
+		Agents.push_back(new AgentStayToghether(drag, 800));
 		Position p(Broodwar->getStartLocations().at(1));
 		Agents.push_back(new AgentGoToPosition(drag, p));
 	}
@@ -221,10 +290,11 @@ class ZelotControl : public ControlPattern
 public:
 	ZelotControl(Unit zelka) : ControlPattern(zelka)
 	{
-		Agents.push_back(new AgentAttackInRange(zelka, 250, 25));
+		Agents.push_back(new AssessTheEnemy(zelka, 500));
+		Agents.push_back(new AgentAttackInRange(zelka, 150, 10));
 		Position p(Broodwar->getStartLocations().at(1));
 		Agents.push_back(new AgentGoToPosition(zelka, p));
-		//Agents.push_back(new AgentStayToghether(zelka, 50));
+		Agents.push_back(new AgentStayToghether(zelka, 500));
 	}
 };
 
@@ -245,7 +315,7 @@ public:
 
 		}
 	}
-
+	virtual void ReleaseInst() override {}
 
 	void OnFrame()
 	{
@@ -259,7 +329,7 @@ public:
 		for (auto it : mUnits)
 		{
 			it->OnFrame();
-			it->OnDraw();
+		//	it->OnDraw();
 		}
 	}
 private:
