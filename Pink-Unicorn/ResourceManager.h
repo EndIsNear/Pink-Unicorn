@@ -46,8 +46,8 @@ public:
 
 	virtual void OnFrame() override;
 
-	bool ReserveRes(unsigned, unsigned, unsigned);
-	void ReleaseRes(unsigned, unsigned, unsigned);
+	bool ReserveRes(unsigned minerals, unsigned gas, unsigned supply);
+	void ReleaseRes(unsigned minerals, unsigned gas, unsigned supply);
 protected:
 	const ResourcePack& GetCurrentResourceState() const { return mRatePerMin; }
 	const ResourcePack& GetResourceRate() const { return mCurrent; }

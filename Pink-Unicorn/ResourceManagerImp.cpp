@@ -6,7 +6,7 @@ ResourceManager * ResourceManager::m_instance = NULL;
 
 void ResourceManager::OnFrame()
 {
-
+	UpdateState();
 }
 
 bool ResourceManager::Reserve(const ResourcePack &rRecPack)
@@ -78,9 +78,9 @@ void ResourceManager::Release(const ResourcePack & rRecPack)
 }
 
 
-bool ResourceManager::ReserveRes(unsigned min, unsigned gas, unsigned sup)
+bool ResourceManager::ReserveRes(unsigned minerals, unsigned gas, unsigned supply)
 {
-	ResourcePack tmp(min, gas, sup);
+	ResourcePack tmp(minerals, gas, supply);
 	if (CanReserve(tmp))
 	{
 		Reserve(tmp);
@@ -89,8 +89,8 @@ bool ResourceManager::ReserveRes(unsigned min, unsigned gas, unsigned sup)
 	return false;
 }
 
-void ResourceManager::ReleaseRes(unsigned min, unsigned gas, unsigned sup)
+void ResourceManager::ReleaseRes(unsigned minerals, unsigned gas, unsigned supply)
 {
-	ResourcePack tmp(min, gas, sup);
+	ResourcePack tmp(minerals, gas, supply);
 	Release(tmp);
 }
