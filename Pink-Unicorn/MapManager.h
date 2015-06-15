@@ -43,6 +43,8 @@ public:
 	Position GetChokepointBetween(Position& start, Position& end);
 	Position GetBaseExit();
 	TilePosition SuggestBuildingLocation(UnitType type, const TilePosition& preferredPosition = start, int radius = 1000, bool creep = false);
+	TilePosition SuggestDefencePylon(const TilePosition& base = start); // the function determines the most critical chokepoint and gets pylon location next to it
+	TilePosition SuggestDefenceCannon(const TilePosition& base = start);
 private:
 	MapManager(){
 		regularBuildingCount = 0;
