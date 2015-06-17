@@ -69,6 +69,7 @@ TilePosition MapManager::GetNextExpansionLocation()
 	{
 		auto nextRg = resourseGroups.back();
 		resourseGroups.pop_back();
+		resourseGroups.push_front(nextRg); // TODO think how to do it better
 		return GetBaseLocation(nextRg);
 	}
 	return TilePositions::Invalid;
@@ -341,7 +342,7 @@ TilePosition MapManager::SuggestNexus(const TilePosition& location)
 	return TilePositions::Invalid;
 }
 
-std::map<int, Unitset>  GetResourseGroups()
+std::map<int, Unitset> GetResourseGroups()
 {
 	auto resourses = Broodwar->getStaticMinerals();
 	auto gas = Broodwar->getStaticGeysers();
@@ -368,9 +369,9 @@ TilePosition GetResGroupCenter(const Unitset& group)
 	}
 	return TilePosition(center/ group.size());
 }
-std::vector<TilePosition> GetResGroupsCenters(const std::map<int, Unitset> & groups)
+TilePosition::list GetResGroupsCenters(const std::map<int, Unitset> & groups)
 {
-	auto res = std::vector<TilePosition>();
+	auto res = TilePosition::list();
 	for (auto g : groups)
 	{
 		res.push_back(GetResGroupCenter(g.second));

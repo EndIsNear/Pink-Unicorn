@@ -11,6 +11,7 @@ public:
 	virtual void OnUnitComplete(BWAPI::Unit unit){}
 	virtual void OnStart(){};
 	virtual void OnUnitDestroy(BWAPI::Unit unit){};
+	virtual void OnUnitDiscover(BWAPI::Unit unit){};
 	virtual void ReleaseInst() = 0;
 };
 

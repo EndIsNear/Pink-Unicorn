@@ -75,7 +75,7 @@ private:
 	}
 	bool hasUnbuildableNeighbors(TilePosition pos);
 	
-	std::vector<TilePosition> resourseGroups;
+	TilePosition::list resourseGroups;
 	Position::list chokepoints;
 	std::set<TilePosition> pylonLocationsGrid; // <TilePosition location, bool occupied>
 	std::set<TilePosition> builtPylons;

@@ -189,6 +189,8 @@ void PinkUnicorn::onUnitDiscover(BWAPI::Unit unit)
 	{
 		return;
 	}
+	for (auto m : mManagers)
+		m->OnUnitDiscover(unit);
 }
 
 void PinkUnicorn::onUnitEvade(BWAPI::Unit unit)

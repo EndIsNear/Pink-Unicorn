@@ -1,133 +1,107 @@
-//#ifndef SPY_MANAGER_H
-//#define SPY_MANAGER_H
-//
-//#include "DebugStuff.h"
-//#include "ManagerBase.h"
-//#include <vector>
-//#include <queue>
-//#include <assert.h>
-//
-//using namespace BWAPI;
-//class SpyManager;
-//class ExploreTask;
-//
-//struct ResGroup;
-//typedef std::vector<ResGroup> ResGroupSet;
-//
-//struct Enemy; // TODO
-//
-//class ArmyGroup; // TODO
-//typedef std::vector<ArmyGroup> ArmyGroupSet;
-//
-///********************************/
-//class SpyManager : public ManagerBase
-//{
-//public:
-//	virtual void OnFrame();
-//	virtual void CheckForNewTask();
-//	void CheckTasks(Task::Type type);
-//	void OnDiscoverResourse(Unit resPatch);
-//	void OnDiscoverEnemy(Unit enemy);
-//
-//	static const SpyManager& GetInstance()
-//	{
-//		if (!insta)
-//		{
-//			insta = new SpyManager;
-//		}
-//		return *insta;
-//	}
-//
-//	int ExploreLocation(const Position& location);
-//	bool IsReserved(Unit unit);
-//
-//	void GetResGroups();
-//	void GetEnemyArmyApproxPosition();
-//	void GetEnemyBuildings(); // returns discovered buildings
-//	void GetEnemyBuilding(UnitType type); // returns invalid position if building is not there or not discovered
-//	void GetExpansionLocations(); 
-//private:
-//	Unit RequestUnit(UnitType type);
-//	void ReserveUnit(Unit unit);
-//	void ReleaseUnit(int unitID);
-//private:
-//	static SpyManager* insta;
-//private:
-//	Unitset spyUnits;
-//	Unitset enemyBuildings;
-//	Unitset enemyUnits;
-//	ResGroupSet resourses;
-//};
-//
-//class ExploreTask : public Task
-//{
-//public:
-//	ExploreTask(const Position& l, Unit controlUnit, Task::Priority pri)
-//	{
-//		mPriority = pri;
-//		Task::mType = Task::Explore;
-//
-//		this->location = l;
-//		this->unit = controlUnit;
-//	}
-//
-//	bool CanAccept()
-//	{
-//		return unit->isFlying() ? true : (Broodwar->getRegionAt(location)->getRegionGroupID() == 
-//			Broodwar->getRegionAt(unit->getPosition())->getRegionGroupID());
-//	}
-//
-//	bool Complete()
-//	{
-//		return unit->getPosition() == location;
-//	}
-//
-//	bool Cancel()
-//	{
-//		return false;
-//	}
-//
-//	void Execute()
-//	{
-//		unit->move(location);
-//	}
-//public:
-//	Unit unit;
-//	Position location;
-//};
-//
-//struct ResGroup
-//{
-//public:
-//	ResGroup(){
-//		resGrpId = -1;
-//	}
-//
-//	Position GetCenter(); 
-//	Position GetExpansionLocation()
-//	{
-//
-//	};
-//	bool ContainsResourse(Unit res)
-//	{
-//		Broodwar->getUnitsInRadius(res->getPosition(), ResGroupRadius, Filter::ResourceGroup);
-//		return resourses.find(res) != resourses.end();
-//	}
-//	bool CanInsert(Unit res)
-//	{
-//		return resGrpId == -1 || (res->getResourceGroup() == resGrpId && !ContainsResourse(res));
-//	}
-//	void InsertResourse(Unit res)
-//	{
-//		if ( CanInsert(res))
-//		{
-//			resourses.insert(res);
-//		}
-//	}
-//public:
-//	int resGrpId;
-//	Unitset resourses;
-//	static const int ResGroupRadius = 1000;
-//};
-//
-//#endif //SPY_MANAGER_H
+#ifndef SPY_MANAGER_H
+#define SPY_MANAGER_H
+
+#include "DebugStuff.h"
+#include "ManagerBase.h"
+#include "Agent.h"
+#include "MapManager.h"
+#include <vector>
+#include <queue>
+#include <assert.h>
+
+using namespace BWAPI;
+class SpyManager;
+
+void moveUnit(Unit u, Position pos)
+{
+	if (u->isIdle())
+		u->move(pos);
+}
+
+class AgentSpy : public Agent, public DoSomeThingInRange {
+public:
+	AgentSpy(Unit u, const Position& target, PtrUnitFilter filter = IsEnemy) :
+		Agent(u), DoSomeThingInRange(0, filter), location(target), complete(false){};
+	bool OnFrame() override {
+		auto res = false;
+
+		// TODO make it more advanced
+		if (mUnit->getPosition().getDistance(location) > 100 && !complete) {
+			moveUnit(mUnit, location);
+		}
+		else {
+			complete = true;
+			moveUnit(mUnit, Position(Broodwar->self()->getStartLocation()));
+		}
+		return res;
+	};
+	void OnDraw() override{};
+private:
+	Position location;
+	bool complete;
+};
+
+class ScoutPattern : public ControlPattern {
+public:
+	ScoutPattern(Unit spyUnit, Position location) : ControlPattern(spyUnit) {
+		Agents.push_back(new AgentSpy(spyUnit, location));
+		Agents.push_back(new AgentStayAway(spyUnit, 50, 100));
+	};
+
+	void SetLocation(const Position& pos) { location = pos; }
+protected:
+	Position location;
+};
+
+class SpyManager : public ManagerBase
+{
+public:
+	virtual void OnFrame() override {
+		for (auto u : spyUnits)
+			u->OnFrame();
+	}
+	virtual void ReleaseInst() override {
+		delete insta;
+		insta = NULL;
+	}
+	void OnUnitDiscover(Unit u) override {
+		if (u->getPlayer() == Broodwar->enemy()) {
+			if (u->getType().isBuilding())
+				enemyBuildings.insert(u);
+			else
+				enemyUnits.insert(u);
+		}
+	}
+	static const SpyManager& GetInstance()
+	{
+		if (!insta)
+		{
+			insta = new SpyManager;
+		}
+		return *insta;
+	}
+
+	void ExploreLocation(Unit spyUnit, const Position& location) {
+		spyUnits.push_back(new ScoutPattern(spyUnit, location));
+	}
+	void GetEnemyArmyApproxPosition();
+	Unitset GetEnemyBuildings() {
+		return enemyBuildings;
+	}
+	void GetEnemyBuilding(UnitType type) { // returns invalid position if building is not there or not discovered
+		//TODO
+	}
+	TilePosition::list GetEnemyBases();
+private:
+	static SpyManager* insta;
+	~SpyManager(){
+		for (auto su : spyUnits) {
+			delete su;
+		}
+	}
+	std::vector<ControlPattern*> spyUnits;
+	Unitset enemyBuildings;
+	Unitset enemyUnits;
+};
+
+#endif //SPY_MANAGER_H
