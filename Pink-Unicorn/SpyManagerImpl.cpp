@@ -2,6 +2,12 @@
 
 SpyManager * SpyManager::insta = NULL;
 
+void moveUnit(Unit u, Position pos)
+{
+	if (u->isIdle() || u->isGatheringMinerals())
+		u->move(pos);
+}
+
 TilePosition::list SpyManager::GetEnemyBases()
 {
 	auto result = TilePosition::list();

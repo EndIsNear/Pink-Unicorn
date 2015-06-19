@@ -54,9 +54,9 @@ class Vector2D
     double x,y;
 };
 
-std::ostream & operator<<(std::ostream &o, Vector2D &v) { o << v.x  << " "<< v.y; return o;}
+inline std::ostream & operator<<(std::ostream &o, Vector2D &v) { o << v.x  << " "<< v.y; return o;}
 
-double RandDouble(double a = 0., double b = 1.)
+inline double RandDouble(double a = 0., double b = 1.)
 {
 	double f = (double)rand() / RAND_MAX;
 	return a + f * (b - a);

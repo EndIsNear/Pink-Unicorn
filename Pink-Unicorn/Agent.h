@@ -15,6 +15,7 @@ class Agent
 {
 public:
 	Agent(Unit u) : mUnit(u) { }
+	virtual ~Agent(){}
 	virtual void OnDraw() {}
 	virtual bool OnFrame() = 0;
 protected:
@@ -139,7 +140,7 @@ protected:
 	int mSwitchRange;
 };
 
-double CalcScore(Unitset set)
+inline double CalcScore(Unitset set)
 {
 	double result = 0;
 	for (auto it : set)
@@ -244,7 +245,11 @@ protected:
 	Unit mUnit;
 public:
 	ControlPattern(Unit u) : mUnit(u){}
-
+	virtual ~ControlPattern(){
+		for (auto a : Agents) {
+			delete a;
+		}
+	}
 	void OnDraw()
 	{
 		for (auto it : Agents)

@@ -127,12 +127,6 @@ TilePosition MapManager::SuggestBuildingLocation(UnitType type, const TilePositi
 		if (type == UnitTypes::Protoss_Pylon) {
 			return SuggestPylon(preferredPosition);
 		} 
-		else if(type == UnitTypes::Protoss_Assimilator) {
-			return SuggestAssimilator(preferredPosition);
-		} 
-		else if (type == UnitTypes::Protoss_Photon_Cannon) {
-			return SuggestCanon(preferredPosition);
-		} 
 		else if (type == UnitTypes::Protoss_Nexus) {
 			return SuggestNexus(preferredPosition);
 		}
@@ -339,7 +333,7 @@ TilePosition MapManager::SuggestCanon(const TilePosition& location)
 
 TilePosition MapManager::SuggestNexus(const TilePosition& location)
 {
-	return TilePositions::Invalid;
+	return GetNextExpansionLocation();
 }
 
 std::map<int, Unitset> GetResourseGroups()

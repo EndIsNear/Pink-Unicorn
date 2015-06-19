@@ -72,6 +72,9 @@
     <ClCompile Include="StrategyManager.cpp">
       <Filter>Source Files\Managers</Filter>
     </ClCompile>
+    <ClCompile Include="TaskQueueImp.cpp">
+      <Filter>Source Files\Managers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PinkUnicorn.h">
