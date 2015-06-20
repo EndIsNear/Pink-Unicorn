@@ -15,7 +15,7 @@ void ProduceManager::OnUnitComplete(BWAPI::Unit unit)
 {
 	if (Broodwar->getFrameCount() < 1)
 		return;
-	if (unit->getType().isWorker() && unit->isCompleted())
+	if (unit->getType().isWorker() && unit->isCompleted() || unit->getType() == UnitTypes::Protoss_Assimilator)
 		WorkerManager::GetInstance().AddUnit(unit);
 	//else if (!unit->getType().isBuilding())
 	//	MacroManager::GetInstance().AddUnit(unit);
