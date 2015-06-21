@@ -32,7 +32,7 @@ void MapManager::OnUnitComplete(Unit unit)
 {
 	if (unit->getType() == UnitTypes::Protoss_Pylon)
 	{
-		auto tile = unit->getInitialTilePosition();
+		auto tile = unit->getTilePosition();
 		builtPylons.insert(tile);
 		pylonLocationsGrid.erase(tile);
 	}
