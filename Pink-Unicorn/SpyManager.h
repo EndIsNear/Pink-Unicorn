@@ -110,16 +110,16 @@ public:
 class SpyManager : public ManagerBase
 {
 public:
-	bool exploring = false;
+	//bool exploring = false;
 	virtual void OnFrame() override {
 		for (auto u : spyUnits)
 			u->OnFrame();
 
-		Unit w;
+		/*Unit w;
 		if (WorkerManager::GetInstance().GetInstance().ReleaseWorker(Positions::None, w) && !exploring) {
 			ExploreLocations(w, Broodwar->getStartLocations());
 			exploring = true;
-		}
+		}*/
 	}
 	virtual void ReleaseInst() override {
 		delete insta;

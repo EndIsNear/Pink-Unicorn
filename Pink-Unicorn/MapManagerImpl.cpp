@@ -70,6 +70,7 @@ TilePosition MapManager::GetNextExpansionLocation()
 		auto nextRg = resourseGroups.back();
 		resourseGroups.pop_back();
 		resourseGroups.push_front(nextRg); // TODO think how to do it better
+
 		return GetBaseLocation(nextRg);
 	}
 	return TilePositions::Invalid;
@@ -129,6 +130,9 @@ TilePosition MapManager::SuggestBuildingLocation(UnitType type, const TilePositi
 		} 
 		else if (type == UnitTypes::Protoss_Nexus) {
 			return SuggestNexus(preferredPosition);
+		}
+		else if (type == UnitTypes::Protoss_Assimilator) {
+			return SuggestAssimilator(preferredPosition);
 		}
 		else return SuggestRegular(type, preferredPosition);
 	}
@@ -311,6 +315,49 @@ TilePosition MapManager::SuggestPylon(const TilePosition& location)
 	return nextPylonBuildSpot;
 }
 
+struct tileNode {
+	TilePosition pos;
+	int radius;
+	tileNode(const TilePosition& p, int r) : pos(p), radius(r){};
+};
+
+void insertToVect(std::vector<TilePosition>& vect, const TilePosition& p, Color c) {
+	//std::cout << p << std::endl;
+	Broodwar->drawCircle(CoordinateType::Map, p.x*32, p.y*32, 10, c);
+	vect.push_back(p);
+}
+
+TilePosition getBuildTileInRadius(UnitType type, const TilePosition& center, int radius = 64) { // TODO think about spacing and walkability
+	std::queue<tileNode> work;
+	std::set<TilePosition> visited;
+	auto cur = tileNode(center, 0);
+
+	work.push(cur);
+	visited.insert(center);
+
+	while (!work.empty() && cur.radius <= radius)
+	{
+		auto cur = work.front();
+		work.pop();
+
+		if (Broodwar->canBuildHere(cur.pos, type))
+		{
+			//Broodwar->drawCircle(CoordinateType::Map, cur.x * 32, cur.y * 32, 20, Colors::Green);
+			return cur.pos;
+		}
+
+		auto neighbours = getNeighbours(cur.pos);
+		for (auto c : neighbours)
+		{
+			if (visited.find(c) == visited.end())
+			{
+				work.push(tileNode(c, radius));
+				visited.insert(c);
+			}
+		}
+	}
+	return TilePositions::None;
+}
 TilePosition MapManager::SuggestRegular(UnitType type, const TilePosition& location)
 {
 	if (regularBuildingCount % 2 == 0) // no more than 2 buildings near single pylon
@@ -318,11 +365,19 @@ TilePosition MapManager::SuggestRegular(UnitType type, const TilePosition& locat
 		getNextPylon(location);
 	}
 	regularBuildingCount++;
-	return Broodwar->getBuildLocation(type, nextPylon, 3); // TODO check if that works
+	return getBuildTileInRadius(type, nextPylon);
 }
 
 TilePosition MapManager::SuggestAssimilator(const TilePosition& location)
 {
+	if (!gaysers.empty()) {
+		auto less = std::bind([](const TilePosition& start, Unit l, Unit r){
+			return start.getDistance(l->getTilePosition()) < start.getDistance(r->getTilePosition());
+		}, Broodwar->self()->getStartLocation(), _1, _2);
+		auto res = *std::min_element(gaysers.begin(), gaysers.end(), less);
+		gaysers.erase(res);
+		return res->getTilePosition(); // TODO handle cases when gaysers are unavailable
+	}
 	return TilePositions::Invalid;
 }
 
@@ -375,34 +430,7 @@ TilePosition::list GetResGroupsCenters(const std::map<int, Unitset> & groups)
 
 TilePosition GetBaseLocation(const TilePosition& resGroupCenter)
 {
-	std::queue<TilePosition> work;
-	std::set<TilePosition> visited;
-
-	work.push(resGroupCenter);
-	visited.insert(resGroupCenter);
-
-	while (!work.empty())
-	{
-		auto cur = work.front();
-		work.pop();
-
-		if (Broodwar->canBuildHere(cur, UnitTypes::Protoss_Nexus))
-		{
-			//Broodwar->drawCircle(CoordinateType::Map, cur.x * 32, cur.y * 32, 20, Colors::Green);
-			return cur;
-		}
-
-		auto neighbours = getNeighbours(cur);
-		for (auto c : neighbours)
-		{
-			if (visited.find(c) == visited.end())
-			{
-				work.push(c);
-				visited.insert(c);
-			}
-		}
-	}
-	return TilePositions::None;
+	return getBuildTileInRadius(UnitTypes::Protoss_Nexus, resGroupCenter);
 }
 
 void MapManager::CalculateResourseGroups()

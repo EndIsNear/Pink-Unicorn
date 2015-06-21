@@ -76,11 +76,16 @@ private:
 	bool hasUnbuildableNeighbors(TilePosition pos);
 	
 	TilePosition::list resourseGroups;
+	TilePosition nextExpand;
+	TilePosition nextGayser;
+
 	Position::list chokepoints;
+
 	std::set<TilePosition> pylonLocationsGrid; // <TilePosition location, bool occupied>
 	std::set<TilePosition> builtPylons;
 	TilePosition nextPylon;
 	TilePosition nextPylonBuildSpot;
+
 	int regularBuildingCount;
 
 	void ScanPylonBuildGrid();
