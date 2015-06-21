@@ -33,7 +33,7 @@ bool BuildingManager::BuildNearTo(UnitType building, TilePosition pos)
 			Unit worker;
 			if (WorkerManager::GetInstance().ReleaseWorker(Position(), worker))
 			{
-				TilePosition buildPos = MapManager::GetInstance().SuggestBuildingLocation(UnitTypes::Protoss_Pylon, pos);
+				TilePosition buildPos = MapManager::GetInstance().SuggestBuildingLocation(building, pos);
 				if (Broodwar->canBuildHere(buildPos, building, worker))
 				{
 					worker->build(building, buildPos);
