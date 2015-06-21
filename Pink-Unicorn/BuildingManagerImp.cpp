@@ -40,7 +40,17 @@ bool BuildingManager::BuildNearTo(UnitType building, TilePosition pos)
 					if (building == UnitTypes::Protoss_Pylon)
 						m_SupplyInProgress += SupplyPerPylon;
 					m_BuildingsInProgress.push_back(BuildingPair(building, worker));
+					return true;
 				}
+				else
+				{
+					WorkerManager::GetInstance().AddUnit(worker);
+					ResourceManager::GetInstance().ReleaseRes(building.mineralPrice(), building.gasPrice(), 0);
+				}
+			}
+			else
+			{
+				ResourceManager::GetInstance().ReleaseRes(building.mineralPrice(), building.gasPrice(), 0);
 			}
 		}
 	}
