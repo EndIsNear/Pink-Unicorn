@@ -2,6 +2,7 @@
 #include "BuildingManager.h"
 #include "ProductionManager.h"
 #include "WorkerManager.h"
+#include "ResourceManager.h"
 #include "BWAPI.h"
 
 #include <algorithm>
@@ -29,13 +30,16 @@ void StrategyManager::OnFrame()
 	{
 		UpdateSupply();
 		UpdateWorkers();
+		//if (Broodwar->self()->minerals() > 400)
+		//	BuildingManager::GetInstance().Build(UnitTypes::Protoss_Gateway);
 	}
+
 }
 
 void StrategyManager::UpdateSupply()
 {
-	int freePop = std::max(static_cast<int>(Broodwar->self()->supplyTotal() * (WantedFreePopPercents / 100)), 15);
-	if (Broodwar->self()->supplyTotal() + BuildingManager::GetInstance().GetSupplyInProgress() - Broodwar->self()->supplyUsed() < freePop)
+	int wantedSupply = std::max(static_cast<int>(Broodwar->self()->supplyTotal() * (WantedFreePopPercents / 100)), 15);
+	if (ResourceManager::GetInstance().GetFreeSupply() + BuildingManager::GetInstance().GetSupplyInProgress() < wantedSupply)
 	{
 		BuildingManager::GetInstance().BuildBaseExit(UnitTypes::Protoss_Pylon);
 	}

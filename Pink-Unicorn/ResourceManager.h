@@ -48,14 +48,14 @@ public:
 
 	bool ReserveRes(unsigned minerals, unsigned gas, unsigned supply);
 	void ReleaseRes(unsigned minerals, unsigned gas, unsigned supply);
+
+	unsigned GetFreeMineral(){ return mCurrent.minerals - mReserved.minerals; }
+	unsigned GetFreeGas(){ return mCurrent.gas - mReserved.gas; }
+	unsigned GetFreeSupply(){ return  mCurrent.supply - mReserved.supply; }
 protected:
 	const ResourcePack& GetCurrentResourceState() const { return mRatePerMin; }
 	const ResourcePack& GetResourceRate() const { return mCurrent; }
 	const ResourcePack& GetReserved() const { return mReserved; }
-
-	unsigned GetFreeMineral(){ return mCurrent.minerals - mReserved.minerals; }
-	unsigned GetFreeGas(){ return mCurrent.gas - mReserved.gas; }
-	unsigned GetFreeSupply(){ return  mCurrent.supply- mReserved.supply; }
 
 	bool Reserve(const ResourcePack &rRecPack);
 	bool CanReserve(const ResourcePack &rRecPack);
