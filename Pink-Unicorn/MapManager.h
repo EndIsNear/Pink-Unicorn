@@ -40,7 +40,6 @@ private:
 	MapManager(){
 		regularBuildingCount = 0;
 		start = Broodwar->self()->getStartLocation();
-		gaysers = Broodwar->getStaticGeysers();
 		CalculateResourseGroups();
 		ScanPylonBuildGrid();
 	};
@@ -77,9 +76,6 @@ private:
 	bool hasUnbuildableNeighbors(TilePosition pos);
 	
 	TilePosition::list resourseGroups;
-	Unitset gaysers;
-	TilePosition nextExpand;
-	TilePosition nextGayser;
 
 	Position::list chokepoints;
 

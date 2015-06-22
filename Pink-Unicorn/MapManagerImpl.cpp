@@ -13,7 +13,7 @@ void AnalyzeMap();
 
 void MapManager::OnFrame()
 {
-	if (Broodwar->getFrameCount() % 50 == 0)
+	if (Broodwar->getFrameCount() % 100 == 0)
 	{
 		ScanPylonBuildGrid();
 		//CalculateExpansions();
@@ -332,31 +332,34 @@ TilePosition getBuildTileInRadius(UnitType type, const TilePosition& center, int
 	std::set<TilePosition> visited;
 	auto cur = tileNode(center, 0);
 
-	work.push(cur);
-	visited.insert(center);
+	if (center.isValid()) {
+		work.push(cur);
+		visited.insert(center);
 
-	while (!work.empty() && cur.radius <= radius)
-	{
-		auto cur = work.front();
-		work.pop();
-
-		if (Broodwar->canBuildHere(cur.pos, type))
+		while (!work.empty() && cur.radius <= radius)
 		{
-			//Broodwar->drawCircle(CoordinateType::Map, cur.x * 32, cur.y * 32, 20, Colors::Green);
-			return cur.pos;
-		}
+			auto cur = work.front();
+			work.pop();
 
-		auto neighbours = getNeighbours(cur.pos);
-		for (auto c : neighbours)
-		{
-			if (visited.find(c) == visited.end())
+			if (Broodwar->canBuildHere(cur.pos, type))
 			{
-				work.push(tileNode(c, radius));
-				visited.insert(c);
+				//Broodwar->drawCircle(CoordinateType::Map, cur.x * 32, cur.y * 32, 20, Colors::Green);
+				return cur.pos;
+			}
+
+			auto neighbours = getNeighbours(cur.pos);
+			for (auto c : neighbours)
+			{
+				if (visited.find(c) == visited.end())
+				{
+					work.push(tileNode(c, cur.radius + 1));
+					visited.insert(c);
+				}
 			}
 		}
 	}
-	return TilePositions::None;
+	
+	return TilePositions::Invalid;
 }
 TilePosition MapManager::SuggestRegular(UnitType type, const TilePosition& location)
 {
@@ -370,20 +373,26 @@ TilePosition MapManager::SuggestRegular(UnitType type, const TilePosition& locat
 
 TilePosition MapManager::SuggestAssimilator(const TilePosition& location)
 {
-	if (!gaysers.empty()) {
+	auto resourses = Broodwar->getUnitsInRadius(Position(start), 100000, Filter::IsResourceContainer);
+	auto gayzars = Unitset();
+	for (auto g : resourses) {
+		if (g->getType() == UnitTypes::Resource_Vespene_Geyser)
+			gayzars.insert(g);
+	}
+
+	if (!gayzars.empty()) { // there are explored and available gayzers and we choose the best one
 		auto less = std::bind([](const TilePosition& start, Unit l, Unit r){
 			return start.getDistance(l->getTilePosition()) < start.getDistance(r->getTilePosition());
 		}, Broodwar->self()->getStartLocation(), _1, _2);
-		auto res = *std::min_element(gaysers.begin(), gaysers.end(), less);
-		gaysers.erase(res);
-		return res->getTilePosition(); // TODO handle cases when gaysers are unavailable
+		auto res = *std::min_element(gayzars.begin(), gayzars.end(), less);
+		return res->getTilePosition(); 
 	}
 	return TilePositions::Invalid;
 }
 
 TilePosition MapManager::SuggestCanon(const TilePosition& location)
 {
-	return TilePositions::Invalid;
+	return getBuildTileInRadius(UnitTypes::Protoss_Photon_Cannon, location);
 }
 
 TilePosition MapManager::SuggestNexus(const TilePosition& location)
