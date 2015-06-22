@@ -23,7 +23,12 @@ void ProduceManager::OnUnitComplete(BWAPI::Unit unit)
 
 void ProduceManager::ProduceSingleUnit(UnitType unit)
 {
-
+	auto src = unit.whatBuilds();
+	for (auto& builder : Broodwar->self()->getUnits())
+	{
+		if (builder->getType() == src.first && builder->isIdle())
+			builder->build(unit);
+	}
 }
 
 void ProduceManager::ProduceSingleUnitFrom(UnitType unit, Unit producer)

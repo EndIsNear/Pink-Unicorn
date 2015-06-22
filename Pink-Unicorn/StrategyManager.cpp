@@ -11,6 +11,8 @@
 const double WantedFreePopPercents = 10;
 
 StrategyManager * StrategyManager::m_instance = NULL;
+int gatewayCnt = 0;
+int gasCnt = 0;
 
 void StrategyManager::OnStart()
 {
@@ -30,8 +32,16 @@ void StrategyManager::OnFrame()
 	{
 		UpdateSupply();
 		UpdateWorkers();
-		//if (Broodwar->self()->minerals() > 400)
-		//	BuildingManager::GetInstance().Build(UnitTypes::Protoss_Gateway);
+		if (ResourceManager::GetInstance().GetFreeMineral() > 150 && gatewayCnt < 3)
+		{
+			if (BuildingManager::GetInstance().Build(UnitTypes::Protoss_Gateway))
+				gatewayCnt++;
+		}
+		if (gatewayCnt >= 3 && ResourceManager::GetInstance().GetFreeMineral() > 300)
+		{
+			for (int i = 0; i < 3; ++i)
+				ProduceManager::GetInstance().ProduceSingleUnit(UnitTypes::Protoss_Zealot);
+		}
 	}
 
 }

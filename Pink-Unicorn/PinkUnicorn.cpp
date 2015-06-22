@@ -124,7 +124,7 @@ void PinkUnicorn::onStart()
 
 	// Check if this is a replay
 	//set game speed
-	Broodwar->setLocalSpeed(10);
+	Broodwar->setLocalSpeed(0);
 	//Broodwar->setFrameSkip(5);
 
 }
