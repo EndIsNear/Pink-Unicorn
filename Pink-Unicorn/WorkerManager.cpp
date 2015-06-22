@@ -80,11 +80,26 @@ void WorkerManager::AddUnit(Unit unit)
 
 		m_expands[end].base = unit;
 		m_expands[end].minerals = unit->getUnitsInRadius(256, Filter::IsMineralField);
-		//m_expands[end].gasStations = unit->getUnitsInRadius(16, Filter::IsRefinery || );
 	}
 	else if (unit->getType().isRefinery())
 	{
-		//Filter::IsResourceDepot
+		Unit nearBase = unit->getClosestUnit(Filter::IsResourceDepot);
+		for (auto& expand : m_expands)
+		{
+			if (expand.base == nearBase)
+			{
+				expand.gasStations.insert(unit);
+				size_t cnt = 0;
+				for (Unitset::iterator it = expand.workers.begin(); cnt < m_maxGas && it != expand.workers.end(); ++it)
+				{
+					if (!(*it)->isCarryingMinerals() && !(*it)->isCarryingGas() && !(*it)->isGatheringGas())
+					{
+						(*it)->gather(unit);
+						cnt++;
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -124,7 +139,7 @@ int WorkerManager::GetNeededWorkers()
 	int res = 0;
 	for (auto& b : m_expands)
 	{
-		res += m_maxMin * b.minerals.size() - b.workers.size();
+		res += m_maxMin * b.minerals.size() + m_maxGas * b.gasStations.size() - b.workers.size();
 	}
 	return res;
 }
@@ -134,7 +149,7 @@ int WorkerManager::GetNeededWorkersForBase(Unit base)
 	for (auto& b : m_expands)
 	{
 		if (b.base == base)
-			return m_maxMin * b.minerals.size() - b.workers.size();
+			return m_maxMin * b.minerals.size() + m_maxGas * b.gasStations.size() - b.workers.size();
 	}
 	return 0;
 }

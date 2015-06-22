@@ -33,14 +33,24 @@ bool BuildingManager::BuildNearTo(UnitType building, TilePosition pos)
 			Unit worker;
 			if (WorkerManager::GetInstance().ReleaseWorker(Position(), worker))
 			{
-				TilePosition buildPos = MapManager::GetInstance().SuggestBuildingLocation(UnitTypes::Protoss_Pylon, pos);
+				TilePosition buildPos = MapManager::GetInstance().SuggestBuildingLocation(building, pos);
 				if (Broodwar->canBuildHere(buildPos, building, worker))
 				{
 					worker->build(building, buildPos);
 					if (building == UnitTypes::Protoss_Pylon)
 						m_SupplyInProgress += SupplyPerPylon;
 					m_BuildingsInProgress.push_back(BuildingPair(building, worker));
+					return true;
 				}
+				else
+				{
+					WorkerManager::GetInstance().AddUnit(worker);
+					ResourceManager::GetInstance().ReleaseRes(building.mineralPrice(), building.gasPrice(), 0);
+				}
+			}
+			else
+			{
+				ResourceManager::GetInstance().ReleaseRes(building.mineralPrice(), building.gasPrice(), 0);
 			}
 		}
 	}

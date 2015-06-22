@@ -7,15 +7,6 @@
 #include <assert.h>
 
 using namespace BWAPI;
-struct ExpansionLocation
-{
-	TilePosition baseLocation;
-	Position resourseGroupCenter;
-	int radius;
-
-	ExpansionLocation(const TilePosition& b = TilePositions::None, const Position& rgc = Positions::None, int r = 200) : 
-		baseLocation(b), resourseGroupCenter(rgc), radius(r) {};
-};
 
 class MapManager : public ManagerBase
 {
@@ -38,7 +29,7 @@ public:
 	}
 
 	TilePosition::list GetExpansionLocations();
-	Position GetClosestExpansionTo(const Position& location);
+	TilePosition GetNextExpansionLocation();
 	Position::list GetChokepoints();
 	Position GetChokepointBetween(Position& start, Position& end);
 	Position GetBaseExit();
@@ -49,22 +40,22 @@ private:
 	MapManager(){
 		regularBuildingCount = 0;
 		start = Broodwar->self()->getStartLocation();
-		CalculateExpansions();
+		gaysers = Broodwar->getStaticGeysers();
+		CalculateResourseGroups();
 		ScanPylonBuildGrid();
 	};
 	MapManager& operator = (const MapManager &m){};
 	static MapManager * insta;
 	static TilePosition start;
 	static Unit testWorker; // used to better check if given position is buildable or nots
+	void checkTestWorker()
+	{
+		if (!testWorker || !testWorker->exists())
+		{
+			getTestWorker();
+		}
+	}
 
-	int regularBuildingCount;
-	std::vector<ExpansionLocation> expansions;
-	Position::list chokepoints;
-	std::set<TilePosition> pylonLocationsGrid; // <TilePosition location, bool occupied>
-	std::set<TilePosition> builtPylons;
-	TilePosition nextPylon;
-	TilePosition nextPylonBuildSpot;
-	
 	void getTestWorker()
 	{
 		auto workers = Broodwar->getUnitsInRadius(Position(start), 10000, Filter::IsWorker);
@@ -77,10 +68,32 @@ private:
 			}
 		}
 	}
+
+	bool canBuild(UnitType type, const TilePosition& location)
+	{
+		checkTestWorker();
+		return Broodwar->canBuildHere(location, type, testWorker);
+	}
+	bool hasUnbuildableNeighbors(TilePosition pos);
+	
+	TilePosition::list resourseGroups;
+	Unitset gaysers;
+	TilePosition nextExpand;
+	TilePosition nextGayser;
+
+	Position::list chokepoints;
+
+	std::set<TilePosition> pylonLocationsGrid; // <TilePosition location, bool occupied>
+	std::set<TilePosition> builtPylons;
+	TilePosition nextPylon;
+	TilePosition nextPylonBuildSpot;
+
+	int regularBuildingCount;
+
 	void ScanPylonBuildGrid();
 	void InsertToPylonGrid(const TilePosition& pos);
 	Position GetResourseGroupCenter(const TilePosition& expansionLocation = start);
-	void CalculateExpansions();
+	void CalculateResourseGroups();
 	void CalculateChokepoints();
 	void getNextPylonBuildSpot(const TilePosition& location);
 	void getNextPylon(const TilePosition& location);

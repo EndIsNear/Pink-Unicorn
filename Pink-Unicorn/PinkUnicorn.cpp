@@ -9,6 +9,7 @@
 #include "MacroManager.h"
 #include "BuildingManager.h"
 #include "StrategyManager.h"
+#include "SpyManager.h"
 
 #include <iostream>
 
@@ -26,6 +27,7 @@ PinkUnicorn::PinkUnicorn()
 	mManagers.push_back(&BuildingManager::GetInstance());
 	//mManagers.push_back(new MacroManager);
 	mManagers.push_back(&MapManager::GetInstance());
+	mManagers.push_back(&SpyManager::GetInstance());
 }
 
 
@@ -122,7 +124,7 @@ void PinkUnicorn::onStart()
 
 	// Check if this is a replay
 	//set game speed
-	Broodwar->setLocalSpeed(0);
+	Broodwar->setLocalSpeed(10);
 	//Broodwar->setFrameSkip(5);
 
 }
@@ -189,6 +191,8 @@ void PinkUnicorn::onUnitDiscover(BWAPI::Unit unit)
 	{
 		return;
 	}
+	for (auto m : mManagers)
+		m->OnUnitDiscover(unit);
 }
 
 void PinkUnicorn::onUnitEvade(BWAPI::Unit unit)

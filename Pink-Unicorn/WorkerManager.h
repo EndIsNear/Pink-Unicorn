@@ -9,7 +9,7 @@ class WorkerManager : public ManagerBase
 	WorkerManager()
 	{
 		m_maxMin = 3;
-		m_maxGas = 0;
+		m_maxGas = 3;
 	};
 	WorkerManager(const WorkerManager&) = delete;
 	WorkerManager& operator= (const WorkerManager&) = delete;
