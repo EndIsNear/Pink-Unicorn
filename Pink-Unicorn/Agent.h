@@ -126,11 +126,11 @@ public:
 				else if (inRange.size())
 					eu = Closest(mUnit->getPosition(), inRange);
 
-				if (mUnit->getTarget() != eu || mUnit->getLastCommand().getType() != UnitCommandTypes::Attack_Unit)
+				if ( mUnit->getTarget() != eu || mUnit->getLastCommand().getType() != UnitCommandTypes::Attack_Unit)
 					mUnit->attack(eu);
 				bResult = true;
 			}
-			if (mUnit->getLastCommand().getType() == UnitCommandTypes::Attack_Unit)
+			else if (mUnit->getLastCommand().getType() == UnitCommandTypes::Attack_Unit && mUnit->getTarget())
 				bResult = true;
 		}
 		return bResult;
@@ -144,6 +144,8 @@ double CalcScore(Unitset set)
 	double result = 0;
 	for (auto it : set)
 	{
+		if (it->getType().isBuilding())
+			continue;
 		switch (it->getType())
 		{
 			// todo implemented
@@ -168,17 +170,17 @@ public:
 	virtual bool OnFrame() override
 	{
 		bool bResult = false;
-		double myArmyValue = CalcScore(mUnit->getUnitsInRadius(mDist, IsAlly));
+		double myArmyValue = CalcScore(mUnit->getUnitsInRadius(3*mDist, IsAlly));
 		auto enemyArmy = mUnit->getUnitsInRadius(mDist, mFilter);
 		double enemyArmyValue = CalcScore(enemyArmy);
-		if (myArmyValue + 200 < enemyArmyValue)
+		if (myArmyValue *0.95< enemyArmyValue)
 		{
 			auto ep = enemyArmy.getPosition();
 			auto d = ep.getDistance(mUnit->getPosition());
 			auto GoToPos = mUnit->getPosition() - ep;
 			Vector2D vDir(GoToPos.x, GoToPos.y);
 			vDir.Normalize();
-			vDir = vDir * 50;
+			vDir = vDir * mDist* 0.1;
 			GoToPos.x = vDir.x;
 			GoToPos.y = vDir.y;
 			GoToPos = mUnit->getPosition() + GoToPos;
@@ -274,8 +276,8 @@ class DragoonControl : public ControlPattern
 public:
 	DragoonControl(Unit drag) : ControlPattern(drag)
 	{
-		Agents.push_back(new AssessTheEnemy(drag, 500));
-		Agents.push_back(new AgentStayAway(drag, 50, 100, IsEnemy));
+		Agents.push_back(new AssessTheEnemy(drag, 300));
+		Agents.push_back(new AgentStayAway(drag, 75, 100, IsEnemy));
 		Agents.push_back(new AgentAttackInRange(drag, 250, 150));
 		Agents.push_back(new AgentStayAway(drag, 10, 5, IsAlly));
 		Agents.push_back(new AgentStayToghether(drag, 800));
@@ -290,7 +292,7 @@ class ZelotControl : public ControlPattern
 public:
 	ZelotControl(Unit zelka) : ControlPattern(zelka)
 	{
-		Agents.push_back(new AssessTheEnemy(zelka, 500));
+		Agents.push_back(new AssessTheEnemy(zelka, 250));
 		Agents.push_back(new AgentAttackInRange(zelka, 150, 10));
 		Position p(Broodwar->getStartLocations().at(1));
 		Agents.push_back(new AgentGoToPosition(zelka, p));
@@ -298,6 +300,11 @@ public:
 	}
 };
 
+struct UnitPatterPair
+{
+	BWAPI::UnitType type;
+	ControlPattern * cp;
+};
 
 class Micro : public ManagerBase
 {
