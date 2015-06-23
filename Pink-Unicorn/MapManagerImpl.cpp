@@ -117,8 +117,7 @@ Position MapManager::GetBaseExit()
 
 TilePosition MapManager::SuggestBuildingLocation(UnitType type, const TilePosition& preferredPosition, int radius, bool creep)
 {
-	auto res = Broodwar->getBuildLocation(type, preferredPosition, radius, creep);
-
+	auto res = TilePositions::Invalid;
 	if (Broodwar->canBuildHere(preferredPosition, type))
 	{
 		return preferredPosition;
@@ -332,7 +331,7 @@ void insertToVect(std::vector<TilePosition>& vect, const TilePosition& p, Color 
 bool hasSpace(UnitType type, TilePosition pos, int spacing) {
 	auto buildingCenter = Position(pos) + (Position(type.tileSize()) / 2);
 	int buildRadius = buildingCenter.getDistance(Position(pos)) + spacing;
-	auto closestUnit = Broodwar->getClosestUnit(buildingCenter, Filter::IsBuilding, buildRadius);
+	auto closestUnit = Broodwar->getClosestUnit(buildingCenter, (Filter::IsBuilding || Filter::IsBeingConstructed), buildRadius);
 	if (!closestUnit) {
 		return true;
 	}
@@ -380,7 +379,7 @@ TilePosition getBuildTileInRadius(UnitType type, const TilePosition& center, int
 TilePosition MapManager::SuggestRegular(UnitType type, const TilePosition& location)
 {
 	if (nextPylon.isValid()) {
-		auto res = getBuildTileInRadius(type, nextPylon);
+		auto res = getBuildTileInRadius(type, nextPylon, 320);
 		if (!res.isValid()) 
 		{
 			getNextPylon(location);
@@ -454,7 +453,7 @@ TilePosition::list GetResGroupsCenters(const std::map<int, Unitset> & groups)
 
 TilePosition GetBaseLocation(const TilePosition& resGroupCenter)
 {
-	return getBuildTileInRadius(UnitTypes::Protoss_Nexus, resGroupCenter);
+	return getBuildTileInRadius(UnitTypes::Protoss_Nexus, resGroupCenter, 0, -10);
 }
 
 void MapManager::CalculateResourseGroups()
