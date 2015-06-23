@@ -26,21 +26,40 @@ void StrategyManager::OnStart()
 
 }
 
+static int pylons;
 void StrategyManager::OnFrame()
 {
 	if (Broodwar->getFrameCount() % 10 == 0)
 	{
 		UpdateSupply();
 		UpdateWorkers();
-		if (ResourceManager::GetInstance().GetFreeMineral() > 150 && gatewayCnt < 3)
+
+		static bool asimilator;
+		static bool core;
+		if (asimilator == false)
+		if (ResourceManager::GetInstance().GetFreeMineral() > 75 )
+		{
+			if (BuildingManager::GetInstance().Build(UnitTypes::Protoss_Assimilator))
+				asimilator = true;
+		}
+		if (ResourceManager::GetInstance().GetFreeMineral() > 150 && gatewayCnt > 1 && pylons > 1 && core == false)
+		{
+			if (BuildingManager::GetInstance().Build(UnitTypes::Protoss_Cybernetics_Core))
+				core = true;
+		}
+
+		if (ResourceManager::GetInstance().GetFreeMineral() > 150 && gatewayCnt < 3 && pylons > 1)
 		{
 			if (BuildingManager::GetInstance().Build(UnitTypes::Protoss_Gateway))
 				gatewayCnt++;
 		}
-		if (gatewayCnt >= 3 && ResourceManager::GetInstance().GetFreeMineral() > 300)
+		if (gatewayCnt >= 3 && ResourceManager::GetInstance().GetFreeMineral() > 350 && ResourceManager::GetInstance().GetFreeMineral() >75)
 		{
-			for (int i = 0; i < 3; ++i)
-				ProduceManager::GetInstance().ProduceSingleUnit(UnitTypes::Protoss_Zealot);
+			ProduceManager::GetInstance().ProduceSingleUnit(UnitTypes::Protoss_Zealot);
+			ProduceManager::GetInstance().ProduceSingleUnit(UnitTypes::Protoss_Zealot);
+			ProduceManager::GetInstance().ProduceSingleUnit(UnitTypes::Protoss_Dragoon);
+			//ProduceManager::GetInstance().ProduceSingleUnit(UnitTypes::Protoss_Dragoon);
+			//ProduceManager::GetInstance().ProduceSingleUnit(UnitTypes::Protoss_Zealot);
 		}
 	}
 
@@ -52,6 +71,7 @@ void StrategyManager::UpdateSupply()
 	if (ResourceManager::GetInstance().GetFreeSupply() + BuildingManager::GetInstance().GetSupplyInProgress() < wantedSupply)
 	{
 		BuildingManager::GetInstance().BuildBaseExit(UnitTypes::Protoss_Pylon);
+		pylons++;
 	}
 }
 

@@ -27,7 +27,10 @@ void ProduceManager::ProduceSingleUnit(UnitType unit)
 	for (auto& builder : Broodwar->self()->getUnits())
 	{
 		if (builder->getType() == src.first && builder->isIdle())
+		{
 			builder->build(unit);
+			break;
+		}
 	}
 }
 

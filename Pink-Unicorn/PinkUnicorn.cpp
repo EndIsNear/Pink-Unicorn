@@ -7,6 +7,7 @@
 #include "WorkerManager.h"
 #include "ProductionTasks.h"
 #include "MacroManager.h"
+#include "Agent.h"
 #include "BuildingManager.h"
 #include "StrategyManager.h"
 #include "SpyManager.h"
@@ -16,7 +17,7 @@
 using namespace BWAPI;
 using namespace Filter;
 
-
+Micro *Micro::inst = NULL;
 
 PinkUnicorn::PinkUnicorn()
 {
@@ -28,6 +29,7 @@ PinkUnicorn::PinkUnicorn()
 	//mManagers.push_back(new MacroManager);
 	mManagers.push_back(&MapManager::GetInstance());
 	mManagers.push_back(&SpyManager::GetInstance());
+	mManagers.push_back(&Micro::GetInstance());
 }
 
 
