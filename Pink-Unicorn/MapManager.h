@@ -40,6 +40,7 @@ private:
 	MapManager(){
 		regularBuildingCount = 0;
 		start = Broodwar->self()->getStartLocation();
+		nextPylon = TilePositions::Invalid;
 		CalculateResourseGroups();
 		ScanPylonBuildGrid();
 	};
