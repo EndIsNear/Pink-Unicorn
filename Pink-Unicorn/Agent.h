@@ -253,6 +253,10 @@ public:
 			delete a;
 		}
 	}
+
+	Unit GetUnit() {
+		return mUnit;
+	}
 	void OnDraw()
 	{
 		for (auto it : Agents)

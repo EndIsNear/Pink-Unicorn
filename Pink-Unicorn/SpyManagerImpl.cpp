@@ -19,3 +19,20 @@ TilePosition::list SpyManager::GetEnemyBases()
 	}
 	return result;
 }
+
+bool SpyManager::IsUnitScouting(Unit u) {
+	for (auto sp : spyUnits) {
+		if (sp->GetUnit() == u)
+			return true;
+	}
+	return false;
+}
+void SpyManager::StopUnit(Unit u) {
+	for (int i = 0; i < spyUnits.size(); ++i) {
+		if (spyUnits[i]->GetUnit() == u) {
+			delete *(spyUnits.begin() + i);
+			spyUnits.erase(spyUnits.begin() + i);
+			return;
+		}
+	}
+}

@@ -139,19 +139,25 @@ TilePosition MapManager::SuggestBuildingLocation(UnitType type, const TilePositi
 	return res;
 }
 
+void addPoint(std::vector<TilePosition>& points, const TilePosition& location) {
+	if (location.isValid()) {
+		points.push_back(location);
+	}
+}
 std::vector<TilePosition> getNeighbours(TilePosition pos)
 {
 	auto res = std::vector<TilePosition>();
-	res.push_back(TilePosition(pos.x, pos.y-1));
-	res.push_back(TilePosition(pos.x - 1, pos.y - 1));
-	res.push_back(TilePosition(pos.x + 1, pos.y - 1));
-	res.push_back(TilePosition(pos.x - 1, pos.y));
-	res.push_back(TilePosition(pos.x + 1, pos.y));
-	res.push_back(TilePosition(pos.x, pos.y + 1));
-	res.push_back(TilePosition(pos.x - 1, pos.y + 1));
-	res.push_back(TilePosition(pos.x + 1, pos.y + 1));
+	addPoint(res, TilePosition(pos.x, pos.y-1));
+	addPoint(res, TilePosition(pos.x - 1, pos.y - 1));
+	addPoint(res, TilePosition(pos.x + 1, pos.y - 1));
+	addPoint(res, TilePosition(pos.x - 1, pos.y));
+	addPoint(res, TilePosition(pos.x + 1, pos.y));
+	addPoint(res, TilePosition(pos.x, pos.y + 1));
+	addPoint(res, TilePosition(pos.x - 1, pos.y + 1));
+	addPoint(res, TilePosition(pos.x + 1, pos.y + 1));
 	return res;
 }
+
 bool MapManager::hasUnbuildableNeighbors(TilePosition pos)
 {
 	for (auto p : getNeighbours(pos))
@@ -288,14 +294,16 @@ void MapManager::ScanPylonBuildGrid()
 	}
 }
 
-TilePosition getNextSpot(const TilePosition& location, const std::set<TilePosition>& container)
+TilePosition getNextSpot(const TilePosition& location, std::set<TilePosition>& container)
 {
 	if (!container.empty())
 	{
 		auto pred = std::bind([](const TilePosition& target, const TilePosition& l, const TilePosition& r){
 			return l.getDistance(target) < r.getDistance(target);
 		}, location, _1, _2);
-		return *std::min_element(container.begin(), container.end(), pred);
+		auto res = *std::min_element(container.begin(), container.end(), pred);
+		container.erase(res);
+		return res;
 	}
 	return TilePositions::Invalid;
 }
@@ -311,15 +319,8 @@ void MapManager::getNextPylon(const TilePosition& location)
 TilePosition MapManager::SuggestPylon(const TilePosition& location)
 {
 	getNextPylonBuildSpot(location);
-	pylonLocationsGrid.erase(nextPylonBuildSpot); 
 	return nextPylonBuildSpot;
 }
-
-struct tileNode {
-	TilePosition pos;
-	int radius;
-	tileNode(const TilePosition& p, int r) : pos(p), radius(r){};
-};
 
 void insertToVect(std::vector<TilePosition>& vect, const TilePosition& p, Color c) {
 	//std::cout << p << std::endl;
@@ -327,58 +328,72 @@ void insertToVect(std::vector<TilePosition>& vect, const TilePosition& p, Color 
 	vect.push_back(p);
 }
 
-TilePosition getBuildTileInRadius(UnitType type, const TilePosition& center, int radius = 64) { // TODO think about spacing and walkability
-	std::queue<tileNode> work;
+
+bool hasSpace(UnitType type, TilePosition pos, int spacing) {
+	auto buildingCenter = Position(pos) + (Position(type.tileSize()) / 2);
+	int buildRadius = buildingCenter.getDistance(Position(pos)) + spacing;
+	auto closestUnit = Broodwar->getClosestUnit(buildingCenter, Filter::IsBuilding, buildRadius);
+	if (!closestUnit) {
+		return true;
+	}
+	return false;
+}
+
+TilePosition getBuildTileInRadius(UnitType type, const TilePosition& center, int radius = 320, int spacing = 30) {
+	std::queue<TilePosition> work;
 	std::set<TilePosition> visited;
-	auto cur = tileNode(center, 0);
+	auto cur = center;
+	int iterations = 0;
 
 	if (center.isValid()) {
 		work.push(cur);
 		visited.insert(center);
+		
 
-		while (!work.empty() && cur.radius <= radius)
+		while (!work.empty())
 		{
 			auto cur = work.front();
 			work.pop();
-
-			if (Broodwar->canBuildHere(cur.pos, type))
+			iterations++;
+			if (hasSpace(type, cur, spacing) && Broodwar->canBuildHere(cur, type))
 			{
-				//Broodwar->drawCircle(CoordinateType::Map, cur.x * 32, cur.y * 32, 20, Colors::Green);
-				return cur.pos;
+				//std::cout << iterations << std::endl;
+				return cur;
 			}
 
-			auto neighbours = getNeighbours(cur.pos);
+			auto neighbours = getNeighbours(cur);
 			for (auto c : neighbours)
 			{
-				if (visited.find(c) == visited.end())
+				auto distance = Position(c).getDistance(Position(center));
+				if (visited.find(c) == visited.end() && distance < radius)
 				{
-					work.push(tileNode(c, cur.radius + 1));
+					work.push(c);
 					visited.insert(c);
 				}
 			}
 		}
 	}
-	
+	//std::cout << iterations << std::endl;
+	//std::cout << " invalid\n";
 	return TilePositions::Invalid;
 }
 TilePosition MapManager::SuggestRegular(UnitType type, const TilePosition& location)
 {
-	if (regularBuildingCount % 2 == 0) // no more than 2 buildings near single pylon
-	{
-		getNextPylon(location);
+	if (nextPylon.isValid()) {
+		auto res = getBuildTileInRadius(type, nextPylon);
+		if (!res.isValid()) 
+		{
+			getNextPylon(location);
+		}
+		return res;
 	}
-	regularBuildingCount++;
-	return getBuildTileInRadius(type, nextPylon);
+	getNextPylon(location);
+	return TilePositions::Invalid;
 }
 
 TilePosition MapManager::SuggestAssimilator(const TilePosition& location)
 {
-	auto resourses = Broodwar->getUnitsInRadius(Position(start), 100000, Filter::IsResourceContainer);
-	auto gayzars = Unitset();
-	for (auto g : resourses) {
-		if (g->getType() == UnitTypes::Resource_Vespene_Geyser)
-			gayzars.insert(g);
-	}
+	auto gayzars = Broodwar->getGeysers();
 
 	if (!gayzars.empty()) { // there are explored and available gayzers and we choose the best one
 		auto less = std::bind([](const TilePosition& start, Unit l, Unit r){

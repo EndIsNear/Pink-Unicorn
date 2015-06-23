@@ -153,6 +153,8 @@ public:
 		//TODO
 	}
 	TilePosition::list GetEnemyBases();
+	bool IsUnitScouting(Unit u);
+	void StopUnit(Unit u);
 private:
 	static SpyManager* insta;
 	~SpyManager(){
