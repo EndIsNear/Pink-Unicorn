@@ -462,11 +462,14 @@ void MapManager::CalculateResourseGroups()
 	auto resGroups = GetResourseGroups();
 	resourseGroups = GetResGroupsCenters(resGroups);
 
-	auto pred = std::bind([](const TilePosition& start, const TilePosition& l, const TilePosition& r){
-		return start.getDistance(l) > start.getDistance(r);
-	}, Broodwar->self()->getStartLocation(), _1, _2);
+	auto baseExit = GetBaseExit();
+
+	auto pred = [&baseExit](const TilePosition& l, const TilePosition& r){
+		return baseExit.getDistance(static_cast<Position>(l)) > baseExit.getDistance(static_cast<Position>(r));
+	};
 	std::sort(resourseGroups.begin(), resourseGroups.end(), pred);
 
-	resourseGroups.pop_back(); // that removes the start location's RG, because we dont want to expand there
+	std::remove_if(resourseGroups.begin(), resourseGroups.end(),
+		([](const TilePosition& pos){ return Broodwar->self()->getStartLocation().getDistance(pos) < 16; }));
 }
 
