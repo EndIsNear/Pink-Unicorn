@@ -11,8 +11,6 @@
 const double WantedFreePopPercents = 10;
 
 StrategyManager * StrategyManager::m_instance = NULL;
-int gatewayCnt = 0;
-int gasCnt = 0;
 
 void StrategyManager::OnStart()
 {
@@ -26,47 +24,13 @@ void StrategyManager::OnStart()
 
 }
 
-
 void StrategyManager::OnFrame()
 {
 	if (Broodwar->getFrameCount() % 10 == 0)
 	{
 		UpdateSupply();
 		UpdateWorkers();
-
-		static bool asimilator;
-		static bool core;
-		if (asimilator == false)
-		if (ResourceManager::GetInstance().GetFreeMineral() > 150)
-		{
-			if (BuildingManager::GetInstance().Build(UnitTypes::Protoss_Assimilator))
-				asimilator = true;
-		}
-		if (ResourceManager::GetInstance().GetFreeMineral() > 150 && gatewayCnt > 1 && core == false)
-		{
-			if (BuildingManager::GetInstance().Build(UnitTypes::Protoss_Cybernetics_Core))
-				core = true;
-		}
-
-		if (ResourceManager::GetInstance().GetFreeMineral() > 150 && Broodwar->self()->supplyTotal() > 20 && gatewayCnt < 5 )
-		{
-			if (BuildingManager::GetInstance().Build(UnitTypes::Protoss_Gateway))
-				gatewayCnt++;
-		}
-		if (gatewayCnt >= 3 )
-		{
-			ProduceManager::GetInstance().ProduceSingleUnit(UnitTypes::Protoss_Dragoon);
-			ProduceManager::GetInstance().ProduceSingleUnit(UnitTypes::Protoss_Dragoon);
-			ProduceManager::GetInstance().ProduceSingleUnit(UnitTypes::Protoss_Zealot);
-			ProduceManager::GetInstance().ProduceSingleUnit(UnitTypes::Protoss_Zealot);
-			ProduceManager::GetInstance().ProduceSingleUnit(UnitTypes::Protoss_Zealot);
-			ProduceManager::GetInstance().ProduceSingleUnit(UnitTypes::Protoss_Zealot);
-			ProduceManager::GetInstance().ProduceSingleUnit(UnitTypes::Protoss_Zealot);
-			//ProduceManager::GetInstance().ProduceSingleUnit(UnitTypes::Protoss_Dragoon);
-			//ProduceManager::GetInstance().ProduceSingleUnit(UnitTypes::Protoss_Zealot);
-		}
 	}
-
 }
 
 void StrategyManager::UpdateSupply()
