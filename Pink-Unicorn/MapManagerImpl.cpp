@@ -457,19 +457,28 @@ TilePosition GetBaseLocation(const TilePosition& resGroupCenter)
 	return getBuildTileInRadius(UnitTypes::Protoss_Nexus, resGroupCenter, 400, 0);
 }
 
+void RemoveClosestToStart(TilePosition::list& rgps) {
+	for (int i = 0; i < rgps.size(); ++i) {
+		auto current = rgps.back();
+		rgps.pop_back();
+
+		if (Broodwar->self()->getStartLocation().getDistance(current) < 16) {
+			return;
+		}
+		rgps.push_front(current);
+	}
+}
+
 void MapManager::CalculateResourseGroups()
 {
 	auto resGroups = GetResourseGroups();
 	resourseGroups = GetResGroupsCenters(resGroups);
-
 	auto baseExit = GetBaseExit();
 
+	RemoveClosestToStart(resourseGroups);
 	auto pred = [&baseExit](const TilePosition& l, const TilePosition& r){
 		return baseExit.getDistance(static_cast<Position>(l)) > baseExit.getDistance(static_cast<Position>(r));
 	};
 	std::sort(resourseGroups.begin(), resourseGroups.end(), pred);
-
-	std::remove_if(resourseGroups.begin(), resourseGroups.end(),
-		([](const TilePosition& pos){ return Broodwar->self()->getStartLocation().getDistance(pos) < 16; }));
 }
 
