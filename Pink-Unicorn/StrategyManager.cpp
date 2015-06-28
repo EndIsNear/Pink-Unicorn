@@ -31,6 +31,7 @@ void StrategyManager::OnFrame()
 		UpdateSupply();
 		UpdateWorkers();
 	}
+	BuildExpand();
 }
 
 void StrategyManager::UpdateSupply()
@@ -50,5 +51,13 @@ void StrategyManager::UpdateWorkers()
 		if(workMan.GetNeededWorkersForBase(base) > 0) //crnMaxDiff)
 			ProduceManager::GetInstance().ProduceSingleUnitFrom(UnitTypes::Protoss_Probe, base);
 	}
+}
+
+bool StrategyManager::BuildExpand()
+{
+	if (ResourceManager::GetInstance().GetFreeMineral() < 400)
+		return false;
+	auto pos = MapManager::GetInstance().GetNextExpansionLocation();
+	return BuildingManager::GetInstance().BuildNearTo(UnitTypes::Protoss_Nexus, pos);
 }
 

@@ -60,6 +60,9 @@ public:
 private:
 	std::vector <BuildingPair> m_BuildingsInProgress;
 	int m_SupplyInProgress;
+
+	//use it after reserve res 
+	bool BuildWithNearTo(Unit builder, UnitType building, TilePosition pos);
 };
 
 

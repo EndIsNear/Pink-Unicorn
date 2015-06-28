@@ -44,9 +44,9 @@ public:
 	{
 		m_bases.insert(base);
 	}
-
 private:
 	Unitset m_bases;
+	bool BuildExpand();
 };
 
 #endif //STRATEGY_MANAGER_H

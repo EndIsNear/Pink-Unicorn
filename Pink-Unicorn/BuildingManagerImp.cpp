@@ -46,19 +46,19 @@ bool BuildingManager::BuildNearTo(UnitType building, TilePosition pos)
 			Unit worker;
 			if (WorkerManager::GetInstance().ReleaseWorker(Position(), worker))
 			{
-				TilePosition buildPos = MapManager::GetInstance().SuggestBuildingLocation(building, pos);
-				if (Broodwar->canBuildHere(buildPos, building, worker))
+				if (Broodwar->isExplored(pos))
 				{
-					worker->build(building, buildPos);
-					if (building == UnitTypes::Protoss_Pylon)
-						m_SupplyInProgress += SupplyPerPylon;
-					m_BuildingsInProgress.push_back(BuildingPair(building, worker));
-					return true;
+					BuildWithNearTo(worker, building, pos);
 				}
 				else
 				{
-					WorkerManager::GetInstance().AddUnit(worker);
-					ResourceManager::GetInstance().ReleaseRes(building.mineralPrice(), building.gasPrice(), 0);
+					pos.x -= 1;//move away from build pos
+					worker->move(static_cast<Position>(pos));
+					Broodwar->registerEvent(
+						[=](Game * p){BuildingManager::GetInstance().BuildWithNearTo(worker, UnitTypes::Protoss_Nexus, pos); },
+						[worker](Game * p){ return worker->isIdle(); },
+						1, 20
+						);
 				}
 			}
 			else
@@ -66,6 +66,26 @@ bool BuildingManager::BuildNearTo(UnitType building, TilePosition pos)
 				ResourceManager::GetInstance().ReleaseRes(building.mineralPrice(), building.gasPrice(), 0);
 			}
 		}
+	}
+	return false;
+}
+
+bool BuildingManager::BuildWithNearTo(Unit builder, UnitType building, TilePosition pos)
+{
+	TilePosition buildPos = MapManager::GetInstance().SuggestBuildingLocation(building, pos);
+	if (Broodwar->canBuildHere(buildPos, building, builder))
+	{
+		builder->build(building, buildPos);
+		if (building == UnitTypes::Protoss_Pylon)
+			m_SupplyInProgress += SupplyPerPylon;
+		m_BuildingsInProgress.push_back(BuildingPair(building, builder));
+		auto err = Broodwar->getLastError();
+		return true;
+	}
+	else
+	{
+		WorkerManager::GetInstance().AddUnit(builder);
+		ResourceManager::GetInstance().ReleaseRes(building.mineralPrice(), building.gasPrice(), 0);
 	}
 	return false;
 }
