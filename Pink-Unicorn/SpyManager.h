@@ -142,6 +142,7 @@ public:
 		return *insta;
 	}
 
+	void InitialSpy(Unit unit);
 	void ExploreLocations(Unit spyUnit, const TilePosition::list& locations, bool patrol = true) {
 		spyUnits.push_back(new ScoutPattern(spyUnit, locations, patrol));
 	}

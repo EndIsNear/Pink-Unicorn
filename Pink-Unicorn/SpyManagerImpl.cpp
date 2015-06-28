@@ -36,3 +36,12 @@ void SpyManager::StopUnit(Unit u) {
 		}
 	}
 }
+void SpyManager::InitialSpy(Unit unit) {
+	TilePosition::list outerStartLocations;
+	for (auto l : Broodwar->getStartLocations()) {
+		if (l != Broodwar->self()->getStartLocation()) {
+			outerStartLocations.push_back(l);
+		}
+	}
+	ExploreLocations(unit, outerStartLocations);
+}
