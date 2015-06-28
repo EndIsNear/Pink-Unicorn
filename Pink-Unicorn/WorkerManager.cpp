@@ -60,7 +60,7 @@ void WorkerManager::AddUnit(Unit unit)
 				//		return;
 				//	}
 				//}
-				if (unit->gather(unit->getClosestUnit(Filter::IsMineralField)))
+				if (unit->gather(expand.base->getClosestUnit(Filter::IsMineralField)))
 				{
 					return;
 				}

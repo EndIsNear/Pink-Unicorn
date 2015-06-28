@@ -62,7 +62,7 @@ void BuildingManager::CheckNewBuildings(Unit building)
 	for (size_t i = 0; i < m_BuildingsInProgress.size(); ++i)
 	{
 		if (building->getType() == m_BuildingsInProgress[i].first 
-			&& building->getDistance(m_BuildingsInProgress[i].second) < 32)
+			&& building->getDistance(m_BuildingsInProgress[i].second) < 64)
 		{
 			WorkerManager::GetInstance().AddUnit(m_BuildingsInProgress[i].second);
 			ResourceManager::GetInstance().ReleaseRes(building->getType().mineralPrice(), building->getType().gasPrice(), 0);

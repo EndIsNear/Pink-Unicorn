@@ -21,7 +21,6 @@ void StrategyManager::OnStart()
 			m_bases.insert(unit);
 		}
 	}
-
 }
 
 void StrategyManager::OnFrame()
