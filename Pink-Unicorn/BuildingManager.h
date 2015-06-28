@@ -51,11 +51,7 @@ public:
 
 	void CheckNewBuildings(Unit building);
 
-	void OnUnitComplete(Unit unit)
-	{
-		if (unit->getType() == UnitTypes::Protoss_Pylon)
-			m_SupplyInProgress -= SupplyPerPylon;
-	}
+	void OnUnitComplete(Unit unit);
 
 	int GetSupplyInProgress()
 	{

@@ -40,6 +40,10 @@ public:
 
 	void UpdateSupply();
 	void UpdateWorkers();
+	void AddBase(Unit base)
+	{
+		m_bases.insert(base);
+	}
 
 private:
 	Unitset m_bases;

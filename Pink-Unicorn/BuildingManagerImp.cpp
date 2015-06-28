@@ -2,6 +2,7 @@
 #include "WorkerManager.h"
 #include "MapManager.h"
 #include "ResourceManager.h"
+#include "StrategyManager.h"
 
 #include "BuildingManager.h"
 
@@ -11,6 +12,18 @@ void BuildingManager::OnFrame()
 {
 
 }
+
+void BuildingManager::OnUnitComplete(Unit unit)
+{
+	if (unit->getType() == UnitTypes::Protoss_Pylon)
+		m_SupplyInProgress -= SupplyPerPylon;
+	else if (unit->getType() == UnitTypes::Protoss_Nexus)
+	{
+		WorkerManager::GetInstance().AddUnit(unit);
+		StrategyManager::GetInstance().AddBase(unit);
+	}
+}
+
 
 bool BuildingManager::BuildBaseExit(UnitType building)
 {

@@ -45,7 +45,7 @@ void WorkerManager::AddUnit(Unit unit)
 {
 	if (unit->getType().isWorker())
 	{
-		auto nearBase = unit->getClosestUnit(Filter::IsResourceDepot);
+		auto nearBase = unit->getClosestUnit(Filter::IsResourceDepot && Filter::IsCompleted);
 		for (auto& expand : m_expands)
 		{
 			if (expand.base == nearBase)

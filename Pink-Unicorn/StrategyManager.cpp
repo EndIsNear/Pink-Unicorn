@@ -3,6 +3,7 @@
 #include "ProductionManager.h"
 #include "WorkerManager.h"
 #include "ResourceManager.h"
+#include "MapManager.h"
 #include "BWAPI.h"
 
 #include <algorithm>
@@ -50,6 +51,4 @@ void StrategyManager::UpdateWorkers()
 			ProduceManager::GetInstance().ProduceSingleUnitFrom(UnitTypes::Protoss_Probe, base);
 	}
 }
-
-
 
