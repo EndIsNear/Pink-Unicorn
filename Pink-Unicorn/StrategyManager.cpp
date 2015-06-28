@@ -26,21 +26,44 @@ void StrategyManager::OnStart()
 
 }
 
+
 void StrategyManager::OnFrame()
 {
 	if (Broodwar->getFrameCount() % 10 == 0)
 	{
 		UpdateSupply();
 		UpdateWorkers();
-		if (ResourceManager::GetInstance().GetFreeMineral() > 150 && gatewayCnt < 3)
+
+		static bool asimilator;
+		static bool core;
+		if (asimilator == false)
+		if (ResourceManager::GetInstance().GetFreeMineral() > 150)
+		{
+			if (BuildingManager::GetInstance().Build(UnitTypes::Protoss_Assimilator))
+				asimilator = true;
+		}
+		if (ResourceManager::GetInstance().GetFreeMineral() > 150 && gatewayCnt > 1 && core == false)
+		{
+			if (BuildingManager::GetInstance().Build(UnitTypes::Protoss_Cybernetics_Core))
+				core = true;
+		}
+
+		if (ResourceManager::GetInstance().GetFreeMineral() > 150 && Broodwar->self()->supplyTotal() > 20 && gatewayCnt < 5 )
 		{
 			if (BuildingManager::GetInstance().Build(UnitTypes::Protoss_Gateway))
 				gatewayCnt++;
 		}
-		if (gatewayCnt >= 3 && ResourceManager::GetInstance().GetFreeMineral() > 300)
+		if (gatewayCnt >= 3 )
 		{
-			for (int i = 0; i < 3; ++i)
-				ProduceManager::GetInstance().ProduceSingleUnit(UnitTypes::Protoss_Zealot);
+			ProduceManager::GetInstance().ProduceSingleUnit(UnitTypes::Protoss_Dragoon);
+			ProduceManager::GetInstance().ProduceSingleUnit(UnitTypes::Protoss_Dragoon);
+			ProduceManager::GetInstance().ProduceSingleUnit(UnitTypes::Protoss_Zealot);
+			ProduceManager::GetInstance().ProduceSingleUnit(UnitTypes::Protoss_Zealot);
+			ProduceManager::GetInstance().ProduceSingleUnit(UnitTypes::Protoss_Zealot);
+			ProduceManager::GetInstance().ProduceSingleUnit(UnitTypes::Protoss_Zealot);
+			ProduceManager::GetInstance().ProduceSingleUnit(UnitTypes::Protoss_Zealot);
+			//ProduceManager::GetInstance().ProduceSingleUnit(UnitTypes::Protoss_Dragoon);
+			//ProduceManager::GetInstance().ProduceSingleUnit(UnitTypes::Protoss_Zealot);
 		}
 	}
 
@@ -49,7 +72,7 @@ void StrategyManager::OnFrame()
 void StrategyManager::UpdateSupply()
 {
 	int wantedSupply = std::max(static_cast<int>(Broodwar->self()->supplyTotal() * (WantedFreePopPercents / 100)), 15);
-	if (ResourceManager::GetInstance().GetFreeSupply() + BuildingManager::GetInstance().GetSupplyInProgress() < wantedSupply)
+	if (ResourceManager::GetInstance().GetFreeSupply() + BuildingManager::GetInstance().GetSupplyInProgress() < wantedSupply+10)
 	{
 		BuildingManager::GetInstance().BuildBaseExit(UnitTypes::Protoss_Pylon);
 	}

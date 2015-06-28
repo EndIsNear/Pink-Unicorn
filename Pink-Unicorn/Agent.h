@@ -127,7 +127,7 @@ public:
 				else if (inRange.size())
 					eu = Closest(mUnit->getPosition(), inRange);
 
-				if ( mUnit->getTarget() != eu || mUnit->getLastCommand().getType() != UnitCommandTypes::Attack_Unit)
+				if (mUnit->getTarget() != eu || mUnit->getLastCommand().getType() != UnitCommandTypes::Attack_Unit)
 					mUnit->attack(eu);
 				bResult = true;
 			}
@@ -174,18 +174,19 @@ public:
 		double myArmyValue = CalcScore(mUnit->getUnitsInRadius(3*mDist, IsAlly));
 		auto enemyArmy = mUnit->getUnitsInRadius(mDist, mFilter);
 		double enemyArmyValue = CalcScore(enemyArmy);
-		if (myArmyValue *0.95< enemyArmyValue)
+		if (myArmyValue *1< enemyArmyValue)
 		{
 			auto ep = enemyArmy.getPosition();
 			auto d = ep.getDistance(mUnit->getPosition());
 			auto GoToPos = mUnit->getPosition() - ep;
 			Vector2D vDir(GoToPos.x, GoToPos.y);
 			vDir.Normalize();
-			vDir = vDir * mDist* 0.1;
+			vDir = vDir * 100;
 			GoToPos.x = vDir.x;
 			GoToPos.y = vDir.y;
 			GoToPos = mUnit->getPosition() + GoToPos;
-			mUnit->move(GoToPos);
+			if(Broodwar->isWalkable(WalkPosition(GoToPos)))
+				mUnit->move(GoToPos);
 			Broodwar->drawCircle(CoordinateType::Map, GoToPos.x, GoToPos.y, 25, Colors::Green);
 			bResult = true;
 		}
@@ -209,8 +210,11 @@ public:
 		if (!mUnit->isMoving()) // try to stay together
 		{
 			auto friends = Broodwar->getUnitsInRadius(mUnit->getPosition(), mDist, mFilter);
-			mUnit->move(friends.getPosition());
-
+			if (friends.size() < mDist *0.05)
+			{
+				mUnit->move(friends.getPosition());
+				bResult = true;
+			}
 		}
 		return bResult;
 	}
@@ -267,6 +271,10 @@ public:
 
 	void OnFrame()
 	{
+		if (mUnit->isStuck())
+		{
+			mUnit->move(Position(Broodwar->self()->getStartLocation()));
+		}
 		for (auto it : Agents)
 		{
 			if (it->OnFrame())
@@ -276,9 +284,21 @@ public:
 
 	bool isUnitDead()
 	{
-		return mUnit->getHitPoints() == 0;
+		return  !mUnit->exists();
 	}
 };
+static
+Position GetEnemyPos(Position &p)
+{
+	TilePosition pp(p);
+	TilePosition result(Broodwar->getStartLocations().at(0));
+	for (auto it : Broodwar->getStartLocations())
+	{
+		if (it.getDistance(pp) > result.getDistance(pp))
+			result = it;
+	}
+	return Position(result);
+}
 
 class DragoonControl : public ControlPattern
 {
@@ -286,12 +306,11 @@ public:
 	DragoonControl(Unit drag) : ControlPattern(drag)
 	{
 		Agents.push_back(new AssessTheEnemy(drag, 300));
-		Agents.push_back(new AgentStayAway(drag, 75, 100, IsEnemy));
+		Agents.push_back(new AgentStayAway(drag, 75, 50, IsEnemy));
 		Agents.push_back(new AgentAttackInRange(drag, 250, 150));
-		Agents.push_back(new AgentStayAway(drag, 10, 5, IsAlly));
-		Agents.push_back(new AgentStayToghether(drag, 800));
-		Position p(Broodwar->getStartLocations().at(1));
-		Agents.push_back(new AgentGoToPosition(drag, p));
+		//Agents.push_back(new AgentStayAway(drag, 10, 5, IsAlly));
+		//Agents.push_back(new AgentStayToghether(drag, 300));
+		Agents.push_back(new AgentGoToPosition(drag, GetEnemyPos(drag->getPosition())));
 	}
 };
 
@@ -301,11 +320,11 @@ class ZelotControl : public ControlPattern
 public:
 	ZelotControl(Unit zelka) : ControlPattern(zelka)
 	{
-		Agents.push_back(new AssessTheEnemy(zelka, 250));
-		Agents.push_back(new AgentAttackInRange(zelka, 150, 10));
-		Position p(Broodwar->getStartLocations().at(1));
-		Agents.push_back(new AgentGoToPosition(zelka, p));
-		Agents.push_back(new AgentStayToghether(zelka, 500));
+	//	Agents.push_back(new AssessTheEnemy(zelka, 200));
+		Agents.push_back(new AgentAttackInRange(zelka, 100, 10));
+	//	Agents.push_back(new AgentStayToghether(zelka, 300));
+		Agents.push_back(new AgentGoToPosition(zelka, GetEnemyPos(zelka->getPosition())));
+		//Agents.push_back(new AgentStayToghether(zelka, 500));
 	}
 };
 
@@ -317,41 +336,77 @@ struct UnitPatterPair
 
 class Micro : public ManagerBase
 {
+	Micro() : next(0) {  }
+	static Micro *inst;
+	
 public:
-	Micro(Unitset Army)
+	static ManagerBase& GetInstance()
 	{
-		mRadius = 800;
-		mBattleField = Army.getPosition();
-		for (auto it : Army)
-		{
-			if (it->getType() == UnitTypes::Protoss_Zealot)
-				mUnits.push_back(new ZelotControl(it));
-			if (it->getType() == UnitTypes::Protoss_Dragoon)
-				mUnits.push_back(new DragoonControl(it));
+		if (inst == NULL)
+			inst = new Micro;
+		return *inst;
+	}
 
+
+	virtual void ReleaseInst() override {}
+
+	virtual void OnUnitComplete(Unit u) override
+	{
+		if (IsAlly(u))
+		{
+
+			if (u->getType() == UnitTypes::Protoss_Zealot)
+				mNoAgents.push_back(u);
+			if (u->getType() == UnitTypes::Protoss_Dragoon)
+				mNoAgents.push_back(u);
 		}
 	}
-	virtual void ReleaseInst() override {}
 
 	void OnFrame()
 	{
+
 		for (auto it = mUnits.begin(); it != mUnits.end();)
 		{
 			if ((*it)->isUnitDead())
+			{
 				it = mUnits.erase(it);
+			}
 			else
 				it++;
 		}
-		for (auto it : mUnits)
+
+		if (mNoAgents.size() > 10 || mUnits.size() > 5)
 		{
-			it->OnFrame();
-		//	it->OnDraw();
+			for (auto it : mNoAgents)
+			{
+				if (it->getType() == UnitTypes::Protoss_Zealot)
+					mUnits.push_back(new ZelotControl(it));
+				if (it->getType() == UnitTypes::Protoss_Dragoon)
+					mUnits.push_back(new DragoonControl(it));
+			}
+			mNoAgents.clear();
 		}
+		
+		if (mUnits.size())
+		{
+
+			for (int i = 0; i < 3; i++)
+			{
+				if (next >=  mUnits.size())
+					next = 0;
+
+				mUnits[next]->OnFrame();
+				next++;
+			}
+		}
+
 	}
 private:
+	unsigned next;
 	std::vector<ControlPattern *>  mUnits;
-	Position mBattleField;
-	int mRadius;
+	std::vector<Unit > mNoAgents;
 
 };
+
+
 #endif
