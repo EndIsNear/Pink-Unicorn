@@ -8,9 +8,9 @@ class MacroManager : public ManagerBase
 	public:
 		MacroManager() {}
 		virtual void OnFrame() override;
+		int getUnitCnt(UnitType type);
+		void AddUnit(Unit u);
 	private:
-		void ExecuteRequireBuildinTask(RequireBuilding &task);
-		TaskList myTasks;
 };
 
 
