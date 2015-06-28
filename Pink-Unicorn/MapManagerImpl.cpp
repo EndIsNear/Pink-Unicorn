@@ -56,8 +56,8 @@ TilePosition::list MapManager::GetExpansionLocations()
 	for (auto rg : resourseGroups)
 	{
 		auto base = GetBaseLocation(rg);
-		Broodwar->drawCircle(CoordinateType::Map, rg.x * 32, rg.y * 32, 20, Colors::Blue);
-		Broodwar->drawCircle(CoordinateType::Map, base.x * 32, base.y * 32, 20, Colors::Green);
+		//Broodwar->drawCircle(CoordinateType::Map, rg.x * 32, rg.y * 32, 20, Colors::Blue);
+		//Broodwar->drawCircle(CoordinateType::Map, base.x * 32, base.y * 32, 20, Colors::Green);
 		result.push_back(GetBaseLocation(rg));
 	}
 	return result;
@@ -329,6 +329,7 @@ void insertToVect(std::vector<TilePosition>& vect, const TilePosition& p, Color 
 
 
 bool hasSpace(UnitType type, TilePosition pos, int spacing) {
+	if (spacing == 0) return true;
 	auto buildingCenter = Position(pos) + (Position(type.tileSize()) / 2);
 	int buildRadius = buildingCenter.getDistance(Position(pos)) + spacing;
 	auto closestUnit = Broodwar->getClosestUnit(buildingCenter, (Filter::IsBuilding || Filter::IsBeingConstructed), buildRadius);
@@ -372,8 +373,8 @@ TilePosition getBuildTileInRadius(UnitType type, const TilePosition& center, int
 			}
 		}
 	}
-	//std::cout << iterations << std::endl;
-	//std::cout << " invalid\n";
+	std::cout << iterations << std::endl;
+	std::cout << " invalid\n";
 	return TilePositions::Invalid;
 }
 TilePosition MapManager::SuggestRegular(UnitType type, const TilePosition& location)
@@ -453,7 +454,7 @@ TilePosition::list GetResGroupsCenters(const std::map<int, Unitset> & groups)
 
 TilePosition GetBaseLocation(const TilePosition& resGroupCenter)
 {
-	return getBuildTileInRadius(UnitTypes::Protoss_Nexus, resGroupCenter, 0, -10);
+	return getBuildTileInRadius(UnitTypes::Protoss_Nexus, resGroupCenter, 400, 0);
 }
 
 void MapManager::CalculateResourseGroups()
