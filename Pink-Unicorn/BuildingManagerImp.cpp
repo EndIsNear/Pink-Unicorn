@@ -53,10 +53,11 @@ bool BuildingManager::BuildNearTo(UnitType building, TilePosition pos)
 				else
 				{
 					pos.x -= 1;//move away from build pos
-					worker->move(static_cast<Position>(pos));
+					worker->move(Position(pos));
+					pos.x += 1;//return to the right build position
 					Broodwar->registerEvent(
-						[=](Game * p){BuildingManager::GetInstance().BuildWithNearTo(worker, UnitTypes::Protoss_Nexus, pos); },
-						[worker](Game * p){ return worker->isIdle(); },
+						[=](Game * p){BuildingManager::GetInstance().BuildWithNearTo(worker, building, pos); },
+						[worker, pos](Game * p){ return worker->isIdle() && Broodwar->isExplored(pos); },
 						1, 20
 						);
 				}
@@ -73,13 +74,11 @@ bool BuildingManager::BuildNearTo(UnitType building, TilePosition pos)
 bool BuildingManager::BuildWithNearTo(Unit builder, UnitType building, TilePosition pos)
 {
 	TilePosition buildPos = MapManager::GetInstance().SuggestBuildingLocation(building, pos);
-	if (Broodwar->canBuildHere(buildPos, building, builder))
+	if (builder->build(building, buildPos))
 	{
-		builder->build(building, buildPos);
 		if (building == UnitTypes::Protoss_Pylon)
 			m_SupplyInProgress += SupplyPerPylon;
 		m_BuildingsInProgress.push_back(BuildingPair(building, builder));
-		auto err = Broodwar->getLastError();
 		return true;
 	}
 	else
