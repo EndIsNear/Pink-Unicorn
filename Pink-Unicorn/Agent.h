@@ -4,6 +4,7 @@
 
 #include <BWAPI.h>
 #include <BWAPI/Client.h>
+#include <algorithm>
 #include "ManagerBase.h"
 #include "2dVector.h"
 
@@ -22,7 +23,7 @@ protected:
 	Unit mUnit;
 };
 
-inline Unit LowHP(Unitset us)
+inline Unit LowHP(Unitset &us)
 {
 	Unit Result = *us.begin();
 	for (auto it : us)
@@ -83,7 +84,7 @@ protected:
 
 };
 
-inline Unit Closest(Position pos, Unitset set)
+inline Unit Closest(Position &pos, Unitset &set)
 {
 	Unit result = *set.begin();
 	for (auto it : set)
@@ -140,7 +141,7 @@ protected:
 	int mSwitchRange;
 };
 
-inline double CalcScore(Unitset set)
+inline double CalcScore(Unitset &set)
 {
 	double result = 0;
 	for (auto it : set)
@@ -306,7 +307,9 @@ public:
 	DragoonControl(Unit drag) : ControlPattern(drag)
 	{
 		Agents.push_back(new AssessTheEnemy(drag, 300));
-		Agents.push_back(new AgentStayAway(drag, 75, 50, IsEnemy));
+		// this must be fix but for now i ok 
+		PtrUnitFilter pred = IsEnemy;// && !IsBuilding;
+		Agents.push_back(new AgentStayAway(drag, 75, 50, pred));
 		Agents.push_back(new AgentAttackInRange(drag, 250, 150));
 		//Agents.push_back(new AgentStayAway(drag, 10, 5, IsAlly));
 		//Agents.push_back(new AgentStayToghether(drag, 300));
@@ -328,69 +331,58 @@ public:
 	}
 };
 
-struct UnitPatterPair
-{
-	BWAPI::UnitType type;
-	ControlPattern * cp;
-};
 
-class Micro : public ManagerBase
+class MicroControler
 {
-	Micro() : next(0) {  }
-	static Micro *inst;
-	
 public:
-	static ManagerBase& GetInstance()
+
+	MicroControler(Unitset &set) : next(0) 
 	{
-		if (inst == NULL)
-			inst = new Micro;
-		return *inst;
+		for (auto it : set)
+			AddUnit(it);
+	}
+	~MicroControler()
+	{
+		for (auto it : mUnits)
+			delete it;
+	}
+	void AddUnit(Unit u) 
+	{
 	}
 
-
-	virtual void ReleaseInst() override {}
-
-	virtual void OnUnitComplete(Unit u) override
+	/*this is extremly slow*/
+	void  GetUnits(Unitset &output)
 	{
-		if (IsAlly(u))
-		{
-
-			if (u->getType() == UnitTypes::Protoss_Zealot)
-				mNoAgents.push_back(u);
-			if (u->getType() == UnitTypes::Protoss_Dragoon)
-				mNoAgents.push_back(u);
-		}
+		for (auto it : mUnits)
+			output.insert(it->GetUnit());
 	}
 
-	void OnFrame()
+	void GetUnitsWithType(Unitset &output, UnitType type)
+	{
+		for (auto it : mUnits)
+			if (it->GetUnit()->getType() == type)
+				output.insert(it->GetUnit());
+
+	}
+
+	void OnFrame(unsigned  Time)
 	{
 
 		for (auto it = mUnits.begin(); it != mUnits.end();)
 		{
 			if ((*it)->isUnitDead())
 			{
+				delete *it;
 				it = mUnits.erase(it);
 			}
 			else
 				it++;
 		}
-
-		if (mNoAgents.size() > 10 || mUnits.size() > 5)
-		{
-			for (auto it : mNoAgents)
-			{
-				if (it->getType() == UnitTypes::Protoss_Zealot)
-					mUnits.push_back(new ZelotControl(it));
-				if (it->getType() == UnitTypes::Protoss_Dragoon)
-					mUnits.push_back(new DragoonControl(it));
-			}
-			mNoAgents.clear();
-		}
 		
 		if (mUnits.size())
 		{
 
-			for (int i = 0; i < 3; i++)
+			for (int i = 0; i < Time; i++)
 			{
 				if (next >=  mUnits.size())
 					next = 0;
@@ -399,12 +391,10 @@ public:
 				next++;
 			}
 		}
-
 	}
 private:
 	unsigned next;
 	std::vector<ControlPattern *>  mUnits;
-	std::vector<Unit > mNoAgents;
 
 };
 

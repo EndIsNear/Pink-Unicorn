@@ -17,7 +17,6 @@
 using namespace BWAPI;
 using namespace Filter;
 
-Micro *Micro::inst = NULL;
 
 PinkUnicorn::PinkUnicorn()
 {
@@ -29,13 +28,13 @@ PinkUnicorn::PinkUnicorn()
 	//mManagers.push_back(new MacroManager);
 	mManagers.push_back(&MapManager::GetInstance());
 	mManagers.push_back(&SpyManager::GetInstance());
-	mManagers.push_back(&Micro::GetInstance());
 }
 
 
 void PinkUnicorn::onFrame()
 {
-	
+
+
 	//dispaly FPS
 	Broodwar->drawTextScreen(200, 0, "FPS: %d", Broodwar->getFPS());
 	Broodwar->drawTextScreen(200, 20, "Average FPS: %f", Broodwar->getAverageFPS());
