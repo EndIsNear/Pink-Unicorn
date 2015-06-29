@@ -17,7 +17,7 @@ void BuildingManager::OnUnitComplete(Unit unit)
 {
 	if (unit->getType() == UnitTypes::Protoss_Pylon)
 		m_SupplyInProgress -= SupplyPerPylon;
-	else if (unit->getType() == UnitTypes::Protoss_Nexus)
+	else if (unit->getType() == UnitTypes::Protoss_Nexus && Broodwar->getFrameCount() > 100)
 	{
 		WorkerManager::GetInstance().AddUnit(unit);
 		StrategyManager::GetInstance().AddBase(unit);
@@ -58,10 +58,10 @@ bool BuildingManager::BuildNearTo(UnitType building, TilePosition pos)
 					Broodwar->registerEvent(
 						[=](Game * p)
 						{
-						if (worker->exists())
-							BuildingManager::GetInstance().BuildWithNearTo(worker, building, pos);
-						else
-							ResourceManager::GetInstance().ReleaseRes(building.mineralPrice(), building.gasPrice(), 0);
+							if (worker->exists())
+								BuildingManager::GetInstance().BuildWithNearTo(worker, building, pos);
+							else
+								ResourceManager::GetInstance().ReleaseRes(building.mineralPrice(), building.gasPrice(), 0);
 						},
 						[worker, pos](Game * p){ return worker->isIdle() && Broodwar->isExplored(pos); },
 						1, 20
