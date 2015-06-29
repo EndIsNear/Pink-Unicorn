@@ -44,11 +44,11 @@ bool BuildingManager::BuildNearTo(UnitType building, TilePosition pos)
 		if (ResourceManager::GetInstance().ReserveRes(building.mineralPrice(), building.gasPrice(), 0))
 		{
 			Unit worker;
-			if (WorkerManager::GetInstance().ReleaseWorker(Position(), worker))
+			if (WorkerManager::GetInstance().ReleaseWorker(Position(), worker) && worker->hasPath(Position(pos)))
 			{
 				if (Broodwar->isExplored(pos))
 				{
-					BuildWithNearTo(worker, building, pos);
+					return BuildWithNearTo(worker, building, pos);
 				}
 				else
 				{
@@ -56,10 +56,17 @@ bool BuildingManager::BuildNearTo(UnitType building, TilePosition pos)
 					worker->move(Position(pos));
 					pos.x += 1;//return to the right build position
 					Broodwar->registerEvent(
-						[=](Game * p){BuildingManager::GetInstance().BuildWithNearTo(worker, building, pos); },
+						[=](Game * p)
+						{
+						if (worker->exists())
+							BuildingManager::GetInstance().BuildWithNearTo(worker, building, pos);
+						else
+							ResourceManager::GetInstance().ReleaseRes(building.mineralPrice(), building.gasPrice(), 0);
+						},
 						[worker, pos](Game * p){ return worker->isIdle() && Broodwar->isExplored(pos); },
 						1, 20
 						);
+					return true;
 				}
 			}
 			else
