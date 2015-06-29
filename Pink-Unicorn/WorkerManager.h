@@ -10,6 +10,8 @@ class WorkerManager : public ManagerBase
 	{
 		m_maxMin = 3;
 		m_maxGas = 3;
+		m_workersCnt = 4;
+		m_maxWorkers = 70;
 	};
 	WorkerManager(const WorkerManager&) = delete;
 	WorkerManager& operator= (const WorkerManager&) = delete;
@@ -57,9 +59,15 @@ public:
 	{
 		m_maxMin = workers;
 	}
+
 	void SetWorkPerGas(size_t workers)
 	{
 		m_maxGas = workers;
+	}
+
+	void SetMaxWorkersCnt(size_t workers)
+	{
+		m_maxWorkers = workers;
 	}
 
 private:
@@ -78,7 +86,11 @@ private:
 	size_t m_maxMin;
 	//max workers per gas station
 	size_t m_maxGas;
+	size_t m_workersCnt;
+	size_t m_maxWorkers;
 	std::vector<Expand> m_expands;
+
+	void RemoveDeadWorkers(size_t idx);
 };
 
 #endif //WORKER_MANAGER_H

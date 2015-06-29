@@ -38,7 +38,12 @@ void WorkerManager::OnStart()
 
 void WorkerManager::OnFrame()
 {
-
+	if (Broodwar->getFrameCount() > 100 && Broodwar->getFrameCount() % 25 == 0)
+	{
+		//calculates current expand for cheking
+		size_t idx = (Broodwar->getFrameCount() / 25) % m_expands.size();
+		RemoveDeadWorkers(idx);
+	}
 }
 
 void WorkerManager::AddUnit(Unit unit)
@@ -51,6 +56,7 @@ void WorkerManager::AddUnit(Unit unit)
 			if (expand.base == nearBase)
 			{
 				expand.workers.insert(unit);
+				m_workersCnt++;
 				//TODO: check max workers per mineral/gas
 				//for (auto& mineral : expand.minerals)
 				//{
@@ -128,6 +134,7 @@ bool WorkerManager::ReleaseWorker(Position pos, Unit& result)
 		{
 			result = worker;
 			bestExp.workers.erase(worker);
+			m_workersCnt--;
 			return true;
 		}
 	}
@@ -137,6 +144,8 @@ bool WorkerManager::ReleaseWorker(Position pos, Unit& result)
 int WorkerManager::GetNeededWorkers()
 {
 	int res = 0;
+	if (m_maxWorkers < m_workersCnt)
+		return res;
 	for (auto& b : m_expands)
 	{
 		res += m_maxMin * b.minerals.size() + m_maxGas * b.gasStations.size() - b.workers.size();
@@ -146,6 +155,8 @@ int WorkerManager::GetNeededWorkers()
 
 int WorkerManager::GetNeededWorkersForBase(Unit base)
 {
+	if (m_maxWorkers < m_workersCnt)
+		return 0;
 	for (auto& b : m_expands)
 	{
 		if (b.base == base)
@@ -154,4 +165,16 @@ int WorkerManager::GetNeededWorkersForBase(Unit base)
 	return 0;
 }
 
-
+void WorkerManager::RemoveDeadWorkers(size_t idx)
+{
+	for (auto it = m_expands[idx].workers.begin(); it != m_expands[idx].workers.end();)
+	{
+		if (!(*it)->exists())
+		{
+			m_expands[idx].workers.erase(it++);
+			m_workersCnt--;
+		}
+		else
+			it++;
+	}
+}
