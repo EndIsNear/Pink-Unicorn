@@ -91,6 +91,8 @@ private:
 	std::vector<Expand> m_expands;
 
 	void RemoveDeadWorkers(size_t idx);
+	void BalanceWorkerBetweenExpands();
+	void moveWorkersFromTo(size_t cnt, size_t idxFrom, size_t idxTo);
 };
 
 #endif //WORKER_MANAGER_H

@@ -44,6 +44,10 @@ void WorkerManager::OnFrame()
 		size_t idx = (Broodwar->getFrameCount() / 25) % m_expands.size();
 		RemoveDeadWorkers(idx);
 	}
+	if (Broodwar->getFrameCount() % 300 == 0)
+	{
+		BalanceWorkerBetweenExpands();
+	}
 }
 
 void WorkerManager::AddUnit(Unit unit)
@@ -57,15 +61,6 @@ void WorkerManager::AddUnit(Unit unit)
 			{
 				expand.workers.insert(unit);
 				m_workersCnt++;
-				//TODO: check max workers per mineral/gas
-				//for (auto& mineral : expand.minerals)
-				//{
-				//	if (mineral->isBeingGathered())
-				//	{
-				//		unit->gather(mineral);
-				//		return;
-				//	}
-				//}
 				if (unit->gather(expand.base->getClosestUnit(Filter::IsMineralField)))
 				{
 					return;
@@ -126,7 +121,6 @@ bool WorkerManager::ReleaseWorker(Position pos, Unit& result)
 	//	}
 	//}
 
-	// basi grozniq kod
 	for (auto& worker : bestExp.workers)
 	{
 		//TODO: Smarter check for free worker
@@ -173,6 +167,42 @@ void WorkerManager::RemoveDeadWorkers(size_t idx)
 		{
 			m_expands[idx].workers.erase(it++);
 			m_workersCnt--;
+		}
+		else
+			it++;
+	}
+}
+
+void WorkerManager::BalanceWorkerBetweenExpands()
+{
+	if (m_expands.size() < 2)
+		return;
+	//minimum per expand
+	size_t workersPerExp = m_workersCnt/m_expands.size() + 1;
+
+	for (int i = 0; i < m_expands.size()/2; ++i)
+	{
+		auto res = std::minmax_element(m_expands.begin(), m_expands.end(),
+			[](Expand & left, Expand & right){ return left.workers.size() < right.workers.size(); });
+		size_t workersToMove = res.second->workers.size() - workersPerExp;
+		moveWorkersFromTo(workersToMove, res.second - m_expands.begin(), res.first - m_expands.begin());
+	}
+}
+
+void WorkerManager::moveWorkersFromTo(size_t toMove, size_t idxFrom, size_t idxTo)
+{
+	auto& from = m_expands[idxFrom].workers;
+	auto& to = m_expands[idxTo].workers;
+	size_t cnt = 0;
+	for (auto it = from.begin(); it != from.end() && cnt < toMove;)
+	{
+		if ((*it)->exists() && !(*it)->isGatheringGas() && !(*it)->isCarryingMinerals())
+		{
+			to.insert(*it);
+			//maybe handle fail of gathering
+			(*it)->gather(m_expands[idxTo].base->getClosestUnit(Filter::IsMineralField));
+			from.erase(it++);
+			cnt++;
 		}
 		else
 			it++;
