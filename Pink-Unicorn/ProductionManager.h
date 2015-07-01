@@ -38,8 +38,8 @@ public:
 	virtual void OnFrame() override;
 	virtual void OnUnitComplete(BWAPI::Unit unit) override;
 
-	void ProduceSingleUnit(UnitType unit);
-	void ProduceSingleUnitFrom(UnitType unit, Unit producer);
+	bool ProduceSingleUnit(UnitType unit);
+	bool ProduceSingleUnitFrom(UnitType unit, Unit producer);
 };
 
 #endif

@@ -22,6 +22,20 @@ void StrategyManager::OnStart()
 			m_bases.insert(unit);
 		}
 	}
+	PushBuildTask(11, UnitTypes::Protoss_Gateway, Broodwar->self()->getStartLocation());
+	PushProductionTask(10, UnitTypes::Protoss_Zealot);
+	PushBuildTask(9, UnitTypes::Protoss_Gateway, Broodwar->self()->getStartLocation());
+	PushBuildTask(9, UnitTypes::Protoss_Assimilator, Broodwar->self()->getStartLocation());
+	PushProductionTask(8, UnitTypes::Protoss_Zealot);
+	PushProductionTask(8, UnitTypes::Protoss_Zealot);
+	PushBuildTask(7, UnitTypes::Protoss_Gateway, Broodwar->self()->getStartLocation());
+	PushBuildTask(7, UnitTypes::Protoss_Cybernetics_Core, Broodwar->self()->getStartLocation());
+	for (int i = 0; i < 100; ++i)
+	{
+		PushProductionTask(6, UnitTypes::Protoss_Zealot);
+		PushProductionTask(6, UnitTypes::Protoss_Dragoon);
+	}
+
 }
 
 void StrategyManager::OnFrame()
@@ -30,13 +44,13 @@ void StrategyManager::OnFrame()
 	{
 		UpdateSupply();
 		UpdateWorkers();
+		CheckQueue();
 	}
-	BuildExpand();
 }
 
 void StrategyManager::UpdateSupply()
 {
-	int wantedSupply = std::max(static_cast<int>(Broodwar->self()->supplyTotal() * (WantedFreePopPercents / 100)), 15);
+	size_t wantedSupply = std::max(static_cast<int>(Broodwar->self()->supplyTotal() * (WantedFreePopPercents / 100)), 15);
 	if (ResourceManager::GetInstance().GetFreeSupply() + BuildingManager::GetInstance().GetSupplyInProgress() < wantedSupply+10)
 	{
 		BuildingManager::GetInstance().BuildBaseExit(UnitTypes::Protoss_Pylon);
@@ -59,5 +73,41 @@ bool StrategyManager::BuildExpand()
 		return false;
 	auto pos = MapManager::GetInstance().GetNextExpansionLocation();
 	return BuildingManager::GetInstance().BuildNearTo(UnitTypes::Protoss_Nexus, pos);
+}
+
+void StrategyManager::PushBuildTask(int priority, UnitType type, TilePosition nearTo)
+{
+	m_TaskQ.emplace(priority,
+		[type, nearTo]()
+	{
+		return BuildingManager::GetInstance().BuildNearTo(type, nearTo);
+	}
+	);
+}
+
+void StrategyManager::PushProductionTask(int priority, UnitType type/*, TilePosition nearTo*/)
+{
+	m_TaskQ.emplace(priority,
+		[type]()
+	{
+		return ProduceManager::GetInstance().ProduceSingleUnit(type);
+	}
+		);
+}
+
+void StrategyManager::PushExpandTask(int priority)
+{
+	m_TaskQ.emplace(priority,
+		[]()
+	{
+		return StrategyManager::GetInstance().BuildExpand();
+	}
+	);
+}
+
+void StrategyManager::CheckQueue()
+{
+	if (!m_TaskQ.empty() && m_TaskQ.top().second())
+		m_TaskQ.pop();
 }
 

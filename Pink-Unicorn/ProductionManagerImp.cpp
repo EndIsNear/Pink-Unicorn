@@ -21,20 +21,21 @@ void ProduceManager::OnUnitComplete(BWAPI::Unit unit)
 	//	MacroManager::GetInstance().AddUnit(unit);
 }
 
-void ProduceManager::ProduceSingleUnit(UnitType unit)
+bool ProduceManager::ProduceSingleUnit(UnitType unit)
 {
 	auto src = unit.whatBuilds();
 	for (auto& builder : Broodwar->self()->getUnits())
 	{
 		if (builder->getType() == src.first && builder->isIdle())
 		{
-			builder->build(unit);
+			ProduceSingleUnitFrom(unit, builder);
 			break;
 		}
 	}
+	return true;
 }
 
-void ProduceManager::ProduceSingleUnitFrom(UnitType unit, Unit producer)
+bool ProduceManager::ProduceSingleUnitFrom(UnitType unit, Unit producer)
 {
 	if (ResourceManager::GetInstance().ReserveRes(unit.mineralPrice(), unit.gasPrice(), unit.supplyRequired()))
 	{
@@ -43,6 +44,7 @@ void ProduceManager::ProduceSingleUnitFrom(UnitType unit, Unit producer)
 			producer->train(unit);
 		}
 		ResourceManager::GetInstance().ReleaseRes(unit.mineralPrice(), unit.gasPrice(), unit.supplyRequired());
+		return true;
 	}
-	
+	return false;
 }
