@@ -95,7 +95,6 @@
     <ClCompile Include="ResourcePack.cpp" />
     <ClCompile Include="SpyManagerImpl.cpp" />
     <ClCompile Include="StrategyManager.cpp" />
-    <ClCompile Include="TaskQueueImp.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="WorkerManager.cpp" />
   </ItemGroup>
@@ -114,7 +113,6 @@
     <ClInclude Include="ResourcePack.h" />
     <ClInclude Include="SpyManager.h" />
     <ClInclude Include="StrategyManager.h" />
-    <ClInclude Include="TasksQueue.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="WorkerManager.h" />
   </ItemGroup>

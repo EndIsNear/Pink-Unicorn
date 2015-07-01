@@ -2,7 +2,6 @@
 #define MACRO_MANAGER_H
 #include "Agent.h"
 #include "ManagerBase.h"
-#include "AllTasks.h"
 #include "map"
 
 

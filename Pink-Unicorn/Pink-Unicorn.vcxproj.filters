@@ -45,9 +45,6 @@
     <ClCompile Include="ResourcePack.cpp">
       <Filter>Source Files\Managers</Filter>
     </ClCompile>
-    <ClCompile Include="TaskQueueImp.cpp">
-      <Filter>Source Files\Managers</Filter>
-    </ClCompile>
     <ClCompile Include="WorkerManager.cpp">
       <Filter>Source Files\Managers</Filter>
     </ClCompile>
@@ -106,9 +103,6 @@
     </ClInclude>
     <ClInclude Include="Utils.h">
       <Filter>Header Files\UtilStuff</Filter>
-    </ClInclude>
-    <ClInclude Include="TasksQueue.h">
-      <Filter>Header Files\Managers</Filter>
     </ClInclude>
     <ClInclude Include="MacroManager.h">
       <Filter>Header Files\Managers</Filter>
