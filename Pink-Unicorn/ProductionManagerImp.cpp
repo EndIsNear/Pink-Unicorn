@@ -28,11 +28,11 @@ bool ProduceManager::ProduceSingleUnit(UnitType unit)
 	{
 		if (builder->getType() == src.first && builder->isIdle())
 		{
-			ProduceSingleUnitFrom(unit, builder);
+			return ProduceSingleUnitFrom(unit, builder);
 			break;
 		}
 	}
-	return true;
+	return false;
 }
 
 bool ProduceManager::ProduceSingleUnitFrom(UnitType unit, Unit producer)

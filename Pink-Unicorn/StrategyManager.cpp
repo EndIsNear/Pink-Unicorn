@@ -30,12 +30,20 @@ void StrategyManager::OnStart()
 	PushProductionTask(8, UnitTypes::Protoss_Zealot);
 	PushBuildTask(7, UnitTypes::Protoss_Gateway, Broodwar->self()->getStartLocation());
 	PushBuildTask(7, UnitTypes::Protoss_Cybernetics_Core, Broodwar->self()->getStartLocation());
-	for (int i = 0; i < 100; ++i)
+	for (int i = 0; i < 7; ++i)
 	{
 		PushProductionTask(6, UnitTypes::Protoss_Zealot);
 		PushProductionTask(6, UnitTypes::Protoss_Dragoon);
 	}
-
+	PushBuildTask(5, UnitTypes::Protoss_Forge, Broodwar->self()->getStartLocation());
+	PushExpandTask(5);
+	PushBuildTask(4, UnitTypes::Protoss_Photon_Cannon, Broodwar->self()->getStartLocation());
+	PushBuildTask(4, UnitTypes::Protoss_Photon_Cannon, Broodwar->self()->getStartLocation());
+	for (int i = 0; i < 100; ++i)
+	{
+		PushProductionTask(3, UnitTypes::Protoss_Zealot);
+		PushProductionTask(3, UnitTypes::Protoss_Dragoon);
+	}
 }
 
 void StrategyManager::OnFrame()
