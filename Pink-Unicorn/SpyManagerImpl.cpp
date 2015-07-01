@@ -14,8 +14,12 @@ TilePosition::list SpyManager::GetEnemyBases()
 	auto expansions = MapManager::GetInstance().GetExpansionLocations();
 	for (auto e : expansions)
 	{
-		if (Broodwar->getUnitsInRadius(Position(e), 500, (IsEnemy || IsBuilding)).size() != 0)
-			result.push_back(e);
+		auto closestUnit = Broodwar->getClosestUnit(Position(e), (IsEnemy && (IsBuilding || IsBeingConstructed)), 450);
+		if (closestUnit) {
+			if (enemyBuildings.find(closestUnit) != enemyBuildings.end()) //if unit isn't destroyed
+				result.push_back(e);
+		}
+		
 	}
 	return result;
 }

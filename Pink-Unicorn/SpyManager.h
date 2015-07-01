@@ -115,6 +115,9 @@ public:
 		for (auto u : spyUnits)
 			u->OnFrame();
 
+		if (Broodwar->getFrameCount() % 50 == 0) {
+			std::cout << GetEnemyBases().size() << std::endl;
+		}
 		/*Unit w;
 		if (WorkerManager::GetInstance().GetInstance().ReleaseWorker(Positions::None, w) && !exploring) {
 			ExploreLocations(w, Broodwar->getStartLocations());
@@ -131,6 +134,14 @@ public:
 				enemyBuildings.insert(u);
 			else
 				enemyUnits.insert(u);
+		}
+	}
+	void OnUnitDestroy(Unit u) {
+		if (u->getPlayer() == Broodwar->enemy()) {
+			if (u->getType().isBuilding())
+				enemyBuildings.erase(u);
+			else
+				enemyUnits.erase(u);
 		}
 	}
 	static SpyManager& GetInstance()
