@@ -56,7 +56,7 @@ private:
 		start = Broodwar->self()->getStartLocation();
 		nextPylon = TilePositions::Invalid;
 		CalculateResourseGroups();
-		CalculateChokepoints();
+		//CalculateChokepoints();
 		ScanPylonBuildGrid();
 	};
 	MapManager& operator = (const MapManager &m){};
