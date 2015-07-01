@@ -8,6 +8,7 @@
 #include "ManagerBase.h"
 #include "2dVector.h"
 
+
 using namespace BWAPI;
 using namespace Filter;
 
@@ -37,9 +38,9 @@ inline Unit LowHP(Unitset &us)
 class DoSomeThingInRange
 {
 protected:
-	DoSomeThingInRange(int dist, PtrUnitFilter filter) :mDist(dist), mFilter(filter) {}
+	DoSomeThingInRange(int dist, const UnitFilter & filter) :mDist(dist), mFilter(filter) {}
 protected:
-	PtrUnitFilter mFilter;
+	const UnitFilter & mFilter;
 	int mDist;
 };
 
@@ -47,7 +48,7 @@ protected:
 class AgentStayAway : public Agent, public DoSomeThingInRange
 {
 public:
-	AgentStayAway(Unit u, int dist, double moveWithDist, PtrUnitFilter filter = IsEnemy) :Agent(u), DoSomeThingInRange(dist, filter), mdMoveWithDist(moveWithDist){}
+	AgentStayAway(Unit u, int dist, double moveWithDist, const UnitFilter &filter) :Agent(u), DoSomeThingInRange(dist, filter), mdMoveWithDist(moveWithDist){}
 
 	virtual void OnDraw() override
 	{
@@ -100,7 +101,7 @@ class AgentAttackInRange : public Agent, public DoSomeThingInRange
 {
 
 public:
-	AgentAttackInRange(Unit u, int dist, int switchRange, PtrUnitFilter filter = IsEnemy) :Agent(u), DoSomeThingInRange(dist, filter), mSwitchRange(switchRange){}
+	AgentAttackInRange(Unit u, int dist, int switchRange, const UnitFilter &filter) :Agent(u), DoSomeThingInRange(dist, filter), mSwitchRange(switchRange){}
 public:
 
 	virtual void OnDraw() override
@@ -162,7 +163,7 @@ inline double CalcScore(Unitset &set)
 class AssessTheEnemy : public Agent, public DoSomeThingInRange
 {
 public:
-	AssessTheEnemy(Unit u, int dist, PtrUnitFilter filter = IsEnemy) :Agent(u), DoSomeThingInRange(dist, filter){}
+	AssessTheEnemy(Unit u, int dist, const UnitFilter &filter) :Agent(u), DoSomeThingInRange(dist, filter){}
 
 	virtual void OnDraw() override
 	{
@@ -198,7 +199,7 @@ public:
 class AgentStayToghether : public Agent, public DoSomeThingInRange
 {
 public:
-	AgentStayToghether(Unit u, int dist, PtrUnitFilter filter = IsAlly) :Agent(u), DoSomeThingInRange(dist, filter){}
+	AgentStayToghether(Unit u, int dist, const UnitFilter &filter) :Agent(u), DoSomeThingInRange(dist, filter){}
 
 	virtual void OnDraw() override
 	{
@@ -252,10 +253,12 @@ protected:
 	Unit mUnit;
 public:
 	ControlPattern(Unit u) : mUnit(u){}
-	virtual ~ControlPattern(){
-		for (auto a : Agents) {
-			delete a;
-		}
+	virtual ~ControlPattern()
+	{
+	//	for (auto a : Agents) 
+	//	{
+	//		delete a;
+	//	}
 	}
 
 	Unit GetUnit() {
@@ -304,50 +307,43 @@ Position GetEnemyPos(Position &p)
 class DragoonControl : public ControlPattern
 {
 public:
-	DragoonControl(Unit drag) : ControlPattern(drag)
-	{
-		Agents.push_back(new AssessTheEnemy(drag, 300));
-		// this must be fix but for now i ok 
-		PtrUnitFilter pred = IsEnemy;// && !IsBuilding;
-		Agents.push_back(new AgentStayAway(drag, 75, 50, pred));
-		Agents.push_back(new AgentAttackInRange(drag, 250, 150));
-		//Agents.push_back(new AgentStayAway(drag, 10, 5, IsAlly));
-		//Agents.push_back(new AgentStayToghether(drag, 300));
-		Agents.push_back(new AgentGoToPosition(drag, GetEnemyPos(drag->getPosition())));
-	}
+	DragoonControl(Unit drag);
 };
 
 class ZelotControl : public ControlPattern
 {
 
 public:
-	ZelotControl(Unit zelka) : ControlPattern(zelka)
-	{
-	//	Agents.push_back(new AssessTheEnemy(zelka, 200));
-		Agents.push_back(new AgentAttackInRange(zelka, 100, 10));
-	//	Agents.push_back(new AgentStayToghether(zelka, 300));
-		Agents.push_back(new AgentGoToPosition(zelka, GetEnemyPos(zelka->getPosition())));
-		//Agents.push_back(new AgentStayToghether(zelka, 500));
-	}
+	ZelotControl(Unit zelka);
 };
 
 
 class MicroControler
 {
 public:
+	MicroControler()
+	{
+
+	}
 
 	MicroControler(Unitset &set) : next(0) 
 	{
 		for (auto it : set)
 			AddUnit(it);
 	}
+
 	~MicroControler()
 	{
-		for (auto it : mUnits)
-			delete it;
+	//	for (auto it : mUnits)
+	//		delete it;
 	}
+
 	void AddUnit(Unit u) 
 	{
+		if (u->getType() == UnitTypes::Protoss_Zealot)
+			mUnits.push_back(new ZelotControl(u));
+		else if (u->getType() == UnitTypes::Protoss_Dragoon)
+			mUnits.push_back(new DragoonControl(u));
 	}
 
 	/*this is extremly slow*/
@@ -372,7 +368,7 @@ public:
 		{
 			if ((*it)->isUnitDead())
 			{
-				delete *it;
+//delete *it;
 				it = mUnits.erase(it);
 			}
 			else

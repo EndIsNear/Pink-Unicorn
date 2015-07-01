@@ -17,7 +17,7 @@ void moveUnit(Unit u, Position pos);
 
 class AgentExploreBuildings : public Agent, public DoSomeThingInRange {
 public:
-	AgentExploreBuildings(Unit u, PtrUnitFilter filter = IsEnemy) :
+	AgentExploreBuildings(Unit u, const UnitFilter &filter) :
 	Agent(u), DoSomeThingInRange(0, filter), next(NULL){};
 	bool OnFrame() override {
 		auto buildingsInRange = Broodwar->getUnitsInRadius(mUnit->getPosition(),
@@ -60,9 +60,9 @@ private:
 
 class AgentSpy : public Agent, public DoSomeThingInRange {
 public:
-	AgentSpy(Unit u, const TilePosition::list& targets, bool patrol = true, PtrUnitFilter filter = IsEnemy) :
+	AgentSpy(Unit u, const TilePosition::list& targets, bool patrol,const UnitFilter &filter) :
 		Agent(u), DoSomeThingInRange(0, filter), locations(targets), complete(false), nextLocation(Positions::None), patrol(patrol){};
-	bool OnFrame() override {
+	  bool OnFrame() override {
 		auto res = false;
 		if (nextLocation == TilePositions::None) {
 			if (locations.size()) {
@@ -101,9 +101,9 @@ private:
 class ScoutPattern : public ControlPattern {
 public:
 	ScoutPattern(Unit spyUnit, const TilePosition::list& locations, bool patrol) : ControlPattern(spyUnit) {
-		Agents.push_back(new AgentStayAway(spyUnit, 120, 100));
-		Agents.push_back(new AgentExploreBuildings(spyUnit));
-		Agents.push_back(new AgentSpy(spyUnit, locations, patrol));		
+		Agents.push_back(new AgentStayAway(spyUnit, 250, 250, IsEnemy && !IsBuilding && !IsWorker));
+		Agents.push_back(new AgentExploreBuildings(spyUnit, IsEnemy && IsBuilding));
+		Agents.push_back(new AgentSpy(spyUnit, locations, patrol, IsEnemy));
 	};
 };
 
@@ -120,6 +120,9 @@ public:
 			exploring = true;
 		}*/
 	}
+
+	virtual void OnStart() override {}
+
 	virtual void ReleaseInst() override {
 		delete insta;
 		insta = NULL;

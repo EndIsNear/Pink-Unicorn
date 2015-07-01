@@ -7,8 +7,19 @@
 
 class MacroManager : public ManagerBase
 {
-	public:
-		MacroManager() {}
+private:
+	static MacroManager *inst;
+	MacroManager() {}
+public:
+		static MacroManager&  GetInstance()
+		{
+			if (!inst)
+				inst = new MacroManager();
+
+			return *inst;
+		}
+		virtual void ReleaseInst() override { delete inst; inst = NULL; }
+		virtual void OnStart() override {}
 		virtual void OnFrame() override;
 		virtual void OnUnitComplete(Unit u) override;
 		virtual void OnUnitDestroy(Unit u) override;

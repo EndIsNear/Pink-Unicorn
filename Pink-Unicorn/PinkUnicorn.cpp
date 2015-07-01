@@ -27,6 +27,7 @@ PinkUnicorn::PinkUnicorn()
 	//mManagers.push_back(new MacroManager);
 	mManagers.push_back(&MapManager::GetInstance());
 	mManagers.push_back(&SpyManager::GetInstance());
+	mManagers.push_back(&MacroManager::GetInstance());
 }
 
 

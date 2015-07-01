@@ -83,6 +83,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Agent.cpp" />
     <ClCompile Include="BuildingManagerImp.cpp" />
     <ClCompile Include="DebugStuff.cpp" />
     <ClCompile Include="GameAnalyzer.cpp" />
