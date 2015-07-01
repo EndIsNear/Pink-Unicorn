@@ -6,6 +6,7 @@
 #include <vector>
 #include <assert.h>
 
+
 using namespace BWAPI;
 
 class MapManager : public ManagerBase
@@ -30,7 +31,7 @@ public:
 
 	TilePosition::list GetExpansionLocations();
 	TilePosition GetNextExpansionLocation();
-	Position::list GetChokepoints();
+	void GetChokepoints();
 	Position GetChokepointBetween(Position& start, Position& end);
 	Position GetBaseExit();
 	TilePosition SuggestBuildingLocation(UnitType type, const TilePosition& preferredPosition = start, int radius = 1000, bool creep = false);
@@ -42,6 +43,7 @@ private:
 		start = Broodwar->self()->getStartLocation();
 		nextPylon = TilePositions::Invalid;
 		CalculateResourseGroups();
+		CalculateChokepoints();
 		ScanPylonBuildGrid();
 	};
 	MapManager& operator = (const MapManager &m){};
@@ -78,8 +80,9 @@ private:
 	
 	TilePosition::list resourseGroups;
 
-	Position::list chokepoints;
-
+	TilePosition::list chokepoints;
+	//std::vector<pTileNode> chokepoints;
+	//std::vector<pTileNode> allnodes;
 	std::set<TilePosition> pylonLocationsGrid; // <TilePosition location, bool occupied>
 	std::set<TilePosition> builtPylons;
 	TilePosition nextPylon;

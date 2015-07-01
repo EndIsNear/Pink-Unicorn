@@ -58,27 +58,27 @@ TilePosition::list MapManager::GetExpansionLocations()
 		auto base = GetBaseLocation(rg);
 		//Broodwar->drawCircle(CoordinateType::Map, rg.x * 32, rg.y * 32, 20, Colors::Blue);
 		//Broodwar->drawCircle(CoordinateType::Map, base.x * 32, base.y * 32, 20, Colors::Green);
-		result.push_back(GetBaseLocation(rg));
+		result.push_back(base);
 	}
 	return result;
 }
 
+
 TilePosition MapManager::GetNextExpansionLocation()
 {
+	//auto unoccupiedRGs = GetUnoccupiedRGs(resourseGroups);
 	if (resourseGroups.size())
 	{
 		auto nextRg = resourseGroups.back();
 		resourseGroups.pop_back();
 		resourseGroups.push_front(nextRg); // TODO think how to do it better
-
 		return GetBaseLocation(nextRg);
 	}
 	return TilePositions::Invalid;
 }
-
-Position::list MapManager::GetChokepoints()
+void MapManager::GetChokepoints()
 {
-	return chokepoints;
+	//return chokepoints;
 }
 
 Position MapManager::GetChokepointBetween(Position& start, Position& end)
@@ -118,6 +118,7 @@ Position MapManager::GetBaseExit()
 TilePosition MapManager::SuggestBuildingLocation(UnitType type, const TilePosition& preferredPosition, int radius, bool creep)
 {
 	auto res = TilePositions::Invalid;
+	auto prefPos = (preferredPosition == TilePositions::None) ? start : preferredPosition;
 	if (Broodwar->canBuildHere(preferredPosition, type))
 	{
 		return preferredPosition;
@@ -125,15 +126,15 @@ TilePosition MapManager::SuggestBuildingLocation(UnitType type, const TilePositi
 	else
 	{
 		if (type == UnitTypes::Protoss_Pylon) {
-			return SuggestPylon(preferredPosition);
+			return SuggestPylon(prefPos);
 		} 
 		else if (type == UnitTypes::Protoss_Nexus) {
-			return SuggestNexus(preferredPosition);
+			return SuggestNexus(prefPos);
 		}
 		else if (type == UnitTypes::Protoss_Assimilator) {
-			return SuggestAssimilator(preferredPosition);
+			return SuggestAssimilator(prefPos);
 		}
-		else return SuggestRegular(type, preferredPosition);
+		else return SuggestRegular(type, prefPos);
 	}
 	return res;
 }
@@ -250,13 +251,6 @@ Position::list MapManager::getPath(const Position& start, const Position& end)
 	return Position::list();
 }
 
-
-void MapManager::CalculateChokepoints()
-{
-	auto start = Broodwar->getRegionAt(Position(Broodwar->self()->getStartLocation()));
-	auto initialValues = new std::map<int, int>;
-	auto mapWidth = Broodwar->mapWidth();
-}
 
 void MapManager::InsertToPylonGrid(const TilePosition& pos)
 {
@@ -457,16 +451,18 @@ TilePosition GetBaseLocation(const TilePosition& resGroupCenter)
 	return getBuildTileInRadius(UnitTypes::Protoss_Nexus, resGroupCenter, 400, 0);
 }
 
-void RemoveClosestToStart(TilePosition::list& rgps) {
-	for (int i = 0; i < rgps.size(); ++i) {
-		auto current = rgps.back();
-		rgps.pop_back();
+TilePosition::list GetUnoccupiedRGs(const TilePosition::list& rgps) {
+	TilePosition::list result = rgps;
+	for (int i = 0; i < result.size(); ++i) {
+		auto current = result.back();
+		result.pop_back();
 
-		if (Broodwar->self()->getStartLocation().getDistance(current) < 16) {
-			return;
+		if (Broodwar->getUnitsInRadius(Position(current), 400, (Filter::IsResourceDepot || Filter::IsMorphing)).size() != 0) {
+			continue;
 		}
-		rgps.push_front(current);
+		result.push_front(current);
 	}
+	return result;
 }
 
 void MapManager::CalculateResourseGroups()
@@ -475,7 +471,7 @@ void MapManager::CalculateResourseGroups()
 	resourseGroups = GetResGroupsCenters(resGroups);
 	auto baseExit = GetBaseExit();
 
-	RemoveClosestToStart(resourseGroups);
+	resourseGroups = GetUnoccupiedRGs(resourseGroups);
 	auto pred = [&baseExit](const TilePosition& l, const TilePosition& r){
 		return baseExit.getDistance(static_cast<Position>(l)) > baseExit.getDistance(static_cast<Position>(r));
 	};
