@@ -72,6 +72,9 @@
     <ClCompile Include="TaskQueueImp.cpp">
       <Filter>Source Files\Managers</Filter>
     </ClCompile>
+    <ClCompile Include="MapRegion.cpp">
+      <Filter>Source Files\Managers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PinkUnicorn.h">
@@ -120,6 +123,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="StrategyManager.h">
+      <Filter>Header Files\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="MapRegion.h">
       <Filter>Header Files\Managers</Filter>
     </ClInclude>
   </ItemGroup>

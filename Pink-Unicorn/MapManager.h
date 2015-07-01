@@ -5,9 +5,22 @@
 #include "ManagerBase.h"
 #include <vector>
 #include <assert.h>
-
+#include "MapRegion.h"
 
 using namespace BWAPI;
+
+static int maxDistance = 5;
+struct tileNode;
+typedef std::shared_ptr<tileNode> pTileNode;
+typedef bool(*pred)(pTileNode);
+
+struct tileNode {
+	TilePosition pos;
+	int value; // 0 for unwalkable, positive int indicating the distance to unwalkable positions
+	int groupId;
+	bool inChokepoint;
+	tileNode() : value(-1), groupId(-1), inChokepoint(false){};
+};
 
 class MapManager : public ManagerBase
 {
@@ -80,9 +93,9 @@ private:
 	
 	TilePosition::list resourseGroups;
 
-	TilePosition::list chokepoints;
-	//std::vector<pTileNode> chokepoints;
-	//std::vector<pTileNode> allnodes;
+	//TilePosition::list chokepoints;
+	std::vector<pTileNode> chokepoints;
+	std::vector<pTileNode> allnodes;
 	std::set<TilePosition> pylonLocationsGrid; // <TilePosition location, bool occupied>
 	std::set<TilePosition> builtPylons;
 	TilePosition nextPylon;

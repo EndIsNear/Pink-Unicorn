@@ -89,6 +89,7 @@
     <ClCompile Include="MacroManagerImp.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MapManagerImpl.cpp" />
+    <ClCompile Include="MapRegion.cpp" />
     <ClCompile Include="PinkUnicorn.cpp" />
     <ClCompile Include="ProductionManagerImp.cpp" />
     <ClCompile Include="ResourceManagerImp.cpp" />
@@ -107,6 +108,7 @@
     <ClInclude Include="MacroManager.h" />
     <ClInclude Include="ManagerBase.h" />
     <ClInclude Include="MapManager.h" />
+    <ClInclude Include="MapRegion.h" />
     <ClInclude Include="PinkUnicorn.h" />
     <ClInclude Include="ProductionManager.h" />
     <ClInclude Include="ResourceManager.h" />
