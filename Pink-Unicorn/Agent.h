@@ -40,7 +40,7 @@ class DoSomeThingInRange
 protected:
 	DoSomeThingInRange(int dist, const UnitFilter & filter) :mDist(dist), mFilter(filter) {}
 protected:
-	const UnitFilter & mFilter;
+	UnitFilter  mFilter;
 	int mDist;
 };
 
@@ -147,11 +147,11 @@ inline double CalcScore(Unitset &set)
 	double result = 0;
 	for (auto it : set)
 	{
-		if (it->getType().isBuilding())
+		if (IsBuilding(it) || IsWorker(it))
 			continue;
 		switch (it->getType())
 		{
-			// todo implemented
+
 		default:
 			result += it->getType().mineralPrice() + it->getType().gasPrice();
 			break;

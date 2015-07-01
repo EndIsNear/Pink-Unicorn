@@ -25,7 +25,7 @@ void MacroManager::OnFrame()
 
 void MacroManager::OnUnitComplete(Unit u)
 {
-	if (IsWorker(u) == false && !IsEnemy(u))
+	if ( !IsWorker(u) && !IsEnemy(u))
 	{
 		mFreeUnits[u->getType()].insert(u);
 

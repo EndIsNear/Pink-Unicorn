@@ -21,7 +21,7 @@ public:
 	Agent(u), DoSomeThingInRange(0, filter), next(NULL){};
 	bool OnFrame() override {
 		auto buildingsInRange = Broodwar->getUnitsInRadius(mUnit->getPosition(),
-		400, IsEnemy);
+			400, mFilter);
 
 		Broodwar->drawCircle(CoordinateType::Map, mUnit->getPosition().x, mUnit->getPosition().y, 400, Colors::Red);
 
@@ -60,7 +60,7 @@ private:
 
 class AgentSpy : public Agent, public DoSomeThingInRange {
 public:
-	AgentSpy(Unit u, const TilePosition::list& targets, bool patrol,const UnitFilter &filter) :
+	AgentSpy(Unit u, const TilePosition::list& targets, bool patrol, const UnitFilter &filter) :
 		Agent(u), DoSomeThingInRange(0, filter), locations(targets), complete(false), nextLocation(Positions::None), patrol(patrol){};
 	  bool OnFrame() override {
 		auto res = false;
@@ -75,7 +75,7 @@ public:
 		}
 		
 		//std::cout << Broodwar->self()->getStartLocation() << std::endl;
-		if (mUnit->getPosition().getDistance(Position(nextLocation)) > 170 && !complete) {
+		if (mUnit->getPosition().getDistance(Position(nextLocation)) > 170 && !complete && mUnit->getTargetPosition() != Position(nextLocation)) {
 			moveUnit(mUnit, Position(nextLocation));
 			//mUnit->move(Position(nextLocation));
 		}
@@ -101,7 +101,7 @@ private:
 class ScoutPattern : public ControlPattern {
 public:
 	ScoutPattern(Unit spyUnit, const TilePosition::list& locations, bool patrol) : ControlPattern(spyUnit) {
-		Agents.push_back(new AgentStayAway(spyUnit, 250, 250, IsEnemy && !IsBuilding && !IsWorker));
+		Agents.push_back(new AgentStayAway(spyUnit, 250, 250, IsEnemy && !IsBuilding ));
 		Agents.push_back(new AgentExploreBuildings(spyUnit, IsEnemy && IsBuilding));
 		Agents.push_back(new AgentSpy(spyUnit, locations, patrol, IsEnemy));
 	};
