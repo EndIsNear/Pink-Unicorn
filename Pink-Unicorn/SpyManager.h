@@ -114,10 +114,6 @@ public:
 	virtual void OnFrame() override {
 		for (auto u : spyUnits)
 			u->OnFrame();
-
-		if (Broodwar->getFrameCount() % 50 == 0) {
-			std::cout << GetEnemyBases().size() << std::endl;
-		}
 		/*Unit w;
 		if (WorkerManager::GetInstance().GetInstance().ReleaseWorker(Positions::None, w) && !exploring) {
 			ExploreLocations(w, Broodwar->getStartLocations());
