@@ -106,25 +106,23 @@ void WorkerManager::AddUnit(Unit unit)
 
 bool WorkerManager::ReleaseWorker(Position pos, Unit& result)
 {
-	//TODO: use position in getUnitTask (just uncoment)
 
 	//Position wantedPos = tmp->mPosition;
 	auto& bestExp = m_expands[0];
-	//int minDist = bestExp.base->getDistance(wantedPos);
-	//for (auto& expand : m_expands)
-	//{
-	//	auto tmp = expand.base->getDistance(wantedPos);
-	//	if (minDist > tmp)
-	//	{
-	//		bestExp = expand;
-	//		minDist = tmp;
-	//	}
-	//}
+	int minDist = bestExp.base->getDistance(pos);
+	for (auto& expand : m_expands)
+	{
+		auto tmp = expand.base->getDistance(pos);
+		if (minDist > tmp)
+		{
+			bestExp = expand;
+			minDist = tmp;
+		}
+	}
 
 	for (auto& worker : bestExp.workers)
 	{
-		//TODO: Smarter check for free worker
-		if (!worker->isCarryingMinerals() && !worker->isCarryingGas())
+		if (!worker->isCarryingMinerals() && !worker->isGatheringGas())
 		{
 			result = worker;
 			bestExp.workers.erase(worker);

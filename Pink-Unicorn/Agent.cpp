@@ -1,6 +1,6 @@
 #include "Agent.h"
 #include "SpyManager.h"
-#include "AgentsFilters.h"
+//#include "AgentsFilters.h"
 
 
 DragoonControl::DragoonControl(Unit drag) : ControlPattern(drag)
