@@ -12,6 +12,7 @@ public:
 	virtual void OnStart(){};
 	virtual void OnUnitDestroy(BWAPI::Unit unit){};
 	virtual void OnUnitDiscover(BWAPI::Unit unit){};
+	virtual void OnUnitShow(BWAPI::Unit unit){};
 	virtual void ReleaseInst() = 0;
 };
 

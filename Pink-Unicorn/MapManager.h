@@ -43,6 +43,9 @@ public:
 	}
 
 	TilePosition::list GetExpansionLocations();
+	TilePosition::list GetResourseGroups() {
+		return resourseGroups;
+	}
 	TilePosition GetNextExpansionLocation();
 	void GetChokepoints();
 	Position GetChokepointBetween(Position& start, Position& end);

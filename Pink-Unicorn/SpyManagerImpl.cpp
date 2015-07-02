@@ -8,18 +8,82 @@ void moveUnit(Unit u, Position pos)
 		u->move(pos);
 }
 
+bool AgentExploreBuildings::OnFrame()  {
+	auto buildingsInRange = Broodwar->getUnitsInRadius(mUnit->getPosition(),
+		400, mFilter);
+
+	Broodwar->drawCircle(CoordinateType::Map, mUnit->getPosition().x, mUnit->getPosition().y, 400, Colors::Red);
+
+	for (auto b : buildingsInRange) {
+		if (!discovered(b) && b->getType().isBuilding()) {
+			toExplore.push_front(b);
+			discoveredBuildings.insert(b);
+		}
+	}
+
+	if (next) {
+		moveUnit(mUnit, next->getPosition());
+		//mUnit->move(next->getPosition());
+		if (mUnit->getDistance(next) < 70) {
+			next = NULL;
+		}
+	}
+	else {
+		if (toExplore.size()) {
+			next = toExplore.back();
+			toExplore.pop_back();
+			toExplore.push_front(next);
+		}
+	}
+	return false;
+};
+
+bool AgentSpy::OnFrame() {
+	auto res = false;
+	if (nextLocation == TilePositions::None) {
+		if (locations.size()) {
+			nextLocation = locations.back();
+			locations.pop_back();
+		}
+		if (patrol) {
+			locations.push_front(nextLocation);
+		}
+	}
+
+	//std::cout << Broodwar->self()->getStartLocation() << std::endl;
+	if (mUnit->getPosition().getDistance(Position(nextLocation)) > 100 && !complete) {
+		moveUnit(mUnit, Position(nextLocation));
+		//mUnit->move(Position(nextLocation));
+	}
+	else {
+		if (!locations.size() && !patrol && !complete) {
+			moveUnit(mUnit, Position(Broodwar->self()->getStartLocation()));
+			complete = true;
+		}
+		else {
+			nextLocation = TilePositions::None;
+		}
+	}
+	return res;
+};
+
+Unit GetClosestBuilding(std::map<Unit, TilePosition>& buildings, const TilePosition& pos) {
+	for (auto b : buildings) {
+		if (b.second.getDistance(pos) < 20)
+			return b.first;
+	}
+	return NULL;
+}
 TilePosition::list SpyManager::GetEnemyBases()
 {
 	auto result = TilePosition::list();
-	auto expansions = MapManager::GetInstance().GetExpansionLocations();
-	for (auto e : expansions)
+	auto rgs = MapManager::GetInstance().GetResourseGroups();
+	for (auto e : rgs)
 	{
-		auto closestUnit = Broodwar->getClosestUnit(Position(e), (IsEnemy && (IsBuilding || IsBeingConstructed)), 450);
+		auto closestUnit = GetClosestBuilding(enemyBuildings, e);
 		if (closestUnit) {
-			if (enemyBuildings.find(closestUnit) != enemyBuildings.end()) //if unit isn't destroyed
-				result.push_back(e);
+			result.push_back(e);
 		}
-		
 	}
 	return result;
 }

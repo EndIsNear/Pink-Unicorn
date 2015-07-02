@@ -33,8 +33,6 @@ PinkUnicorn::PinkUnicorn()
 
 void PinkUnicorn::onFrame()
 {
-
-
 	//dispaly FPS
 	Broodwar->drawTextScreen(200, 0, "FPS: %d", Broodwar->getFPS());
 	Broodwar->drawTextScreen(200, 20, "Average FPS: %f", Broodwar->getAverageFPS());
@@ -211,8 +209,10 @@ void PinkUnicorn::onUnitShow(BWAPI::Unit unit)
 		return;
 	}
 	if (Broodwar->self() != unit->getPlayer() && Broodwar->neutral() != unit->getPlayer())
-		std::cout << "Enemy found: " << unit->getType().c_str() << std::endl;
+		//std::cout << "Enemy found: " << unit->getType().c_str() << std::endl;
 
+	for (auto m : mManagers)
+		m->OnUnitShow(unit);
 }
 
 void PinkUnicorn::onUnitHide(BWAPI::Unit unit)
