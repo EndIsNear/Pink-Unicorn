@@ -78,6 +78,13 @@ TilePosition MapManager::GetNextExpansionLocation()
 }
 void MapManager::GetChokepoints()
 {
+	for (auto c : chokepoints) {
+		Broodwar->drawCircle(CoordinateType::Map, c->pos.x * 32, c->pos.y * 32, 10, Colors::Red);
+	}
+
+	for (auto t : allnodes) {
+		Broodwar->drawText(CoordinateType::Map, t->pos.x * 32, t->pos.y * 32, "%d", t->value);
+	}
 	//return chokepoints;
 }
 
@@ -409,7 +416,7 @@ TilePosition MapManager::SuggestNexus(const TilePosition& location)
 	return GetNextExpansionLocation();
 }
 
-std::map<int, Unitset> GetResourseGroups()
+std::map<int, Unitset> GetResGroups()
 {
 	auto resourses = Broodwar->getStaticMinerals();
 	auto gas = Broodwar->getStaticGeysers();
@@ -467,7 +474,7 @@ TilePosition::list GetUnoccupiedRGs(const TilePosition::list& rgps) {
 
 void MapManager::CalculateResourseGroups()
 {
-	auto resGroups = GetResourseGroups();
+	auto resGroups = GetResGroups();
 	resourseGroups = GetResGroupsCenters(resGroups);
 	auto baseExit = GetBaseExit();
 
