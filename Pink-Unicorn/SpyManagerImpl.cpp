@@ -41,12 +41,12 @@ bool AgentExploreBuildings::OnFrame()  {
 bool AgentSpy::OnFrame() {
 	auto res = false;
 	if (nextLocation == TilePositions::None) {
-		if (locations.size()) {
+		for (int i = 0; i < locations.size() && !Broodwar->hasPath(mUnit->getPosition(), Position(nextLocation)); ++i) {
 			nextLocation = locations.back();
 			locations.pop_back();
-		}
-		if (patrol) {
-			locations.push_front(nextLocation);
+			if (patrol) {
+				locations.push_front(nextLocation);
+			}
 		}
 	}
 
