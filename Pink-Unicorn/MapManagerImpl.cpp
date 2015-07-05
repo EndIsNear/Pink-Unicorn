@@ -41,6 +41,7 @@ void MapManager::OnFrame()
 		//CalculateExpansions();
 	}
 
+	//GetDefencePoints(start);
 	/*if (Broodwar->getFrameCount() > 2500) {
 		drawGateway(*this, p1);
 		drawGateway(*this, p2);
@@ -103,22 +104,6 @@ TilePosition MapManager::GetNextExpansionLocation()
 		return GetBaseLocation(nextRg);
 	}
 	return TilePositions::Invalid;
-}
-void MapManager::GetChokepoints()
-{
-	for (auto c : chokepoints) {
-		Broodwar->drawCircle(CoordinateType::Map, c.pos.x * 32, c.pos.y * 32, 10, Colors::Red);
-	}
-
-	for (auto t : allnodes) {
-		Broodwar->drawText(CoordinateType::Map, t->pos.x * 32, t->pos.y * 32, "%d", t->regionId);
-		//Broodwar->drawText(CoordinateType::Map, t.pos.x * 32, t.pos.y * 32, "%d %d", t.pos.x, t.pos.y);
-	}
-
-	for (auto c : closed) {
-		Broodwar->drawCircle(CoordinateType::Map, c.pos.x * 32, c.pos.y * 32, 15, Colors::Blue);
-	}
-	//return chokepoints;
 }
 
 Position MapManager::GetChokepointBetween(Position& start, Position& end)
@@ -514,3 +499,32 @@ void MapManager::CalculateResourseGroups()
 	std::sort(resourseGroups.begin(), resourseGroups.end(), pred);
 }
 
+TilePosition::list MapManager::GetDefencePoints(const TilePosition& aroundHere) {
+	auto arroundHereNode = getNode(aroundHere);
+	TilePosition::list result;
+	if (arroundHereNode->regionId == INVALID) {
+		// the point is either unwalkable, or a chokepoint
+		// if chokepoint - return it
+		if (arroundHereNode->value != 0) {
+			result.push_back(aroundHere);
+		}
+	}
+	else {
+		auto region = regions[arroundHereNode->regionId];
+		auto chokepoints = region->getAdjacentChokepoints();
+
+		for (auto c : chokepoints) {
+			auto dps = c->getDefencePointsAround();
+			for (auto dp : dps) {
+				auto node = getNode(dp);
+
+				if (node->regionId != arroundHereNode->regionId) {
+					result.push_back(dp);
+					Broodwar->drawBoxMap(Position(dp), Position(dp + TilePosition(1, 1)), Colors::Green);
+				}
+			}
+		}
+	}
+
+	return result;
+}

@@ -236,7 +236,7 @@ void MapAnalyzer::CalculateChokepoints() {
 		for (auto c : cps[i]) {
 			c->chokePointId = i;
 		}
-		auto cp = pChokePoint(new ChokePoint(cps[i]));
+		auto cp = pChokePoint(new ChokePoint(cps[i], nodeMap));
 		cp->id = i;
 		chokpts[i] = cp;
 	}
@@ -246,7 +246,7 @@ void MapAnalyzer::CalculateRegions() {
 	getRegionGroups();
 
 	for (auto cp : chokpts) {
-		cp.second->calcAdjacentRegions(nodeMap);
+		cp.second->calcAdjacentRegions(regions);
 	}
 	for (auto r : regions) {
 		r.second->calcAdjacentChokepoints(chokpts);
@@ -354,7 +354,7 @@ void MapAnalyzer::getRegionGroups() {
 			auto current = nodeMap[i][j];
 			if (current->value != 0 && !current->closed) {
 				if (visited.find(current) == visited.end()) {
-					pRegion group = pRegion(new MapRegion());
+					pRegion group = pRegion(new MapRegion(nodeMap));
 					getRegionGroup(visited, current, nextRegionId, group);
 					if (group->area() != 0) {
 						group->id = nextRegionId++;
@@ -364,4 +364,12 @@ void MapAnalyzer::getRegionGroups() {
 			}
 		}
 	}
+}
+
+bool ChokePoint::inAdjacentRegion(int id) {
+	for (auto r : adjacentRegions) {
+		if (r->getId() == id)
+			return true;
+	}
+	return false;
 }

@@ -10,7 +10,7 @@
 
 using namespace BWAPI;
 
-class MapManager : public ManagerBase
+class MapManager : public ManagerBase, public MapAnalyzer
 {
 public:
 	virtual void OnFrame();
@@ -35,20 +35,32 @@ public:
 		return resourseGroups;
 	}
 	TilePosition GetNextExpansionLocation();
-	void GetChokepoints();
 	Position GetChokepointBetween(Position& start, Position& end);
+	TilePosition::list GetDefencePoints(const TilePosition& aroundHere);
+	int GetRegionId(const TilePosition& tile) {
+		return getNode(tile)->regionId;
+	}
+	pRegion GetRegion(int id) {
+		return regions[id];
+	}
+	pRegion GetRegion(const TilePosition& tile) {
+		if (GetRegionId(tile) != INVALID)
+			return regions[GetRegionId(tile)];
+		else
+			return nullptr;
+	}
 	Position GetBaseExit();
 	TilePosition SuggestBuildingLocation(UnitType type, const TilePosition& preferredPosition = start, int radius = 1000, bool creep = false);
 	TilePosition SuggestDefencePylon(const TilePosition& base = start); // the function determines the most critical chokepoint and gets pylon location next to it
 	TilePosition SuggestDefenceCannon(const TilePosition& base = start);
 private:
 	MapManager(){
-		ma = MapAnalyzer::GetInstance();
+		//ma = MapAnalyzer::GetInstance();
 		//ma->CalculateChokepoints();
 
-		chokepoints = ma->GetChokepoints();
-		allnodes = ma->GetAllNodes();
-		closed = ma->GetClosed();
+		//chokepoints = GetChokepoints();
+		//allnodes = GetAllNodes();
+		//closed = GetClosed();
 
 		regularBuildingCount = 0;
 		start = Broodwar->self()->getStartLocation();
@@ -58,7 +70,7 @@ private:
 	};
 	MapManager& operator = (const MapManager &m){};
 	static MapManager * insta;
-	MapAnalyzer *ma;
+	//MapAnalyzer *ma;
 	static TilePosition start;
 	static Unit testWorker; // used to better check if given position is buildable or nots
 	void checkTestWorker()
@@ -92,9 +104,9 @@ private:
 	TilePosition::list resourseGroups;
 
 	//TilePosition::list chokepoints;
-	std::vector<tileNode> chokepoints;
+	std::vector<pTileNode> chokepoints;
 	std::vector<pTileNode> allnodes;
-	std::vector<tileNode> closed;
+	std::vector<pTileNode> closed;
 	std::set<TilePosition> pylonLocationsGrid; // <TilePosition location, bool occupied>
 	std::set<TilePosition> builtPylons;
 	TilePosition nextPylon;

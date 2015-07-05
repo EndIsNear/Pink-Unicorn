@@ -6,21 +6,22 @@
 #include <BWAPI.h>
 #include <BWAPI\Client.h>
 #include <memory>
+#include <cmath>
 #include <vector>
 #include <assert.h>
 //#include "MapManager.h"
 using namespace BWAPI;
 
-static int maxDistance = 5;
+static int maxDistance = 3;
 struct tileNode;
 typedef tileNode *pTileNode;
-//typedef bool(*pred)(pTileNode);
 typedef std::function<bool(pTileNode)> pred;
 typedef std::set<TilePosition> TPSet;
 typedef std::vector<TPSet> TPSetGroup;
 
 #define INVALID -1
 #define REGION_MIN_SIZE 25
+#define PI 3.14159
 
 struct tileNode {
 	TilePosition pos;
@@ -51,6 +52,24 @@ std::set<TilePosition> getSurroundingTilesInSquare(const TilePosition& center, i
 std::set<TilePosition> getNeighbors(const TilePosition& pos);
 
 class MapAnalyzer {
+public:
+	static MapAnalyzer* GetInstance() {
+		Broodwar->mapName();
+		if (!insta || insta->map != Broodwar->mapName()) {
+			if (insta)
+				delete insta;
+			insta = new MapAnalyzer();
+		}
+		return insta;
+	}
+	std::vector<tileNode> GetChokepoints() {
+		return chokePoints;
+	}
+
+	std::vector<tileNode> GetClosed() {
+		return closed;
+	}
+protected:
 	pTileNode** nodeMap;
 	int mw;
 	int mh;
@@ -78,7 +97,6 @@ class MapAnalyzer {
 	}
 	MapAnalyzer(const MapAnalyzer& m){};
 	const MapAnalyzer& operator=(const MapAnalyzer& m){};
-private:
 	std::string map;
 	static MapAnalyzer * insta;
 	std::vector<tileNode> chokePoints;
@@ -95,16 +113,7 @@ private:
 		CalculateChokepoints();
 		CalculateRegions();
 	}
-public:
-	static MapAnalyzer* GetInstance() {
-		Broodwar->mapName();
-		if (!insta || insta->map != Broodwar->mapName()) {
-			if (insta)
-				delete insta;
-			insta = new MapAnalyzer();
-		}
-		return insta;
-	}
+
 	static void ReleaseInstance() {
 		delete insta;
 		insta = NULL;
@@ -142,16 +151,6 @@ public:
 	void CalcChokePoints();
 	void CalculateChokepoints();
 	bool isCornerChokepoint(pTileNode pos);
-	std::vector<tileNode> GetChokepoints() {
-		return chokePoints;
-	}
-	std::vector<pTileNode> GetAllNodes() {
-		return allNodes;
-	}
-
-	std::vector<tileNode> GetClosed() {
-		return closed;
-	}
 	UnwalkableAreaSet getUnwalkableGroups();
 	UnwalkableArea getUnwalkableGroup(std::set<TilePosition>& visited, const TilePosition& pos);
 	void getGroup(std::set<pTileNode>& visited,
@@ -245,13 +244,44 @@ class UnwalkableAreaSet : public std::vector<UnwalkableArea>{
 
 };
 
+class Vector {
+	double x;
+	double y;
+public:
+	Vector(TilePosition& pos) {
+		x = pos.x;
+		y = pos.y;
+	}
+	Vector& rotateVector(double degrees) {
+		auto s = sin(degrees*PI / 180);
+		auto c = cos(degrees*PI / 180);
+		x = c * x - s*y;
+		y = s * x + c * y;
+		return *this;
+	}
+	operator TilePosition() {
+		return TilePosition(int(x), int(y));
+	}
+};
+
 class Group {
 protected:
 	std::vector<pTileNode> tiles;
+	pTileNode ** nodeMap;
 	int id;
+	Group(pTileNode ** map) : nodeMap(map){};
 public:
+	pTileNode getNode(int i, int j) {
+		if (i > -1 && i < Broodwar->mapWidth() && j >= 0 && j < Broodwar->mapHeight())
+			return nodeMap[i][j];
+		return nullptr;
+	}
 	int area() {
 		return tiles.size();
+	}
+
+	int getId() {
+		return id;
 	}
 };
 
@@ -259,26 +289,60 @@ class ChokePoint : public Group{
 	friend class MapAnalyzer;
 	friend class MapRegion;
 	std::vector<pTileNode> closedParts;
-	std::set<int> adjacentRegions;
-	void calcAdjacentRegions(pTileNode ** nodeMap) {// very very ugly
+	std::vector<pRegion> adjacentRegions;
+	void calcAdjacentRegions(std::map<int, pRegion>& regions) {// very very ugly
+		std::set<int> tempIds;
 		for (auto c : closedParts) {
 			auto neighbors = getSurroundingTilesInSquare(c->pos, 2);
 			for (auto n : neighbors) {
 				auto node = nodeMap[n.x][n.y];
 				if (node->regionId != INVALID)
-					adjacentRegions.insert(node->regionId);
+					tempIds.insert(node->regionId);
 			}
 		}
+
+		for (auto id : tempIds) {
+			adjacentRegions.push_back(regions[id]);
+		}
 	}
-	ChokePoint(std::set<pTileNode>& group) { 
+	ChokePoint(std::set<pTileNode>& group, pTileNode ** nodeMap) : Group(nodeMap) { 
 		for (auto t : group) {
 			tiles.push_back(t);
 			if (t->closed)
 				closedParts.push_back(t);
 		}
 	}
+	bool inAdjacentRegion(int id);
 public:
+	std::vector<pRegion> getAdjacentRegions() {
+		return adjacentRegions;
+	}
 
+	TilePosition::list getDefencePointsAround() {
+		TilePosition::list result;
+		auto closed = *closedParts.begin();
+		auto neighbours = getSurroundingTilesInSquare(closed->pos, 11);
+
+		std::map<int, std::vector<TilePosition>> groups;
+		for (auto p : neighbours) {
+			auto node = getNode(p.x, p.y);
+			if (node && node->value != 0 && inAdjacentRegion(node->regionId)) {
+				//Broodwar->drawBoxMap(Position(p), Position(p + TilePosition(1, 1)), Colors::Green);
+				groups[node->regionId].push_back(p);
+			}
+		}
+
+		for (auto g : groups) {
+			auto dp = TilePosition(0, 0);
+			for (auto p : g.second) {
+				dp += p;
+			}
+			dp /= g.second.size();
+			//Broodwar->drawBoxMap(Position(dp), Position(dp + TilePosition(1, 1)), Colors::Green);
+			result.push_back(dp);
+		}
+		return result;
+	}
 };
 
 class MapRegion : public Group {
@@ -286,7 +350,7 @@ class MapRegion : public Group {
 	std::set<pTileNode> border;
 	std::vector<pChokePoint> adjacentChokePoints;
 	std::vector<pRegion> adjacentRegions;
-	MapRegion(){};
+	MapRegion(pTileNode ** nodeMap) : Group(nodeMap){};
 	void calcAdjacentChokepoints(std::map<int, pChokePoint>& cps) {
 		std::set<int> visitedIds;
 		std::vector<pChokePoint> result;
@@ -306,9 +370,9 @@ class MapRegion : public Group {
 		std::vector<pRegion> result;
 		for (auto cp : adjacentChokePoints) {
 			auto adjRegionsInCP = cp->adjacentRegions;
-			for (auto i : adjRegionsInCP) {
-				if (i != this->id) {
-					visitedIds.insert(i);
+			for (auto r : adjRegionsInCP) {
+				if (r->id != this->id) {
+					visitedIds.insert(r->id);
 				}
 			}
 		}
@@ -318,7 +382,7 @@ class MapRegion : public Group {
 		}
 		adjacentRegions = result;
 	}
-public:
+
 	void merge(const pRegion& other) {
 		int a = 2;
 		for (auto t : other->tiles) {
@@ -336,6 +400,13 @@ public:
 				border.insert(t);
 			}
 		}
+	}
+public:
+	std::vector<pChokePoint> getAdjacentChokepoints() {
+		return adjacentChokePoints;
+	}
+	std::vector<pRegion> getAdjacentRegions() {
+		return adjacentRegions;
 	}
 };
 #endif //MAP_R_H
