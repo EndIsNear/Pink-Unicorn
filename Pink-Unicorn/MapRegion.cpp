@@ -2,14 +2,21 @@
 #include "MapManager.h"
 #include <memory>
 
-static void addPoint(std::vector<TilePosition>& points, const TilePosition& location) {
+MapAnalyzer * MapAnalyzer::insta = NULL;
+
+template <class T>
+static bool contains(std::set<T>& g, T pos) {
+	return (g.find(pos) != g.end());
+}
+
+void addPoint(std::set<TilePosition>& points, const TilePosition& location) {
 	if (location.isValid()) {
-		points.push_back(location);
+		points.insert(location);
 	}
 }
 
-static std::vector<TilePosition> getSurroundingTilesInSquare(const TilePosition& center, int widthFromCenter) {
-	std::vector<TilePosition> result;
+std::set<TilePosition> getSurroundingTilesInSquare(const TilePosition& center, int widthFromCenter) {
+	std::set<TilePosition> result;
 	for (int i = center.x - widthFromCenter; i <= center.x + widthFromCenter; ++i) {
 		for (int j = center.y - widthFromCenter; j <= center.y + widthFromCenter; ++j) {
 			if (i == center.x && j == center.y) 
@@ -20,41 +27,71 @@ static std::vector<TilePosition> getSurroundingTilesInSquare(const TilePosition&
 	return result;
 }
 
-static std::vector<TilePosition> getNeighbours(const TilePosition& pos)
+std::set<TilePosition> getNeighbors(const TilePosition& pos)
 {
 	return getSurroundingTilesInSquare(pos, 1);
 }
 
-static std::vector<pTileNode> getNeighborNodes(std::map<TilePosition, pTileNode>& map, pTileNode node, pred p) {
+std::vector<pTileNode> MapAnalyzer::getNeighborNodes(const TilePosition& tile, pred p) {
 	std::vector<pTileNode> result;
-	auto neighbors = getNeighbours(node->pos);
+	auto neighbors = getNeighbors(tile);
 	//auto neighbors = get4Neighbours(node->pos);
 	for (auto n : neighbors) {
-		auto node = map[n];
+		auto node = getNode(n);
 		if (p(node))
 			result.push_back(node);
 	}
 	return result;
 }
 
-std::vector<pTileNode> getNodesWithValue(std::map < TilePosition, pTileNode>& map, int value) {
+std::vector<pTileNode> MapAnalyzer::getNodesWithValue(int value) {
 	std::vector<pTileNode> result;
-	for (auto p : map) {
-		if (p.second->value == value)
-			result.push_back(p.second);
+	for (int i = 0; i < mw; ++i) {
+		for (int j = 0; j < mh; ++j) {
+			auto p = nodeMap[i][j];
+			if (p->value == value)
+				result.push_back(p);
+		}
 	}
 	return result;
 }
 
-void CalculateDistancesToUnWalkables(std::map < TilePosition, pTileNode>& map) {
+void MapAnalyzer::addNode(std::set<pTileNode>& points, pTileNode node, pred p){
+	if (node && node->pos.isValid() && (!p || p(node))) {
+		points.insert(node);
+	}
+}
+
+std::set<pTileNode> MapAnalyzer::getSurroundingNodeInSquare(const TilePosition& center, int widthFromCenter, pred p) {
+	std::set<pTileNode> result;
+	for (int i = center.x - widthFromCenter; i <= center.x + widthFromCenter; ++i) {
+		for (int j = center.y - widthFromCenter; j <= center.y + widthFromCenter; ++j) {
+			if (i == center.x && j == center.y)
+				continue;
+			addNode(result, getNode(i, j), p);
+		}
+	}
+	return result;
+}
+
+std::set<pTileNode> MapAnalyzer::getNeighborNodesWithDistInSquare(std::set<pTileNode>& square, pTileNode node, int dist, pred p) {
+	auto neighbors = getSurroundingNodeInSquare(node->pos, dist, p);
+	std::set<pTileNode> result;
+	for (auto t : neighbors) {
+		if (square.find(t) != square.end())
+			result.insert(t);
+	}
+	return result; // TODO test
+}
+void MapAnalyzer::CalculateDistancesToUnWalkables() {
 	auto isUnexplored = [](pTileNode pos) {
 		return pos->value == -1;
 	};
 
 	for (int i = 0; i < maxDistance; ++i) {
-		auto nodesWithValue = getNodesWithValue(map, i);
+		auto nodesWithValue = getNodesWithValue(i);
 		for (auto node : nodesWithValue) {
-			auto neighborNodes = getNeighborNodes(map, node, isUnexplored);
+			auto neighborNodes = getNeighborNodes(node->pos, isUnexplored);
 			for (auto nn : neighborNodes) {
 				nn->value = i + 1;
 			}
@@ -62,24 +99,26 @@ void CalculateDistancesToUnWalkables(std::map < TilePosition, pTileNode>& map) {
 	}
 
 	// the unexplored left are set to maxDistance
-	auto nodesWithValue = getNodesWithValue(map, -1);
+	auto nodesWithValue = getNodesWithValue(-1);
 	for (auto node : nodesWithValue) {
 		node->value = maxDistance;
 	}
 }
 
-void CalcChokePoints(std::map<TilePosition, pTileNode>& map) {
-	for (auto p : map) {
-		auto neighbors = getNeighbours(p.first);
-		auto nodeData = p.second;
-		if (nodeData->value == maxDistance || nodeData->value >2 || nodeData->value == 0) continue;
+void MapAnalyzer::CalcChokePoints() {
+	for (int i = 0; i < mw; ++i) {
+		for (int j = 0; j < mh; ++j) {
+			auto nodeData = nodeMap[i][j];
+			auto neighbors = getNeighbors(nodeData->pos);
+			if (nodeData->value == maxDistance || nodeData->value >2 || nodeData->value == 0) continue;
 
-		nodeData->inChokepoint = true;
-		for (auto n : neighbors) {
-			auto posData = map[n];
-			if (posData->value > nodeData->value) {
-				nodeData->inChokepoint = false;
-				break;
+			nodeData->inChokepoint = true;
+			for (auto n : neighbors) {
+				auto posData = getNode(n);
+				if (posData->value > nodeData->value) {
+					nodeData->inChokepoint = false;
+					break;
+				}
 			}
 		}
 	}
@@ -89,7 +128,7 @@ bool visited(std::set<TilePosition>& visited, const TilePosition& pos) {
 	return visited.find(pos) != visited.end();
 };
 
-UnwalkableArea getUnwalkableGroup(std::set<TilePosition>& visited, const TilePosition& pos) {
+UnwalkableArea MapAnalyzer::getUnwalkableGroup(std::set<TilePosition>& visited, const TilePosition& pos) {
 	UnwalkableArea area;
 	area.fillAreaAround(pos);
 
@@ -99,7 +138,7 @@ UnwalkableArea getUnwalkableGroup(std::set<TilePosition>& visited, const TilePos
 	return area;
 }
 
-UnwalkableAreaSet getUnwalkableGroups() {
+UnwalkableAreaSet MapAnalyzer::getUnwalkableGroups() {
 	auto mw = Broodwar->mapWidth();
 	auto mh = Broodwar->mapHeight();
 	UnwalkableAreaSet result;
@@ -113,11 +152,9 @@ UnwalkableAreaSet getUnwalkableGroups() {
 				v.insert(current);
 				auto group = getUnwalkableGroup(v, current);
 				if (group.tiles.size() != 0) {
-					result.addArea(group);
+					result.push_back(group);
 					count++;
 				}
-					
-				
 			}
 		}
 	}
@@ -125,45 +162,206 @@ UnwalkableAreaSet getUnwalkableGroups() {
 	return result;
 }
 
-void MapManager::CalculateChokepoints() {
+void MapAnalyzer::closeLine(pTileNode f, pTileNode s) {
+	int x0 = f->pos.x, y0 = f->pos.y, x1 = s->pos.x, y1 = s->pos.y;
+	int dx = abs(x1 - x0), sx = x0<x1 ? 1 : -1;
+	int dy = abs(y1 - y0), sy = y0<y1 ? 1 : -1;
+	int err = (dx>dy ? dx : -dy) / 2, e2;
+
+	for (;;){
+		getNode(x0, y0)->closed = true;
+		closed.push_back(*getNode(x0, y0));
+		if (x0 == x1 && y0 == y1) break;
+		e2 = err;
+		if (e2 >-dx) { err -= dy; x0 += sx; }
+		if (e2 < dy) { err += dx; y0 += sy; }
+	}
+}
+
+void MapAnalyzer::closeChokepoint(std::set<pTileNode>& chokePoint) {
+	auto el = *chokePoint.begin();
+	pred unwalkable = [](pTileNode n) {
+		return n->value == 0;
+	};
+	auto neighbors = getSurroundingNodeInSquare(el->pos, 4, unwalkable);
+	auto groups = getGroups(neighbors, 1);
+
+	for (auto g : groups) {
+		auto pointFromGroup = *g.begin();
+		closeLine(pointFromGroup, el);
+	}
+}
+
+void MapAnalyzer::CalculateChokepoints() {
 	auto mw = Broodwar->mapWidth();
 	auto mh = Broodwar->mapHeight();
-	std::map<TilePosition, pTileNode> map;
 	auto groupedUnwalkables = getUnwalkableGroups();
 
-	for (int i = 0; i < mw; ++i) {
-		for (int j = 0; j < mh; ++j) {
-			TilePosition current(i, j);
-			//auto node = calcClosestUnwalkable(current, mw, mh);
-			auto node = pTileNode(new tileNode);
-			node->inChokepoint = false;
-			node->pos = current;
-			if (!Broodwar->isWalkable(WalkPosition(current))) {
-				if (groupedUnwalkables.isInSignificantArea(current))
+	for (auto g : groupedUnwalkables) {
+		if (g.isSignificant()) {
+			for (auto t : g.tiles) {
+				auto node = getNode(t);
+				if (t.y != mh - 1)
 					node->value = 0;
+				else
+					node->value = getNode(t.x, t.y - 1)->value;
 			}
-
-			map.insert (std::make_pair(current, node));
 		}
 	}
 
-	//std::cout << "removing unsignificant groups done!\n";
+	CalculateDistancesToUnWalkables();
+	CalcChokePoints();
+	std::vector<pTileNode> tmp;
+	for (int i = 0; i < mw; ++i) {
+		for (int j = 0; j < mh; ++j) {
+			auto node = nodeMap[i][j];
+			if (node->inChokepoint)
+				tmp.push_back(node);
+			allNodes.push_back(node);
+		}
+	}
 
-	CalculateDistancesToUnWalkables(map);
-	CalcChokePoints(map);
-	for (auto m : map) {
-		if (m.second->inChokepoint)
-			chokepoints.push_back(m.second);
-		allnodes.push_back(m.second);
+	for (auto it = tmp.begin(); it != tmp.end(); it++) {
+		auto c = *it;
+		if (!isCornerChokepoint(c)) {
+			chokePoints.push_back(*c);
+			cp.insert(c);
+		}
+	}
+
+	auto cps = getGroups(cp, 1);
+	std::vector<ChokePoint> chokpoints;
+	for (int i = 0; i < cps.size(); ++i) {
+		closeChokepoint(cps[i]);
+		for (auto c : cps[i]) {
+			c->chokePointId = i;
+		}
+		auto cp = pChokePoint(new ChokePoint(cps[i]));
+		cp->id = i;
+		chokpts[i] = cp;
+	}
+}
+
+void MapAnalyzer::CalculateRegions() {
+	getRegionGroups();
+
+	for (auto cp : chokpts) {
+		cp.second->calcAdjacentRegions(nodeMap);
+	}
+	for (auto r : regions) {
+		r.second->calcAdjacentChokepoints(chokpts);
+		r.second->calcAdjacentRegions(regions);
+	}
+
+	for (auto r : regions) {
+		auto adjacentRegions = r.second->adjacentRegions;
+		if(r.second->area() > REGION_MIN_SIZE) {
+			for (auto ar : adjacentRegions) {
+				if (ar->area() < REGION_MIN_SIZE) {
+					r.second->merge(ar);
+					r.second->calcAdjacentChokepoints(chokpts);
+					r.second->calcAdjacentRegions(regions);
+				}
+			}
+		}
 	}
 }
 
 void UnwalkableArea::fillAreaAround(const TilePosition& tile) {
-	if (Broodwar->isWalkable(WalkPosition(tile)) || contains(tile)) return;
+	if (Broodwar->isWalkable(WalkPosition(tile)) || this->contains(tile)) return;
 
 	tiles.insert(tile);
-	auto neighbors = getNeighbours(tile);
+	auto neighbors = getNeighbors(tile);
 	for (auto n : neighbors) {
 		fillAreaAround(n);
+	}
+}
+
+//corner "chokepoints" are to be removed from the chokepoint list
+
+void MapAnalyzer::getUnwalkableGroupInSquare(std::set<pTileNode>& square, pTileNode node, std::set<pTileNode>& result, pred p) {
+	if (!node->value && !contains(result, node)) {
+		result.insert(node);
+
+		auto neighbors = getNeighborNodesWithDistInSquare(square, node, 2, p);
+		for (auto n : neighbors) {
+			getUnwalkableGroupInSquare(square, n, result, p);
+		}
+	}
+}
+
+bool MapAnalyzer::isCornerChokepoint(pTileNode node) {
+	std::set<pTileNode> group;
+	auto unwalkable = [](pTileNode n){return n->value == 0; };
+	auto surroundingTile = getSurroundingNodeInSquare(node->pos, 4, unwalkable);
+	//surroundingTile.insert(node);
+	
+	if (surroundingTile.size()) {
+		auto first = *surroundingTile.begin();
+		getUnwalkableGroupInSquare(surroundingTile, first, group, unwalkable);
+		if (group.size() != surroundingTile.size())
+			return false;
+		return true;
+	}
+	
+	return true;
+}
+
+void MapAnalyzer::getRegionGroup(std::set<pTileNode>& visited,
+	pTileNode node,
+	int id,
+	pRegion result)
+{
+	std::set<pTileNode> lVisited;
+	auto notVisited = [&lVisited](pTileNode n){
+		return lVisited.find(n) == lVisited.end();
+	};
+	getRegionGroupInt(lVisited, node, notVisited, id, result);
+
+	for (auto v : lVisited) {
+		if (!v->closed && v->value != 0)
+			visited.insert(v);
+	}
+}
+void MapAnalyzer::getRegionGroupInt(std::set<pTileNode>& visited,
+	pTileNode node,
+	pred p,
+	int id,
+	pRegion result)
+{
+	result->tiles.push_back(node);
+	node->regionId = id;
+	visited.insert(node);
+
+	auto neighbors = getNeighborNodeFour(node, p);
+	for (auto n : neighbors) {
+		if (n->closed || n->value == 0) {
+			visited.insert(n);
+			result->border.insert(n);
+		}
+		else {
+			getRegionGroupInt(visited, n, p, id, result);
+		}
+	}
+}
+
+void MapAnalyzer::getRegionGroups() {
+	std::set<pTileNode> visited;
+	auto nextRegionId = 0;
+
+	for (int i = 0; i < mw; ++i) {
+		for (int j = 0; j < mh; ++j){
+			auto current = nodeMap[i][j];
+			if (current->value != 0 && !current->closed) {
+				if (visited.find(current) == visited.end()) {
+					pRegion group = pRegion(new MapRegion());
+					getRegionGroup(visited, current, nextRegionId, group);
+					if (group->area() != 0) {
+						group->id = nextRegionId++;
+						regions[group->id] = group;
+					}
+				}
+			}
+		}
 	}
 }

@@ -4,23 +4,11 @@
 #include "DebugStuff.h"
 #include "ManagerBase.h"
 #include <vector>
+#include <memory>
 #include <assert.h>
 #include "MapRegion.h"
 
 using namespace BWAPI;
-
-static int maxDistance = 5;
-struct tileNode;
-typedef std::shared_ptr<tileNode> pTileNode;
-typedef bool(*pred)(pTileNode);
-
-struct tileNode {
-	TilePosition pos;
-	int value; // 0 for unwalkable, positive int indicating the distance to unwalkable positions
-	int groupId;
-	bool inChokepoint;
-	tileNode() : value(-1), groupId(-1), inChokepoint(false){};
-};
 
 class MapManager : public ManagerBase
 {
@@ -55,15 +43,22 @@ public:
 	TilePosition SuggestDefenceCannon(const TilePosition& base = start);
 private:
 	MapManager(){
+		ma = MapAnalyzer::GetInstance();
+		//ma->CalculateChokepoints();
+
+		chokepoints = ma->GetChokepoints();
+		allnodes = ma->GetAllNodes();
+		closed = ma->GetClosed();
+
 		regularBuildingCount = 0;
 		start = Broodwar->self()->getStartLocation();
 		nextPylon = TilePositions::Invalid;
 		CalculateResourseGroups();
-		//CalculateChokepoints();
 		ScanPylonBuildGrid();
 	};
 	MapManager& operator = (const MapManager &m){};
 	static MapManager * insta;
+	MapAnalyzer *ma;
 	static TilePosition start;
 	static Unit testWorker; // used to better check if given position is buildable or nots
 	void checkTestWorker()
@@ -97,8 +92,9 @@ private:
 	TilePosition::list resourseGroups;
 
 	//TilePosition::list chokepoints;
-	std::vector<pTileNode> chokepoints;
+	std::vector<tileNode> chokepoints;
 	std::vector<pTileNode> allnodes;
+	std::vector<tileNode> closed;
 	std::set<TilePosition> pylonLocationsGrid; // <TilePosition location, bool occupied>
 	std::set<TilePosition> builtPylons;
 	TilePosition nextPylon;

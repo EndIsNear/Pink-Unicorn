@@ -11,6 +11,28 @@ Unit MapManager::testWorker = NULL;
 
 void AnalyzeMap();
 
+static void drawBox(TilePosition pos, TilePosition dimensions, Unit worker = nullptr) {
+	if (pos == TilePositions::None) return;
+	auto topRight = Position(pos);
+	auto bottomLeft = Position(pos + dimensions);
+
+	if (Broodwar->canBuildHere(pos, UnitTypes::Protoss_Pylon) && Broodwar->isExplored(pos))
+	{
+		Broodwar->drawBoxMap(topRight, bottomLeft, Colors::Green);
+	}
+	else {
+		Broodwar->drawBoxMap(topRight, bottomLeft, Colors::Red);
+	}
+}
+static void drawGateway(MapManager& mm, TilePosition& p) {
+	auto gatewayDim = UnitTypes::Protoss_Gateway.tileSize();
+	if (p == TilePositions::None)
+		p = mm.SuggestBuildingLocation(UnitTypes::Protoss_Gateway);
+	
+	drawBox(p, gatewayDim);
+}
+
+static TilePosition p1 = TilePositions::None, p2 = TilePositions::None, p3 = TilePositions::None;
 void MapManager::OnFrame()
 {
 	if (Broodwar->getFrameCount() % 100 == 0)
@@ -18,8 +40,14 @@ void MapManager::OnFrame()
 		ScanPylonBuildGrid();
 		//CalculateExpansions();
 	}
-	//GetExpansionLocations();
 
+	/*if (Broodwar->getFrameCount() > 2500) {
+		drawGateway(*this, p1);
+		drawGateway(*this, p2);
+		drawGateway(*this, p3);
+	}*/
+	//GetExpansionLocations();
+	//GetChokepoints();
 	//GetBaseExit();
 	//auto e = SuggestBuildingLocation(UnitTypes::Protoss_Pylon);
 	//Sleep(200);
@@ -79,11 +107,16 @@ TilePosition MapManager::GetNextExpansionLocation()
 void MapManager::GetChokepoints()
 {
 	for (auto c : chokepoints) {
-		Broodwar->drawCircle(CoordinateType::Map, c->pos.x * 32, c->pos.y * 32, 10, Colors::Red);
+		Broodwar->drawCircle(CoordinateType::Map, c.pos.x * 32, c.pos.y * 32, 10, Colors::Red);
 	}
 
 	for (auto t : allnodes) {
-		Broodwar->drawText(CoordinateType::Map, t->pos.x * 32, t->pos.y * 32, "%d", t->value);
+		Broodwar->drawText(CoordinateType::Map, t->pos.x * 32, t->pos.y * 32, "%d", t->regionId);
+		//Broodwar->drawText(CoordinateType::Map, t.pos.x * 32, t.pos.y * 32, "%d %d", t.pos.x, t.pos.y);
+	}
+
+	for (auto c : closed) {
+		Broodwar->drawCircle(CoordinateType::Map, c.pos.x * 32, c.pos.y * 32, 15, Colors::Blue);
 	}
 	//return chokepoints;
 }
@@ -261,22 +294,18 @@ Position::list MapManager::getPath(const Position& start, const Position& end)
 
 void MapManager::InsertToPylonGrid(const TilePosition& pos)
 {
-	Broodwar->drawTextMap((Position)pos, "%d %d", pos.x, pos.y);
+	//Broodwar->drawTextMap((Position)pos, "%d %d", pos.x, pos.y);
 
 	if (testWorker && !testWorker->exists())
 	{
 		getTestWorker();
 	}
 
+	//drawBox(pos, UnitTypes::Protoss_Pylon.tileSize(), testWorker);
 	if (Broodwar->canBuildHere(pos, UnitTypes::Protoss_Pylon, testWorker) && Broodwar->isExplored(pos))
 	{
 		pylonLocationsGrid.insert(pos);
-		//Broodwar->drawCircle(CoordinateType::Map, pos.x * 32, pos.y * 32, 10, Colors::Green);
 	}
-	else {
-		//Broodwar->drawCircle(CoordinateType::Map, pos.x * 32, pos.y * 32, 10, Colors::Red);
-	}
-	
 }
 
 void MapManager::ScanPylonBuildGrid()
