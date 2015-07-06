@@ -9,7 +9,13 @@
 #include <algorithm>
 #include "StrategyManager.h"
 
-const double WantedFreePopPercents = 10;
+const float WantedFreePopPercents = 20;
+
+
+#define BUILD(X) PushBuildTask(pr--, X, Broodwar->self()->getStartLocation())
+#define PROD(X) PushProductionTask(pr--, X);
+static int pr = INT_MAX;
+
 
 StrategyManager * StrategyManager::m_instance = NULL;
 
@@ -22,40 +28,49 @@ void StrategyManager::OnStart()
 			m_bases.insert(unit);
 		}
 	}
-	PushBuildTask(11, UnitTypes::Protoss_Gateway, Broodwar->self()->getStartLocation());
-	PushProductionTask(10, UnitTypes::Protoss_Zealot);
-	PushBuildTask(9, UnitTypes::Protoss_Gateway, Broodwar->self()->getStartLocation());
-	PushBuildTask(9, UnitTypes::Protoss_Assimilator, Broodwar->self()->getStartLocation());
-	PushProductionTask(8, UnitTypes::Protoss_Zealot);
-	PushProductionTask(8, UnitTypes::Protoss_Zealot);
-	PushBuildTask(7, UnitTypes::Protoss_Gateway, Broodwar->self()->getStartLocation());
-	PushBuildTask(7, UnitTypes::Protoss_Gateway, Broodwar->self()->getStartLocation());
-	PushBuildTask(7, UnitTypes::Protoss_Cybernetics_Core, Broodwar->self()->getStartLocation());
-	for (int i = 0; i < 7; ++i)
+	BUILD(UnitTypes::Protoss_Gateway);
+	PROD(UnitTypes::Protoss_Zealot);
+	BUILD(UnitTypes::Protoss_Gateway);
+	PROD(UnitTypes::Protoss_Zealot);
+	PROD(UnitTypes::Protoss_Zealot);
+	PROD(UnitTypes::Protoss_Zealot);
+	PROD(UnitTypes::Protoss_Zealot);
+	BUILD(UnitTypes::Protoss_Gateway);
+	BUILD(UnitTypes::Protoss_Cybernetics_Core);
+	BUILD(UnitTypes::Protoss_Assimilator);
+	for (int i = 0; i < 5; ++i)
 	{
-		PushProductionTask(6, UnitTypes::Protoss_Zealot);
-		PushProductionTask(6, UnitTypes::Protoss_Dragoon);
+		PROD(UnitTypes::Protoss_Zealot);
 	}
-	PushBuildTask(5, UnitTypes::Protoss_Forge, Broodwar->self()->getStartLocation());
-	PushBuildTask(5, UnitTypes::Protoss_Robotics_Facility, Broodwar->self()->getStartLocation());
-	PushBuildTask(4, UnitTypes::Protoss_Observatory, Broodwar->self()->getStartLocation());
-	PushExpandTask(5);
-	PushBuildTask(4, UnitTypes::Protoss_Photon_Cannon, Broodwar->self()->getStartLocation());
-	PushBuildTask(4, UnitTypes::Protoss_Photon_Cannon, Broodwar->self()->getStartLocation());
-	for (int i = 0; i < 3; ++i)
-	{
-		if (i % 10 == 0)
-			PushProductionTask(3, UnitTypes::Protoss_Observer);
-		PushProductionTask(3, UnitTypes::Protoss_Zealot);
-		PushProductionTask(3, UnitTypes::Protoss_Dragoon);
-	}
+	BUILD(UnitTypes::Protoss_Gateway);
 	for (int i = 0; i < 100; ++i)
 	{
-		if (i % 10 == 0)
-			PushProductionTask(2, UnitTypes::Protoss_Observer);
-		PushProductionTask(2, UnitTypes::Protoss_Zealot);
-		PushProductionTask(2, UnitTypes::Protoss_Dragoon);
+		PROD(UnitTypes::Protoss_Zealot);
+		PROD(UnitTypes::Protoss_Dragoon);
 	}
+
+	//PushBuildTask(2000, UnitTypes::Protoss_Gateway, Broodwar->self()->getStartLocation());
+	//PushProductionTask(1999, UnitTypes::Protoss_Zealot);
+	//PushBuildTask(1998, UnitTypes::Protoss_Gateway, Broodwar->self()->getStartLocation());
+	//PushBuildTask(1997, UnitTypes::Protoss_Assimilator, Broodwar->self()->getStartLocation());
+	//PushBuildTask(1996, UnitTypes::Protoss_Cybernetics_Core, Broodwar->self()->getStartLocation());
+	//PushProductionTask(8, UnitTypes::Protoss_Zealot);
+	//PushProductionTask(8, UnitTypes::Protoss_Zealot);
+	//PushBuildTask(7, UnitTypes::Protoss_Gateway, Broodwar->self()->getStartLocation());
+	//PushBuildTask(7, UnitTypes::Protoss_Gateway, Broodwar->self()->getStartLocation());
+	//for (int i = 0; i < 2; ++i)
+	//{
+	//	PushProductionTask(6, UnitTypes::Protoss_Zealot);
+	//	PushProductionTask(6, UnitTypes::Protoss_Dragoon);
+	//}
+	//PushBuildTask(5, UnitTypes::Protoss_Forge, Broodwar->self()->getStartLocation());
+	//PushBuildTask(5, UnitTypes::Protoss_Gateway, Broodwar->self()->getStartLocation());
+	//PushExpandTask(5);
+	//for (int i = 0; i < 100; ++i)
+	//{
+	//	PushProductionTask(4, UnitTypes::Protoss_Zealot);
+	//	PushProductionTask(4, UnitTypes::Protoss_Dragoon);
+	//}
 }
 
 void StrategyManager::OnFrame()
@@ -70,8 +85,8 @@ void StrategyManager::OnFrame()
 
 void StrategyManager::UpdateSupply()
 {
-	size_t wantedSupply = std::max(static_cast<int>(Broodwar->self()->supplyTotal() * (WantedFreePopPercents / 100)), 15);
-	if (ResourceManager::GetInstance().GetFreeSupply() + BuildingManager::GetInstance().GetSupplyInProgress() < wantedSupply+10)
+	size_t wantedSupply = std::max(static_cast<int>(Broodwar->self()->supplyTotal() * (WantedFreePopPercents / 100)), 6);
+	if (ResourceManager::GetInstance().GetFreeSupply() + BuildingManager::GetInstance().GetSupplyInProgress() < wantedSupply)
 	{
 		BuildingManager::GetInstance().BuildBaseExit(UnitTypes::Protoss_Pylon);
 	}

@@ -57,6 +57,11 @@ public:
 	{
 		return m_SupplyInProgress;
 	}
+
+	void AddSupplyInProgress()
+	{
+		m_SupplyInProgress += SupplyPerPylon;
+	}
 private:
 	int m_SupplyInProgress;
 

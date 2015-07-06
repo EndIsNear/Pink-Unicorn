@@ -232,6 +232,8 @@ void PinkUnicorn::onUnitCreate(BWAPI::Unit unit)
 	{
 		return;
 	}
+	if (unit->getType() == UnitTypes::Protoss_Pylon)
+		BuildingManager::GetInstance().AddSupplyInProgress();
 }
 
 void PinkUnicorn::onUnitDestroy(BWAPI::Unit unit)

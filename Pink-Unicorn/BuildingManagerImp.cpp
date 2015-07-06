@@ -83,8 +83,6 @@ bool BuildingManager::BuildWithNearTo(Unit builder, UnitType building, TilePosit
 	TilePosition buildPos = MapManager::GetInstance().SuggestBuildingLocation(building, pos);
 	if (builder->build(building, buildPos))
 	{
-		if (building == UnitTypes::Protoss_Pylon)
-			m_SupplyInProgress += SupplyPerPylon;
 		Broodwar->registerEvent(
 			[=](Game * p)
 			{
