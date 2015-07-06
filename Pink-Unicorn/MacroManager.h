@@ -9,7 +9,7 @@ class MacroManager : public ManagerBase
 {
 private:
 	static MacroManager *inst;
-	MacroManager() {}
+	MacroManager() : mbSpyExpInit(false){}
 public:
 		static MacroManager&  GetInstance()
 		{
@@ -28,8 +28,9 @@ public:
 	private:
 		int GetUnitsCntInConrolers(UnitType type) const ;
 	private:
+		bool mbSpyExpInit;
 		std::map<UnitType, Unitset> mFreeUnits;
-		std::vector<MicroControler> MicroControlers;
+		MicroControler MicroControler;
 };
 
 

@@ -59,21 +59,30 @@ public:
 	{
 		bool bResult = false;
 		auto units = mUnit->getUnitsInRadius( mDist, mFilter);
-		if (units.size())
+		if (LastTarget.isValid() && mUnit->getPosition().getDistance(LastTarget) > 10)
 		{
-			// i must go away
-			auto ep = units.getPosition();
-			auto d = ep.getDistance(mUnit->getPosition());
-			auto GoToPos = mUnit->getPosition() - ep;
-			Vector2D vDir(GoToPos.x, GoToPos.y);
-			vDir.Normalize();
-			vDir = vDir * mdMoveWithDist;
-			GoToPos.x = vDir.x;
-			GoToPos.y = vDir.y;
-			GoToPos = mUnit->getPosition() + GoToPos;
-			mUnit->move(GoToPos);
-			Broodwar->drawCircle(CoordinateType::Map, GoToPos.x, GoToPos.y, 25, Colors::Green);
-			bool bResult = true;
+			bResult = true;
+			LastTarget = Positions::Invalid;
+		}
+		else
+		{
+			if (units.size())
+			{
+				// i must go away
+				auto ep = units.getPosition();
+				auto d = ep.getDistance(mUnit->getPosition());
+				auto GoToPos = mUnit->getPosition() - ep;
+				Vector2D vDir(GoToPos.x, GoToPos.y);
+				vDir.Normalize();
+				vDir = vDir * mdMoveWithDist;
+				GoToPos.x = vDir.x;
+				GoToPos.y = vDir.y;
+				GoToPos = mUnit->getPosition() + GoToPos;
+				mUnit->move(GoToPos);
+				LastTarget = GoToPos;
+				Broodwar->drawCircle(CoordinateType::Map, GoToPos.x, GoToPos.y, 25, Colors::Green);
+				bool bResult = true;
+			}
 		}
 
 		return bResult;
@@ -81,6 +90,7 @@ public:
 
 	void SetMoveWithDist(double dist) { mdMoveWithDist = dist; }
 protected:
+	Position LastTarget;
 	double mdMoveWithDist;
 
 };
@@ -130,7 +140,7 @@ public:
 					eu = Closest(mUnit->getPosition(), inRange);
 
 				if (mUnit->getTarget() != eu || mUnit->getLastCommand().getType() != UnitCommandTypes::Attack_Unit)
-					mUnit->attack(eu);
+					mUnit->attack(eu->getPosition());
 				bResult = true;
 			}
 			else if (mUnit->getLastCommand().getType() == UnitCommandTypes::Attack_Unit && mUnit->getTarget())
@@ -253,6 +263,7 @@ protected:
 	Unit mUnit;
 public:
 	ControlPattern(Unit u) : mUnit(u){}
+	void PushAgent(Agent* a) { Agents.push_back(a); };
 	virtual ~ControlPattern()
 	{
 	//	for (auto a : Agents) 
@@ -273,7 +284,7 @@ public:
 
 	}
 
-	void OnFrame()
+	virtual void OnFrame()
 	{
 		if (mUnit->isStuck())
 		{
@@ -291,6 +302,7 @@ public:
 		return  !mUnit->exists();
 	}
 };
+
 static
 Position GetEnemyPos(Position &p)
 {
@@ -321,29 +333,58 @@ public:
 class MicroControler
 {
 public:
-	MicroControler()
+	MicroControler() : next(0)
 	{
 
 	}
 
-	MicroControler(Unitset &set) : next(0) 
+	void Clear()
 	{
-		for (auto it : set)
-			AddUnit(it);
+	//	for (auto it : mUnits)
+		//	delete it;
+
 	}
 
 	~MicroControler()
 	{
-	//	for (auto it : mUnits)
-	//		delete it;
+		Clear();
 	}
 
-	void AddUnit(Unit u) 
+	unsigned GetSize() { return mUnits.size(); }
+
+	void SwitchTargetPoint(Position pos)
 	{
+		Unitset us;
+		for (auto it : mUnits)
+			us.insert(it->GetUnit());
+		Clear();
+		for (auto it : us)
+			AddUnit(it, pos);
+	}
+
+	void AddUnit(Unit u, Position TargetPos) 
+	{
+		ControlPattern *pat = new ControlPattern(u);
 		if (u->getType() == UnitTypes::Protoss_Zealot)
-			mUnits.push_back(new ZelotControl(u));
+		{
+			
+			pat->PushAgent(new AgentStayAway(u, 75, 50, IsEnemy && !IsBuilding));
+			pat->PushAgent(new AgentAttackInRange(u, 250, 150, IsEnemy && !IsBuilding));
+			pat->PushAgent(new AgentGoToPosition(u, TargetPos));
+
+		}
 		else if (u->getType() == UnitTypes::Protoss_Dragoon)
-			mUnits.push_back(new DragoonControl(u));
+		{
+		//	pat->PushAgent(new AgentStayAway(u, 75, 50, IsEnemy && !IsBuilding));
+			pat->PushAgent(new AgentAttackInRange(u, 250, 150, IsEnemy && !IsBuilding));
+			pat->PushAgent(new AgentGoToPosition(u, TargetPos));
+		}
+		else if (u->getType() == UnitTypes::Protoss_Observer)
+		{
+			pat->PushAgent(new AgentStayToghether(u, 150, IsAlly));
+			pat->PushAgent(new AgentGoToPosition(u, TargetPos));
+		}
+		mUnits.push_back(pat);
 	}
 
 	/*this is extremly slow*/
@@ -377,10 +418,9 @@ public:
 		
 		if (mUnits.size())
 		{
-
-			for (int i = 0; i < Time; i++)
+			for (unsigned i = 0; i < Time; i++)
 			{
-				if (next >=  mUnits.size())
+			if (next >=  mUnits.size())
 					next = 0;
 
 				mUnits[next]->OnFrame();

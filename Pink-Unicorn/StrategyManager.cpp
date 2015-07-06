@@ -29,6 +29,7 @@ void StrategyManager::OnStart()
 	PushProductionTask(8, UnitTypes::Protoss_Zealot);
 	PushProductionTask(8, UnitTypes::Protoss_Zealot);
 	PushBuildTask(7, UnitTypes::Protoss_Gateway, Broodwar->self()->getStartLocation());
+	PushBuildTask(7, UnitTypes::Protoss_Gateway, Broodwar->self()->getStartLocation());
 	PushBuildTask(7, UnitTypes::Protoss_Cybernetics_Core, Broodwar->self()->getStartLocation());
 	for (int i = 0; i < 7; ++i)
 	{
@@ -36,13 +37,24 @@ void StrategyManager::OnStart()
 		PushProductionTask(6, UnitTypes::Protoss_Dragoon);
 	}
 	PushBuildTask(5, UnitTypes::Protoss_Forge, Broodwar->self()->getStartLocation());
+	PushBuildTask(5, UnitTypes::Protoss_Robotics_Facility, Broodwar->self()->getStartLocation());
+	PushBuildTask(4, UnitTypes::Protoss_Observatory, Broodwar->self()->getStartLocation());
 	PushExpandTask(5);
 	PushBuildTask(4, UnitTypes::Protoss_Photon_Cannon, Broodwar->self()->getStartLocation());
 	PushBuildTask(4, UnitTypes::Protoss_Photon_Cannon, Broodwar->self()->getStartLocation());
-	for (int i = 0; i < 100; ++i)
+	for (int i = 0; i < 3; ++i)
 	{
+		if (i % 10 == 0)
+			PushProductionTask(3, UnitTypes::Protoss_Observer);
 		PushProductionTask(3, UnitTypes::Protoss_Zealot);
 		PushProductionTask(3, UnitTypes::Protoss_Dragoon);
+	}
+	for (int i = 0; i < 100; ++i)
+	{
+		if (i % 10 == 0)
+			PushProductionTask(2, UnitTypes::Protoss_Observer);
+		PushProductionTask(2, UnitTypes::Protoss_Zealot);
+		PushProductionTask(2, UnitTypes::Protoss_Dragoon);
 	}
 }
 

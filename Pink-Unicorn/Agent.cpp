@@ -6,7 +6,7 @@
 DragoonControl::DragoonControl(Unit drag) : ControlPattern(drag)
 {
 	
-	Agents.push_back(new AssessTheEnemy(drag, 300, IsEnemy && !IsBuilding));
+	//Agents.push_back(new AssessTheEnemy(drag, 300, IsEnemy && !IsBuilding));
 	// this must be fix but for now i ok 
 	Agents.push_back(new AgentStayAway(drag, 75, 50, IsEnemy && !IsBuilding));
 	Agents.push_back(new AgentAttackInRange(drag, 250, 150, IsEnemy && !IsBuilding));

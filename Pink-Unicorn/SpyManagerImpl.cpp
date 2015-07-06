@@ -39,6 +39,7 @@ bool AgentExploreBuildings::OnFrame()  {
 };
 
 bool AgentSpy::OnFrame() {
+
 	auto res = false;
 	if (nextLocation == TilePositions::None) {
 		for (int i = 0; i < locations.size() && !Broodwar->hasPath(mUnit->getPosition(), Position(nextLocation)); ++i) {

@@ -46,10 +46,35 @@ private:
 class ScoutPattern : public ControlPattern {
 public:
 	ScoutPattern(Unit spyUnit, const TilePosition::list& locations, bool patrol) : ControlPattern(spyUnit) {
-		Agents.push_back(new AgentStayAway(spyUnit, 200, 200, IsEnemy && !IsBuilding ));
-		Agents.push_back(new AgentExploreBuildings(spyUnit, IsEnemy && IsBuilding));
-		Agents.push_back(new AgentSpy(spyUnit, locations, patrol, IsEnemy));
+		mLocations = locations;
+		mPatrol = patrol;
+		LoadAgent(spyUnit);
 	};
+
+	void LoadAgent(Unit spyUnit)
+	{
+		Agents.push_back(new AgentStayAway(spyUnit, 200, 200, IsEnemy && !IsBuilding));
+		Agents.push_back(new AgentExploreBuildings(spyUnit, IsEnemy && IsBuilding));
+		Agents.push_back(new AgentSpy(spyUnit, mLocations, mPatrol, IsEnemy));
+	}
+
+	virtual void OnFrame() override
+	{
+		if (!mUnit->exists())
+		{
+			Unit u;
+			if (WorkerManager::GetInstance().ReleaseWorker(Position(Broodwar->self()->getStartLocation()), u))
+			{
+				Agents.clear();
+				LoadAgent(u);
+				mUnit = u;
+			}
+		}
+		ControlPattern::OnFrame();
+	}
+private:
+		TilePosition::list mLocations;
+		bool mPatrol;
 };
 
 class SpyManager : public ManagerBase

@@ -9,10 +9,7 @@ MacroManager *MacroManager::inst = NULL;
 
 void MacroManager::OnFrame()
 {
-	for (auto it : MicroControlers)
-	{
-		it.OnFrame(1);
-	}
+	MicroControler.OnFrame(1);
 
 	if (Broodwar->getFrameCount() == 25 * 40)
 	{
@@ -21,36 +18,38 @@ void MacroManager::OnFrame()
 		SpyManager::GetInstance().InitialSpy(u);
 	}
 }
-
-
+ 
 void MacroManager::OnUnitComplete(Unit u)
 {
-	if ( !IsWorker(u) && !IsEnemy(u))
+	if ( !IsWorker(u) && IsAlly(u))
 	{
 		mFreeUnits[u->getType()].insert(u);
+		Unit worker; 
+		if (Broodwar->getFrameCount() > 25 * 60 && mbSpyExpInit == false)
+		{
+			if (WorkerManager::GetInstance().ReleaseWorker(Position(Broodwar->self()->getStartLocation()), worker))
+			{
+				SpyManager::GetInstance().ExploreLocations(worker, MapManager::GetInstance().GetExpansionLocations());
+				mbSpyExpInit = true;
+			}
+		}
+
+		auto BaseDefPos = MapManager::GetInstance().GetDefencePoints(Broodwar->self()->getStartLocation());
 
 		if (SpyManager::GetInstance().GetEnemyBases().size())
 		{
-			if (MicroControlers.size() && (mFreeUnits[UnitTypes::Protoss_Zealot].size() || mFreeUnits[UnitTypes::Protoss_Dragoon].size()))
+			if ((mFreeUnits[UnitTypes::Protoss_Zealot].size() || mFreeUnits[UnitTypes::Protoss_Dragoon].size()))
 			{
 				for (auto it : mFreeUnits[UnitTypes::Protoss_Dragoon])
-					MicroControlers[0].AddUnit(it);
+					MicroControler.AddUnit(it, Position(BaseDefPos.at(0)));
 				for (auto it : mFreeUnits[UnitTypes::Protoss_Zealot])
-					MicroControlers[0].AddUnit(it);
-				mFreeUnits[UnitTypes::Protoss_Zealot].clear();
-				mFreeUnits[UnitTypes::Protoss_Dragoon].clear();
-			}
-			else if ((mFreeUnits[UnitTypes::Protoss_Zealot].size() + mFreeUnits[UnitTypes::Protoss_Dragoon].size())> 2 && MicroControlers.size() == 0)
-			{
-				MicroControlers.push_back(MicroControler());
-				for (auto it : mFreeUnits[UnitTypes::Protoss_Dragoon])
-					MicroControlers[0].AddUnit(it);
-				for (auto it : mFreeUnits[UnitTypes::Protoss_Zealot])
-					MicroControlers[0].AddUnit(it);
+					MicroControler.AddUnit(it, Position(BaseDefPos.at(0)));
 				mFreeUnits[UnitTypes::Protoss_Zealot].clear();
 				mFreeUnits[UnitTypes::Protoss_Dragoon].clear();
 			}
 		}
+
+		
 	}
 }
 
@@ -66,7 +65,6 @@ void MacroManager::OnUnitDestroy(Unit u)
 int MacroManager::GetUnitsCntInConrolers(UnitType type) const
 {
 	Unitset uset;
-	for (auto it : MicroControlers)
-		it.GetUnitsWithType(uset, type);
+//	MicroControler.GetUnitsWithType(uset, type);
 	return uset.size();
 }
