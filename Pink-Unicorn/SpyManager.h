@@ -73,10 +73,9 @@ public:
 		ControlPattern::OnFrame();
 	}
 private:
-		TilePosition::list mLocations;
-		bool mPatrol;
+	TilePosition::list mLocations;
+	bool mPatrol;
 };
-
 class SpyManager : public ManagerBase
 {
 public:
@@ -147,6 +146,16 @@ public:
 	}
 	TilePosition GetEnemyStart() {
 		return enemyStart;
+	}
+
+	BWAPI::Race GetEnemyRace() {
+		if (enemyBuildings.size()) {
+			return (*enemyBuildings.begin()).first->getType().getRace();
+		}
+		if (enemyUnits.size()) {
+			return (*enemyUnits.begin()).first->getType().getRace();
+		}
+		return Races::Unknown;
 	}
 	TilePosition::list GetEnemyBases();
 	bool IsUnitScouting(Unit u);
