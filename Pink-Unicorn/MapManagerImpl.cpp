@@ -1,4 +1,5 @@
 #include "MapManager.h"
+#include "SpyManager.h"
 #include "Utils.h"
 #include "2dVector.h"
 #include <queue>
@@ -87,11 +88,15 @@ TilePosition::list MapManager::GetExpansionLocations()
 	auto result = TilePosition::list();
 	for (auto rg : resourseGroups)
 	{
+		auto enemyBase = SpyManager::GetInstance().GetEnemyStart();
 		auto base = GetBaseLocation(rg);
 		//Broodwar->drawCircle(CoordinateType::Map, rg.x * 32, rg.y * 32, 20, Colors::Blue);
 		//Broodwar->drawCircle(CoordinateType::Map, base.x * 32, base.y * 32, 20, Colors::Green);
-		if (base.getDistance(start) < 4)
-			result.push_back(base);
+		if (base.getDistance(start) > 4) {
+			if (enemyBase == TilePositions::None ||(enemyBase != TilePositions::None && enemyBase.getDistance(base) > 10)) {
+				result.push_back(base);
+			}
+		}
 	}
 	return result;
 }
