@@ -58,6 +58,7 @@ public:
 	virtual void OnFrame() override {
 		for (auto u : spyUnits)
 			u->OnFrame();
+
 		if (Broodwar->getFrameCount() % 100 == 0) {
 			//std::cout << GetEnemyBases().size() << std::endl;
 		}
@@ -80,6 +81,9 @@ public:
 			auto position = u->getTilePosition();
 			if (u->getType().isBuilding()) {
 				enemyBuildings[u] = position;
+				if (u->getType().isResourceDepot() && enemyStart == TilePositions::None) {
+					enemyStart = u->getTilePosition();
+				}
 				//std::cout << "buildng insert " << u->getType() << std::endl;
 				//std::cout << u->getTilePosition() << std::endl;
 			}
@@ -116,6 +120,9 @@ public:
 	void GetEnemyBuilding(UnitType type) { // returns invalid position if building is not there or not discovered
 		//TODO
 	}
+	TilePosition GetEnemyStart() {
+
+	}
 	TilePosition::list GetEnemyBases();
 	bool IsUnitScouting(Unit u);
 	void StopUnit(Unit u);
@@ -129,6 +136,7 @@ private:
 	std::vector<ControlPattern*> spyUnits;
 	std::map<Unit, TilePosition> enemyBuildings;
 	std::map<Unit, TilePosition> enemyUnits;
+	TilePosition enemyStart = TilePositions::None;
 };
 
 #endif //SPY_MANAGER_H
