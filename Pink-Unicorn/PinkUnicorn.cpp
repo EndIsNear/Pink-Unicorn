@@ -232,7 +232,7 @@ void PinkUnicorn::onUnitCreate(BWAPI::Unit unit)
 	{
 		return;
 	}
-	if (unit->getType() == UnitTypes::Protoss_Pylon)
+	if (unit->getType() == UnitTypes::Protoss_Pylon && IsAlly(unit))
 		BuildingManager::GetInstance().AddSupplyInProgress();
 }
 
