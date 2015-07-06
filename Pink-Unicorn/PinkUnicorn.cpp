@@ -231,10 +231,6 @@ void PinkUnicorn::onUnitCreate(BWAPI::Unit unit)
 	{
 		return;
 	}
-	if (unit->getType().isBuilding())//check isMine ?
-	{
-		BuildingManager::GetInstance().CheckNewBuildings(unit);
-	}
 }
 
 void PinkUnicorn::onUnitDestroy(BWAPI::Unit unit)

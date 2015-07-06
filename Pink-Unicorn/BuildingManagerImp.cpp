@@ -85,7 +85,19 @@ bool BuildingManager::BuildWithNearTo(Unit builder, UnitType building, TilePosit
 	{
 		if (building == UnitTypes::Protoss_Pylon)
 			m_SupplyInProgress += SupplyPerPylon;
-		m_BuildingsInProgress.push_back(BuildingPair(building, builder));
+		Broodwar->registerEvent(
+			[=](Game * p)
+			{
+				if (builder->exists())
+				{
+					WorkerManager::GetInstance().AddUnit(builder);
+				}
+				ResourceManager::GetInstance().ReleaseRes(building.mineralPrice(), building.gasPrice(), 0);
+			},
+			[builder, pos](Game * p){ return builder->isIdle(); },
+			1, 20
+		);
+
 		return true;
 	}
 	else
@@ -94,18 +106,4 @@ bool BuildingManager::BuildWithNearTo(Unit builder, UnitType building, TilePosit
 		ResourceManager::GetInstance().ReleaseRes(building.mineralPrice(), building.gasPrice(), 0);
 	}
 	return false;
-}
-
-void BuildingManager::CheckNewBuildings(Unit building)
-{
-	for (size_t i = 0; i < m_BuildingsInProgress.size(); ++i)
-	{
-		if (building->getType() == m_BuildingsInProgress[i].first 
-			&& building->getDistance(m_BuildingsInProgress[i].second) < 128)
-		{
-			WorkerManager::GetInstance().AddUnit(m_BuildingsInProgress[i].second);
-			ResourceManager::GetInstance().ReleaseRes(building->getType().mineralPrice(), building->getType().gasPrice(), 0);
-			m_BuildingsInProgress.erase(m_BuildingsInProgress.begin() + i);
-		}
-	}
 }

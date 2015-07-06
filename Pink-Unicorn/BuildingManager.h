@@ -58,7 +58,6 @@ public:
 		return m_SupplyInProgress;
 	}
 private:
-	std::vector <BuildingPair> m_BuildingsInProgress;
 	int m_SupplyInProgress;
 
 	//use it after reserve res 
