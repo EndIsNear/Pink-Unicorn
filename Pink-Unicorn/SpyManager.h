@@ -54,7 +54,7 @@ public:
 	void LoadAgent(Unit spyUnit)
 	{
 		Agents.push_back(new AgentStayAway(spyUnit, 200, 200, IsEnemy && !IsBuilding));
-		Agents.push_back(new AgentExploreBuildings(spyUnit, IsEnemy && IsBuilding));
+		//Agents.push_back(new AgentExploreBuildings(spyUnit, IsEnemy && IsBuilding));
 		Agents.push_back(new AgentSpy(spyUnit, mLocations, mPatrol, IsEnemy));
 	}
 
