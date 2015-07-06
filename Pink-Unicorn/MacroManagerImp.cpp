@@ -15,6 +15,26 @@ void MacroManager::OnStart()
 	mMicroControler.SwitchTaskType(MicroControler::Defence);
 }
 
+
+
+inline double CalcScore1(Unitset &set)
+{
+	double result = 0;
+	for (auto it : set)
+	{
+		if (IsBuilding(it) || IsWorker(it))
+			continue;
+		switch (it->getType())
+		{
+
+		default:
+			result += it->getType().mineralPrice() + it->getType().gasPrice();
+			break;
+		}
+	}
+	return result;
+}
+
 void MacroManager::OnFrame()
 {
 	mMicroControler.OnFrame(1);
@@ -32,21 +52,44 @@ void MacroManager::OnFrame()
 		mMicroControler.SwitchTargetPoint(Position(MapManager::GetInstance().GetDefencePoint(Broodwar->self()->getStartLocation(), pos)));
 		mMicroControler.SwitchTaskType(MicroControler::Defence);
 
-	}	else*/ if (mMicroControler.GetSize() > 25 && mMicroControler.GetType() != MicroControler::Attack)
+	}	else*/ 
+	if (Broodwar->getFrameCount() % 150 )
 	{
-		mMicroControler.SwitchTargetPoint(Position(SpyManager::GetInstance().GetEnemyBases().at(0)));
-		mMicroControler.SwitchTaskType(MicroControler::Attack);
-	}
-	else	if (mMicroControler.GetSize() > 15 && mMicroControler.GetType() != MicroControler::Presure)
-	{
-		mMicroControler.SwitchTargetPoint(Position(SpyManager::GetInstance().GetEnemyBases().at(0)));
-		mMicroControler.SwitchTaskType(MicroControler::Presure);
-	}
-	else if (mMicroControler.GetType() != MicroControler::Defence)
-	{
-		TilePosition pos = TilePositions::None;
-		mMicroControler.SwitchTargetPoint(Position(MapManager::GetInstance().GetDefencePoint(Broodwar->self()->getStartLocation(), pos)));
-		mMicroControler.SwitchTaskType(MicroControler::Defence);
+
+	
+		if ((mMicroControler.GetSize() > 25 || mMicroControler.GetType() == MicroControler::Attack) )
+		{
+			auto eu = Broodwar->getUnitsInRadius(Position(SpyManager::GetInstance().GetEnemyBases().at(0)), 2500, IsEnemy);
+			double EnemyScore = CalcScore1(eu);
+			if (EnemyScore < mMicroControler.GetScore() * 0.85)
+			{
+				if (mMicroControler.GetType() != MicroControler::Attack)
+				{
+					mMicroControler.SwitchTargetPoint(Position(SpyManager::GetInstance().GetEnemyBases().back()));
+					mMicroControler.SwitchTaskType(MicroControler::Attack);
+				}
+			}
+			else if(mMicroControler.GetType() != MicroControler::Defence)
+			{
+				TilePosition pos = TilePositions::None;
+				mMicroControler.SwitchTargetPoint(Position(MapManager::GetInstance().GetDefencePoints(Broodwar->self()->getStartLocation()).at(0)));
+				mMicroControler.SwitchTaskType(MicroControler::Defence);
+			}
+		}/*/
+		else	if (mMicroControler.GetSize() > 15 )
+		{
+			if (mMicroControler.GetType() != MicroControler::Presure)
+			{
+				mMicroControler.SwitchTargetPoint(Position(SpyManager::GetInstance().GetEnemyBases().at(0)));
+				mMicroControler.SwitchTaskType(MicroControler::Presure);
+			}
+		}*/
+		else if (mMicroControler.GetType() != MicroControler::Defence)
+		{
+			TilePosition pos = TilePositions::None;
+			mMicroControler.SwitchTargetPoint(Position(MapManager::GetInstance().GetDefencePoints(Broodwar->self()->getStartLocation()).at(0)));
+			mMicroControler.SwitchTaskType(MicroControler::Defence);
+		}
 	}
 
 
@@ -58,7 +101,7 @@ void MacroManager::OnUnitComplete(Unit u)
 	{
 		mFreeUnits[u->getType()].insert(u);
 		Unit worker; 
-		if (Broodwar->getFrameCount() > 25 * 60 && mbSpyExpInit == false)
+		if (Broodwar->getFrameCount() > 25 * 150 && mbSpyExpInit == false)
 		{
 			if (WorkerManager::GetInstance().ReleaseWorker(Position(Broodwar->self()->getStartLocation()), worker))
 			{
@@ -73,6 +116,8 @@ void MacroManager::OnUnitComplete(Unit u)
 			for (auto it : mFreeUnits[UnitTypes::Protoss_Dragoon])
 				mMicroControler.AddUnit(it);
 			for (auto it : mFreeUnits[UnitTypes::Protoss_Zealot])
+				mMicroControler.AddUnit(it);
+			for (auto it : mFreeUnits[UnitTypes::Protoss_Observer])
 				mMicroControler.AddUnit(it);
 			mFreeUnits[UnitTypes::Protoss_Zealot].clear();
 			mFreeUnits[UnitTypes::Protoss_Dragoon].clear();

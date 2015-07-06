@@ -367,8 +367,9 @@ public:
 
 	void Clear()
 	{
-	//	for (auto it : mUnits)
-		//	delete it;
+		for (auto it : mUnits)
+				delete it;
+		mUnits.clear();
 
 	}
 
@@ -389,6 +390,15 @@ public:
 		Clear();
 		for (auto it : us)
 			AddUnit(it);
+	}
+
+
+	double GetScore()
+	{
+		Unitset us;
+		for (auto it : mUnits)
+			us.insert(it->GetUnit());
+		return CalcScore(us);
 	}
 
 	void SwitchTargetPoint(Position pos)
@@ -504,22 +514,22 @@ private:
 		{
 			//	pat->PushAgent(new AgentStayAway(u, 75, 50, IsEnemy && !IsBuilding));
 			pat->PushAgent(new AgentAttackInRange(u, 250, 150, IsEnemy && !IsBuilding));
-			//	pat->PushAgent(new AgentStayToghether(u, 100, IsAlly));
-			pat->PushAgent(new StayOnDist(u, mTarget, 1200));
+		//	pat->PushAgent(new AgentStayToghether(u, 100, IsAlly));
+			pat->PushAgent(new StayOnDist(u, mTarget, 1000));
 		}
 		else if (u->getType() == UnitTypes::Protoss_Dragoon)
 		{
 
 			pat->PushAgent(new AgentStayAway(u, 75, 50, IsEnemy && !IsBuilding));
 			pat->PushAgent(new AgentAttackInRange(u, 250, 150, IsEnemy && !IsBuilding));
-			pat->PushAgent(new AgentStayToghether(u, 100, IsAlly));
-			pat->PushAgent(new StayOnDist(u, mTarget, 1200));
+		//	pat->PushAgent(new AgentStayToghether(u, 100, IsAlly));
+			pat->PushAgent(new StayOnDist(u, mTarget, 1000));
 
 		}
 		else if (u->getType() == UnitTypes::Protoss_Observer)
 		{
-	//		pat->PushAgent(new AgentStayToghether(u, 150, IsAlly));
-			pat->PushAgent(new StayOnDist(u, mTarget, 1200));
+			pat->PushAgent(new AgentStayToghether(u, 150, IsAlly));
+			pat->PushAgent(new StayOnDist(u, mTarget, 1000));
 		}
 		mUnits.push_back(pat);
 	}

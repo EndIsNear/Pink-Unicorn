@@ -6,6 +6,7 @@
 
 #include "BuildingManager.h"
 
+
 BuildingManager * BuildingManager::m_instance = NULL;
 
 void BuildingManager::OnFrame()
@@ -15,7 +16,7 @@ void BuildingManager::OnFrame()
 
 void BuildingManager::OnUnitComplete(Unit unit)
 {
-	if (unit->getType() == UnitTypes::Protoss_Pylon)
+	if (unit->getType() == UnitTypes::Protoss_Pylon && Filter::IsAlly(unit))
 		m_SupplyInProgress -= SupplyPerPylon;
 	else if (unit->getType() == UnitTypes::Protoss_Nexus && Broodwar->getFrameCount() > 100)
 	{

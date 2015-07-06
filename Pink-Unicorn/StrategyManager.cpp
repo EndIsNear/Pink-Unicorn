@@ -42,9 +42,28 @@ void StrategyManager::OnStart()
 	{
 		PROD(UnitTypes::Protoss_Zealot);
 	}
-	BUILD(UnitTypes::Protoss_Gateway);
-	for (int i = 0; i < 100; ++i)
+	BUILD(UnitTypes::Protoss_Robotics_Facility);
+	for (int i = 0; i < 4; ++i)
 	{
+		PROD(UnitTypes::Protoss_Dragoon);
+		PROD(UnitTypes::Protoss_Zealot);
+	}
+	PushExpandTask(pr--);
+	BUILD(UnitTypes::Protoss_Gateway);
+	BUILD(UnitTypes::Protoss_Gateway);
+	BUILD(UnitTypes::Protoss_Observatory);
+	BUILD(UnitTypes::Protoss_Gateway);
+	for (int i = 0; i <1100; ++i)
+	{
+		if (i % 45)
+		{
+			BUILD(UnitTypes::Protoss_Gateway);
+			BUILD(UnitTypes::Protoss_Gateway);
+			BUILD(UnitTypes::Protoss_Gateway);
+			PushExpandTask(pr--);
+		}
+		if (i % 7 == 1) 
+			PROD(UnitTypes::Protoss_Observer);
 		PROD(UnitTypes::Protoss_Zealot);
 		PROD(UnitTypes::Protoss_Dragoon);
 	}
