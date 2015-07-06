@@ -91,7 +91,7 @@ protected:
 			nodeMap[i] = new tileNode*[mh];
 			for (int j = 0; j < mh; ++j){
 				nodeMap[i][j] = new tileNode(TilePosition(i, j));
-				allPNodes.insert(nodeMap[i][j]);
+				allNodes.push_back(nodeMap[i][j]);
 			}
 		}
 	}
@@ -102,7 +102,6 @@ protected:
 	std::vector<tileNode> chokePoints;
 	std::set<pTileNode> cp;
 	std::vector<pTileNode> allNodes;
-	std::set<pTileNode> allPNodes;
 	std::vector<tileNode> closed;
 
 	std::map<int, pChokePoint> chokpts;
@@ -131,12 +130,12 @@ protected:
 			return nodeMap[i][j];
 		return nullptr;
 	}
-	std::vector<pTileNode> getNodes(pred p) {
-		std::vector<pTileNode> result;
+	std::set<pTileNode> getNodes(pred p) {
+		std::set<pTileNode> result;
 		for (int i = 0; i < mw; ++i) {
 			for (int j = 0; j < mh; ++j){
 				if (p(nodeMap[i][j])){
-					result.push_back(nodeMap[i][j]); 
+					result.insert(nodeMap[i][j]); 
 				}
 			}
 		}
@@ -146,7 +145,7 @@ protected:
 	std::vector<pTileNode> getNodesWithValue(int value);
 	void addNode(std::set<pTileNode>& points, pTileNode node, pred p = nullptr);
 	std::set<pTileNode> getSurroundingNodeInSquare(const TilePosition& center, int widthFromCenter, pred p = nullptr);
-	std::set<pTileNode> getNeighborNodesWithDistInSquare(std::set<pTileNode>& square, pTileNode node, int dist, pred p = nullptr);
+	std::set<pTileNode> getNeighborNodesWithDistInSquare(const std::set<pTileNode>& square, pTileNode node, int dist, pred p = nullptr);
 	void CalculateDistancesToUnWalkables();
 	void CalcChokePoints();
 	void CalculateChokepoints();
@@ -202,7 +201,7 @@ protected:
 		}
 		return result;
 	}
-	void getUnwalkableGroupInSquare(std::set<pTileNode>& square, pTileNode node, std::set<pTileNode>& result, pred p);
+	void getUnwalkableGroupInSquare(const std::set<pTileNode>& square, pTileNode node, std::set<pTileNode>& result, pred p);
 	void closeChokepoint(std::set<pTileNode>& chokePoint);
 	void closeLine(pTileNode f, pTileNode s);
 	void CalculateRegions();
@@ -244,26 +243,6 @@ class UnwalkableAreaSet : public std::vector<UnwalkableArea>{
 
 };
 
-class Vector {
-	double x;
-	double y;
-public:
-	Vector(TilePosition& pos) {
-		x = pos.x;
-		y = pos.y;
-	}
-	Vector& rotateVector(double degrees) {
-		auto s = sin(degrees*PI / 180);
-		auto c = cos(degrees*PI / 180);
-		x = c * x - s*y;
-		y = s * x + c * y;
-		return *this;
-	}
-	operator TilePosition() {
-		return TilePosition(int(x), int(y));
-	}
-};
-
 class Group {
 protected:
 	std::vector<pTileNode> tiles;
@@ -283,6 +262,10 @@ public:
 	int getId() {
 		return id;
 	}
+
+	std::vector<pTileNode> getTiles() { // ugly shit
+		return tiles;
+	}
 };
 
 class ChokePoint : public Group{
@@ -293,7 +276,7 @@ class ChokePoint : public Group{
 	void calcAdjacentRegions(std::map<int, pRegion>& regions) {// very very ugly
 		std::set<int> tempIds;
 		for (auto c : closedParts) {
-			auto neighbors = getSurroundingTilesInSquare(c->pos, 2);
+			const auto& neighbors = getSurroundingTilesInSquare(c->pos, 2);
 			for (auto n : neighbors) {
 				auto node = nodeMap[n.x][n.y];
 				if (node->regionId != INVALID)
@@ -321,7 +304,7 @@ public:
 	TilePosition::list getDefencePointsAround() {
 		TilePosition::list result;
 		auto closed = *closedParts.begin();
-		auto neighbours = getSurroundingTilesInSquare(closed->pos, 11);
+		const auto& neighbours = getSurroundingTilesInSquare(closed->pos, 11);
 
 		std::map<int, std::vector<TilePosition>> groups;
 		for (auto p : neighbours) {

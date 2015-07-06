@@ -74,8 +74,8 @@ std::set<pTileNode> MapAnalyzer::getSurroundingNodeInSquare(const TilePosition& 
 	return result;
 }
 
-std::set<pTileNode> MapAnalyzer::getNeighborNodesWithDistInSquare(std::set<pTileNode>& square, pTileNode node, int dist, pred p) {
-	auto neighbors = getSurroundingNodeInSquare(node->pos, dist, p);
+std::set<pTileNode> MapAnalyzer::getNeighborNodesWithDistInSquare(const std::set<pTileNode>& square, pTileNode node, int dist, pred p) {
+	const auto& neighbors = getSurroundingNodeInSquare(node->pos, dist, p);
 	std::set<pTileNode> result;
 	for (auto t : neighbors) {
 		if (square.find(t) != square.end())
@@ -109,7 +109,7 @@ void MapAnalyzer::CalcChokePoints() {
 	for (int i = 0; i < mw; ++i) {
 		for (int j = 0; j < mh; ++j) {
 			auto nodeData = nodeMap[i][j];
-			auto neighbors = getNeighbors(nodeData->pos);
+			const auto &neighbors = getNeighbors(nodeData->pos);
 			if (nodeData->value == maxDistance || nodeData->value >2 || nodeData->value == 0) continue;
 
 			nodeData->inChokepoint = true;
@@ -163,6 +163,7 @@ UnwalkableAreaSet MapAnalyzer::getUnwalkableGroups() {
 }
 
 void MapAnalyzer::closeLine(pTileNode f, pTileNode s) {
+	// brezenham algorithm for drawing lines
 	int x0 = f->pos.x, y0 = f->pos.y, x1 = s->pos.x, y1 = s->pos.y;
 	int dx = abs(x1 - x0), sx = x0<x1 ? 1 : -1;
 	int dy = abs(y1 - y0), sy = y0<y1 ? 1 : -1;
@@ -195,7 +196,7 @@ void MapAnalyzer::closeChokepoint(std::set<pTileNode>& chokePoint) {
 void MapAnalyzer::CalculateChokepoints() {
 	auto mw = Broodwar->mapWidth();
 	auto mh = Broodwar->mapHeight();
-	auto groupedUnwalkables = getUnwalkableGroups();
+	const auto& groupedUnwalkables = getUnwalkableGroups();
 
 	for (auto g : groupedUnwalkables) {
 		if (g.isSignificant()) {
@@ -211,34 +212,23 @@ void MapAnalyzer::CalculateChokepoints() {
 
 	CalculateDistancesToUnWalkables();
 	CalcChokePoints();
-	std::vector<pTileNode> tmp;
-	for (int i = 0; i < mw; ++i) {
-		for (int j = 0; j < mh; ++j) {
-			auto node = nodeMap[i][j];
-			if (node->inChokepoint)
-				tmp.push_back(node);
-			allNodes.push_back(node);
-		}
-	}
 
-	for (auto it = tmp.begin(); it != tmp.end(); it++) {
-		auto c = *it;
-		if (!isCornerChokepoint(c)) {
-			chokePoints.push_back(*c);
-			cp.insert(c);
-		}
-	}
-
-	auto cps = getGroups(cp, 1);
+	std::set<pTileNode> tmp = getNodes([](pTileNode n){return n->inChokepoint; });
+	auto cps = getGroups(tmp, 1);
 	std::vector<ChokePoint> chokpoints;
 	for (int i = 0; i < cps.size(); ++i) {
-		closeChokepoint(cps[i]);
-		for (auto c : cps[i]) {
-			c->chokePointId = i;
-		}
-		auto cp = pChokePoint(new ChokePoint(cps[i], nodeMap));
-		cp->id = i;
-		chokpts[i] = cp;
+		//for (auto t : cps[i]) {
+			//if (!isCornerChokepoint(t)) {
+				closeChokepoint(cps[i]);
+				for (auto c : cps[i]) {
+					c->chokePointId = i;
+				}
+				auto cp = pChokePoint(new ChokePoint(cps[i], nodeMap));
+				cp->id = i;
+				chokpts[i] = cp;
+				//break;
+			//}
+		//}
 	}
 }
 
@@ -271,7 +261,7 @@ void UnwalkableArea::fillAreaAround(const TilePosition& tile) {
 	if (Broodwar->isWalkable(WalkPosition(tile)) || this->contains(tile)) return;
 
 	tiles.insert(tile);
-	auto neighbors = getNeighbors(tile);
+	const auto& neighbors = getNeighbors(tile);
 	for (auto n : neighbors) {
 		fillAreaAround(n);
 	}
@@ -279,11 +269,11 @@ void UnwalkableArea::fillAreaAround(const TilePosition& tile) {
 
 //corner "chokepoints" are to be removed from the chokepoint list
 
-void MapAnalyzer::getUnwalkableGroupInSquare(std::set<pTileNode>& square, pTileNode node, std::set<pTileNode>& result, pred p) {
+void MapAnalyzer::getUnwalkableGroupInSquare(const std::set<pTileNode>& square, pTileNode node, std::set<pTileNode>& result, pred p) {
 	if (!node->value && !contains(result, node)) {
 		result.insert(node);
 
-		auto neighbors = getNeighborNodesWithDistInSquare(square, node, 2, p);
+		const auto& neighbors = getNeighborNodesWithDistInSquare(square, node, 2, p);
 		for (auto n : neighbors) {
 			getUnwalkableGroupInSquare(square, n, result, p);
 		}
@@ -293,7 +283,7 @@ void MapAnalyzer::getUnwalkableGroupInSquare(std::set<pTileNode>& square, pTileN
 bool MapAnalyzer::isCornerChokepoint(pTileNode node) {
 	std::set<pTileNode> group;
 	auto unwalkable = [](pTileNode n){return n->value == 0; };
-	auto surroundingTile = getSurroundingNodeInSquare(node->pos, 4, unwalkable);
+	const auto& surroundingTile = getSurroundingNodeInSquare(node->pos, 4, unwalkable);
 	//surroundingTile.insert(node);
 	
 	if (surroundingTile.size()) {

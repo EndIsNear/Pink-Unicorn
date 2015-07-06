@@ -41,6 +41,7 @@ void MapManager::OnFrame()
 		//CalculateExpansions();
 	}
 
+	//drawRegionData();
 	//GetDefencePoints(start);
 	/*if (Broodwar->getFrameCount() > 2500) {
 		drawGateway(*this, p1);

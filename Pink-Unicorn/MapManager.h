@@ -73,6 +73,24 @@ private:
 	//MapAnalyzer *ma;
 	static TilePosition start;
 	static Unit testWorker; // used to better check if given position is buildable or nots
+	void drawRegionData() {
+		for (auto c : chokpts) {
+			const auto& tiles = c.second->getTiles();
+			for (auto cc : tiles) {
+				Broodwar->drawCircle(CoordinateType::Map, cc->pos.x * 32, cc->pos.y * 32, 10, Colors::Red);
+			}
+			
+		}
+
+		for (auto t : allNodes) {
+			Broodwar->drawText(CoordinateType::Map, t->pos.x * 32, t->pos.y * 32, "%d", t->regionId);
+			//Broodwar->drawText(CoordinateType::Map, t.pos.x * 32, t.pos.y * 32, "%d %d", t.pos.x, t.pos.y);
+		}
+
+		for (auto c : closed) {
+			Broodwar->drawCircle(CoordinateType::Map, c->pos.x * 32, c->pos.y * 32, 15, Colors::Blue);
+		}
+	}
 	void checkTestWorker()
 	{
 		if (!testWorker || !testWorker->exists())
@@ -104,8 +122,6 @@ private:
 	TilePosition::list resourseGroups;
 
 	//TilePosition::list chokepoints;
-	std::vector<pTileNode> chokepoints;
-	std::vector<pTileNode> allnodes;
 	std::vector<pTileNode> closed;
 	std::set<TilePosition> pylonLocationsGrid; // <TilePosition location, bool occupied>
 	std::set<TilePosition> builtPylons;
