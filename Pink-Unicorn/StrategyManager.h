@@ -47,6 +47,7 @@ public:
 		m_bases.insert(base);
 	}
 	bool BuildExpand();
+	Position::list GetExpandPos();
 private:
 	void UpdateSupply();
 	void UpdateWorkers();

@@ -119,3 +119,10 @@ void StrategyManager::CheckQueue()
 		m_TaskQ.pop();
 }
 
+Position::list StrategyManager::GetExpandPos()
+{
+	Position::list res;
+	for (auto& b : m_bases)
+		res.push_back(b->getPosition());
+	return res;
+}
