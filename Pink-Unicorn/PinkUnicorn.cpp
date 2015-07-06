@@ -106,6 +106,7 @@ void PinkUnicorn::onFrame()
 
 void PinkUnicorn::onStart()
 {
+
 	if (Broodwar->isReplay())
 	{
 		return;

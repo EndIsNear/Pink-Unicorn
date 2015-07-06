@@ -12,6 +12,10 @@ public:
 	{
 		for (auto m : mManagers)
 			m->ReleaseInst();
+
+		//ugly hack to clear set events
+		const auto &events = BWAPI::Broodwar->getEvents();
+		const_cast<std::list<BWAPI::Event>&>(events).clear();
 	}
 	virtual void onStart();
 	virtual void onEnd(bool isWinner);
