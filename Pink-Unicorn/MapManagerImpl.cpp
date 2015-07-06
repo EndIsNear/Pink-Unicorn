@@ -43,7 +43,7 @@ void MapManager::OnFrame()
 		//CalculateExpansions();
 	}
 
-	//drawRegionData();
+	drawRegionData();
 	//GetDefencePoints(start);
 	/*if (Broodwar->getFrameCount() > 2500) {
 		drawGateway(*this, p1);
@@ -90,7 +90,8 @@ TilePosition::list MapManager::GetExpansionLocations()
 		auto base = GetBaseLocation(rg);
 		//Broodwar->drawCircle(CoordinateType::Map, rg.x * 32, rg.y * 32, 20, Colors::Blue);
 		//Broodwar->drawCircle(CoordinateType::Map, base.x * 32, base.y * 32, 20, Colors::Green);
-		result.push_back(base);
+		if (base.getDistance(start) < 4)
+			result.push_back(base);
 	}
 	return result;
 }
