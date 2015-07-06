@@ -130,12 +130,12 @@ protected:
 			return nodeMap[i][j];
 		return nullptr;
 	}
-	std::set<pTileNode> getNodes(pred p) {
-		std::set<pTileNode> result;
+	std::vector<pTileNode> getNodes(pred p) {
+		std::vector<pTileNode> result;
 		for (int i = 0; i < mw; ++i) {
 			for (int j = 0; j < mh; ++j){
 				if (p(nodeMap[i][j])){
-					result.insert(nodeMap[i][j]); 
+					result.push_back(nodeMap[i][j]); 
 				}
 			}
 		}
@@ -150,10 +150,11 @@ protected:
 	void CalcChokePoints();
 	void CalculateChokepoints();
 	bool isCornerChokepoint(pTileNode pos);
+	bool hasCornerChokepoint(const std::set<pTileNode>& cp);
 	UnwalkableAreaSet getUnwalkableGroups();
 	UnwalkableArea getUnwalkableGroup(std::set<TilePosition>& visited, const TilePosition& pos);
 	void getGroup(std::set<pTileNode>& visited,
-		std::set<pTileNode>& container,
+		const std::set<pTileNode>& container,
 		pTileNode node,
 		int density, pred p,
 		std::set<pTileNode>& result)
@@ -161,7 +162,7 @@ protected:
 		result.insert(node);
 		visited.insert(node);
 
-		auto neighbors = getNeighborNodesWithDistInSquare(container, node, density, p);
+		const auto& neighbors = getNeighborNodesWithDistInSquare(container, node, density, p);
 		for (auto n : neighbors) {
 			getGroup(visited, container, n, density, p, result);
 		}
@@ -185,7 +186,7 @@ protected:
 		int id,
 		pRegion result);
 	void getRegionGroups();
-	std::vector<std::set<pTileNode>> getGroups(std::set<pTileNode>& initialContainer, int groupsDensity) {
+	std::vector<std::set<pTileNode>> getGroups(const std::set<pTileNode>& initialContainer, int groupsDensity) {
 		std::vector<std::set<pTileNode>> result;
 		std::set<pTileNode> visited;
 		auto notVisited = [&visited](pTileNode n){
@@ -273,7 +274,7 @@ class ChokePoint : public Group{
 	friend class MapRegion;
 	std::vector<pTileNode> closedParts;
 	std::vector<pRegion> adjacentRegions;
-	void calcAdjacentRegions(std::map<int, pRegion>& regions) {// very very ugly
+	void calcAdjacentRegions(std::map<int, pRegion>& regions) {
 		std::set<int> tempIds;
 		for (auto c : closedParts) {
 			const auto& neighbors = getSurroundingTilesInSquare(c->pos, 2);
@@ -367,7 +368,6 @@ class MapRegion : public Group {
 	}
 
 	void merge(const pRegion& other) {
-		int a = 2;
 		for (auto t : other->tiles) {
 			tiles.push_back(t);
 			t->regionId = id;

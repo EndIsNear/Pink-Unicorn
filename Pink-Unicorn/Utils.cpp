@@ -119,4 +119,3 @@ bool IsGatewayUnit(BWAPI::UnitType type)
 }
 
 
-

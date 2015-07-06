@@ -1,5 +1,6 @@
 #include "MapRegion.h"
 #include "MapManager.h"
+#include "Utils.h"
 #include <memory>
 
 MapAnalyzer * MapAnalyzer::insta = NULL;
@@ -184,7 +185,7 @@ void MapAnalyzer::closeChokepoint(std::set<pTileNode>& chokePoint) {
 	pred unwalkable = [](pTileNode n) {
 		return n->value == 0;
 	};
-	auto neighbors = getSurroundingNodeInSquare(el->pos, 4, unwalkable);
+	const auto& neighbors = getSurroundingNodeInSquare(el->pos, 4, unwalkable);
 	auto groups = getGroups(neighbors, 1);
 
 	for (auto g : groups) {
@@ -213,22 +214,26 @@ void MapAnalyzer::CalculateChokepoints() {
 	CalculateDistancesToUnWalkables();
 	CalcChokePoints();
 
-	std::set<pTileNode> tmp = getNodes([](pTileNode n){return n->inChokepoint; });
-	auto cps = getGroups(tmp, 1);
+	std::vector<pTileNode> tmp;
+	tmp = getNodes([](pTileNode n){return n->inChokepoint; });
+
+	for (auto it = tmp.begin(); it != tmp.end(); it++) {
+		auto c = *it;
+		if (!isCornerChokepoint(c)) {
+			cp.insert(c);
+		}
+	}
+
+	auto cps = getGroups(cp, 1);
 	std::vector<ChokePoint> chokpoints;
 	for (int i = 0; i < cps.size(); ++i) {
-		//for (auto t : cps[i]) {
-			//if (!isCornerChokepoint(t)) {
-				closeChokepoint(cps[i]);
-				for (auto c : cps[i]) {
-					c->chokePointId = i;
-				}
-				auto cp = pChokePoint(new ChokePoint(cps[i], nodeMap));
-				cp->id = i;
-				chokpts[i] = cp;
-				//break;
-			//}
-		//}
+		closeChokepoint(cps[i]);
+		for (auto c : cps[i]) {
+			c->chokePointId = i;
+		}
+		auto cp = pChokePoint(new ChokePoint(cps[i], nodeMap));
+		cp->id = i;
+		chokpts[i] = cp;
 	}
 }
 
@@ -288,13 +293,18 @@ bool MapAnalyzer::isCornerChokepoint(pTileNode node) {
 	
 	if (surroundingTile.size()) {
 		auto first = *surroundingTile.begin();
-		getUnwalkableGroupInSquare(surroundingTile, first, group, unwalkable);
+		std::set<pTileNode> visited;
+		auto notvisited = [&visited](pTileNode n) {
+			return !contains(visited, n);
+		};
+		getGroup(visited, surroundingTile, first, 1, notvisited, group);
+		//getUnwalkableGroupInSquare(surroundingTile, first, group, unwalkable);
 		if (group.size() != surroundingTile.size())
 			return false;
 		return true;
 	}
 	
-	return true;
+	return false;
 }
 
 void MapAnalyzer::getRegionGroup(std::set<pTileNode>& visited,
@@ -323,7 +333,7 @@ void MapAnalyzer::getRegionGroupInt(std::set<pTileNode>& visited,
 	node->regionId = id;
 	visited.insert(node);
 
-	auto neighbors = getNeighborNodeFour(node, p);
+	const auto& neighbors = getNeighborNodeFour(node, p);
 	for (auto n : neighbors) {
 		if (n->closed || n->value == 0) {
 			visited.insert(n);

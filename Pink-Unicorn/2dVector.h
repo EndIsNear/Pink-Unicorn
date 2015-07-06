@@ -23,6 +23,7 @@ class Vector2D
     Vector2D(ByOy){x = 0.; y = 1.;}
 		Vector2D(double angle){ x = cos(angle); y = sin(angle); }
     Vector2D(double x, double y) :x(x) , y(y) {}
+	Vector2D(const BWAPI::TilePosition& pos) : x(double(pos.x)), y(double(pos.y)){}
 
     Vector2D operator+(const Vector2D &o) const {return Vector2D(x + o.x, y + o.y);}
     Vector2D operator-(const Vector2D &o) const {return Vector2D(x - o.x, y - o.y);}

@@ -37,6 +37,7 @@ public:
 	TilePosition GetNextExpansionLocation();
 	Position GetChokepointBetween(Position& start, Position& end);
 	TilePosition::list GetDefencePoints(const TilePosition& aroundHere);
+	TilePosition GetDefencePoint(const TilePosition& aroundHere, const TilePosition& direction);
 	int GetRegionId(const TilePosition& tile) {
 		return getNode(tile)->regionId;
 	}

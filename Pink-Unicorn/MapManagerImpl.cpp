@@ -1,4 +1,6 @@
 #include "MapManager.h"
+#include "Utils.h"
+#include "2dVector.h"
 #include <queue>
 #include <memory>
 #include <Windows.h>
@@ -515,6 +517,7 @@ TilePosition::list MapManager::GetDefencePoints(const TilePosition& aroundHere) 
 		auto chokepoints = region->getAdjacentChokepoints();
 
 		for (auto c : chokepoints) {
+			auto regs = c->getAdjacentRegions();
 			auto dps = c->getDefencePointsAround();
 			for (auto dp : dps) {
 				auto node = getNode(dp);
@@ -528,4 +531,24 @@ TilePosition::list MapManager::GetDefencePoints(const TilePosition& aroundHere) 
 	}
 
 	return result;
+}
+
+TilePosition MapManager::GetDefencePoint(const TilePosition& aroundHere, const TilePosition& direction) {
+	auto defPoints = GetDefencePoints(aroundHere);
+	if (defPoints.size() == 1) 
+		return *defPoints.begin();
+	if (defPoints.size() != 0) {
+		auto center = GetCenter(defPoints);
+		auto dir = Vector2D(direction - center);
+		std::vector<Vector2D> vectors;
+		for (auto dp : defPoints) {
+			vectors.push_back(Vector2D(center - dp));
+		}
+
+		for (auto v : vectors) {
+			v = v*(dir.Dist() / v.Dist());
+		}
+	}
+	
+	return TilePositions::None;
 }
