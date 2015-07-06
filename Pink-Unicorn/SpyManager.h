@@ -146,7 +146,7 @@ public:
 		//TODO
 	}
 	TilePosition GetEnemyStart() {
-
+		return enemyStart;
 	}
 	TilePosition::list GetEnemyBases();
 	bool IsUnitScouting(Unit u);
