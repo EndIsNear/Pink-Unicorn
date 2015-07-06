@@ -255,6 +255,24 @@ protected:
 	Position mPos;
 };
 
+class StayOnDist : public AgentGoToPosition
+{
+	public:
+	StayOnDist(Unit u, Position pos, unsigned dist) :AgentGoToPosition(u, pos), mDist(dist){}
+
+	virtual bool OnFrame() override
+	{
+		if (mUnit->getPosition().getDistance(mPos) < mDist)
+			mUnit->holdPosition();
+		else if (mUnit->isIdle())
+			mUnit->move(mPos);
+		return true;
+	}
+
+private:
+	unsigned mDist;
+};
+
 
 class ControlPattern
 {
@@ -333,6 +351,15 @@ public:
 class MicroControler
 {
 public:
+
+	enum TaskType
+	{
+		None,
+		Defence,
+		Attack,
+		Presure
+	};
+
 	MicroControler() : next(0)
 	{
 
@@ -350,41 +377,52 @@ public:
 		Clear();
 	}
 
+	TaskType GetType() { return mType; }
+
 	unsigned GetSize() { return mUnits.size(); }
 
-	void SwitchTargetPoint(Position pos)
+	void Update()
 	{
 		Unitset us;
 		for (auto it : mUnits)
 			us.insert(it->GetUnit());
 		Clear();
 		for (auto it : us)
-			AddUnit(it, pos);
+			AddUnit(it);
 	}
 
-	void AddUnit(Unit u, Position TargetPos) 
+	void SwitchTargetPoint(Position pos)
 	{
-		ControlPattern *pat = new ControlPattern(u);
-		if (u->getType() == UnitTypes::Protoss_Zealot)
-		{
-			
-			pat->PushAgent(new AgentStayAway(u, 75, 50, IsEnemy && !IsBuilding));
-			pat->PushAgent(new AgentAttackInRange(u, 250, 150, IsEnemy && !IsBuilding));
-			pat->PushAgent(new AgentGoToPosition(u, TargetPos));
 
-		}
-		else if (u->getType() == UnitTypes::Protoss_Dragoon)
+		mTarget = pos;
+		Update();
+	}
+
+	void SwitchTaskType(TaskType type)
+	{
+		mType = type;
+		Update();
+	}
+
+	void AddUnit(Unit u) 
+	{
+		switch (mType)
 		{
-		//	pat->PushAgent(new AgentStayAway(u, 75, 50, IsEnemy && !IsBuilding));
-			pat->PushAgent(new AgentAttackInRange(u, 250, 150, IsEnemy && !IsBuilding));
-			pat->PushAgent(new AgentGoToPosition(u, TargetPos));
+		case MicroControler::None:
+			SetOnAttack(u);
+			break;
+		case MicroControler::Defence:
+			SetOnAttack(u);
+			break;
+		case MicroControler::Attack:
+			SetOnAttack(u);
+			break;
+		case MicroControler::Presure:
+			SetOnPresure(u);
+			break;
+		default:
+			break;
 		}
-		else if (u->getType() == UnitTypes::Protoss_Observer)
-		{
-			pat->PushAgent(new AgentStayToghether(u, 150, IsAlly));
-			pat->PushAgent(new AgentGoToPosition(u, TargetPos));
-		}
-		mUnits.push_back(pat);
 	}
 
 	/*this is extremly slow*/
@@ -429,7 +467,72 @@ public:
 		}
 	}
 private:
+
+	void SetOnAttack(Unit u)
+	{
+		ControlPattern *pat = new ControlPattern(u);
+		if (u->getType() == UnitTypes::Protoss_Zealot)
+		{
+
+			//	pat->PushAgent(new AgentStayAway(u, 75, 50, IsEnemy && !IsBuilding));
+			pat->PushAgent(new AgentAttackInRange(u, 200, 150, IsEnemy && !IsBuilding));
+			//		pat->PushAgent(new AgentStayToghether(u, 40, IsAlly));
+			pat->PushAgent(new AgentGoToPosition(u, mTarget));
+		}
+		else if (u->getType() == UnitTypes::Protoss_Dragoon)
+		{
+			pat->PushAgent(new AgentStayAway(u, 75, 50, IsEnemy && !IsBuilding));
+			pat->PushAgent(new AgentAttackInRange(u, 200, 150, IsEnemy && !IsBuilding));
+			//	pat->PushAgent(new AgentStayToghether(u, 40, IsAlly));
+			pat->PushAgent(new AgentGoToPosition(u, mTarget));
+
+		}
+		else if (u->getType() == UnitTypes::Protoss_Observer)
+		{
+		//	pat->PushAgent(new AgentStayToghether(u, 150, IsAlly));
+			pat->PushAgent(new AgentGoToPosition(u, mTarget));
+		}
+		mUnits.push_back(pat);
+	}
+
+	
+
+	void SetOnPresure(Unit u)
+	{
+		ControlPattern *pat = new ControlPattern(u);
+		if (u->getType() == UnitTypes::Protoss_Zealot)
+		{
+			//	pat->PushAgent(new AgentStayAway(u, 75, 50, IsEnemy && !IsBuilding));
+			pat->PushAgent(new AgentAttackInRange(u, 250, 150, IsEnemy && !IsBuilding));
+			//	pat->PushAgent(new AgentStayToghether(u, 100, IsAlly));
+			pat->PushAgent(new StayOnDist(u, mTarget, 1200));
+		}
+		else if (u->getType() == UnitTypes::Protoss_Dragoon)
+		{
+
+			pat->PushAgent(new AgentStayAway(u, 75, 50, IsEnemy && !IsBuilding));
+			pat->PushAgent(new AgentAttackInRange(u, 250, 150, IsEnemy && !IsBuilding));
+			pat->PushAgent(new AgentStayToghether(u, 100, IsAlly));
+			pat->PushAgent(new StayOnDist(u, mTarget, 1200));
+
+		}
+		else if (u->getType() == UnitTypes::Protoss_Observer)
+		{
+	//		pat->PushAgent(new AgentStayToghether(u, 150, IsAlly));
+			pat->PushAgent(new StayOnDist(u, mTarget, 1200));
+		}
+		mUnits.push_back(pat);
+	}
+
+	void SetOnDefence()
+	{
+
+	}
+private:
+
 	unsigned next;
+	TaskType mType;
+	Position mTarget;
 	std::vector<ControlPattern *>  mUnits;
 
 };

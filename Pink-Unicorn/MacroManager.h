@@ -19,7 +19,7 @@ public:
 			return *inst;
 		}
 		virtual void ReleaseInst() override { delete inst; inst = NULL; }
-		virtual void OnStart() override {}
+		virtual void OnStart() override;
 		virtual void OnFrame() override;
 		virtual void OnUnitComplete(Unit u) override;
 		virtual void OnUnitDestroy(Unit u) override;
@@ -30,7 +30,7 @@ public:
 	private:
 		bool mbSpyExpInit;
 		std::map<UnitType, Unitset> mFreeUnits;
-		MicroControler MicroControler;
+		MicroControler mMicroControler;
 };
 
 
