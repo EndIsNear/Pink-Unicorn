@@ -305,7 +305,7 @@ public:
 	TilePosition::list getDefencePointsAround() {
 		TilePosition::list result;
 		auto closed = *closedParts.begin();
-		const auto& neighbours = getSurroundingTilesInSquare(closed->pos, 11);
+		const auto& neighbours = getSurroundingTilesInSquare(closed->pos, 8);
 
 		std::map<int, std::vector<TilePosition>> groups;
 		for (auto p : neighbours) {

@@ -517,7 +517,6 @@ TilePosition::list MapManager::GetDefencePoints(const TilePosition& aroundHere) 
 		auto chokepoints = region->getAdjacentChokepoints();
 
 		for (auto c : chokepoints) {
-			auto regs = c->getAdjacentRegions();
 			auto dps = c->getDefencePointsAround();
 			for (auto dp : dps) {
 				auto node = getNode(dp);
