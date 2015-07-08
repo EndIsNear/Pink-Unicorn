@@ -63,7 +63,7 @@ void StrategyManager::OnStart()
 			PushExpandTask(pr--);
 		}
 		if (i % 7 == 1) 
-			PROD(UnitTypes::Protoss_Observer);
+			//PROD(UnitTypes::Protoss_Observer);
 		PROD(UnitTypes::Protoss_Zealot);
 		PROD(UnitTypes::Protoss_Dragoon);
 	}

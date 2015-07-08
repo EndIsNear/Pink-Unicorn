@@ -44,17 +44,13 @@ void WorkerManager::OnFrame()
 		size_t idx = (Broodwar->getFrameCount() / 25) % m_expands.size();
 		RemoveDeadWorkers(idx);
 	}
-	if (Broodwar->getFrameCount() % 300 == 0)
-	{
-		BalanceWorkerBetweenExpands();
-	}
 }
 
 void WorkerManager::AddUnit(Unit unit)
 {
 	if (unit->getType().isWorker())
 	{
-		auto nearBase = unit->getClosestUnit(Filter::IsResourceDepot && Filter::IsCompleted &&Filter::IsAlly);
+		auto nearBase = unit->getClosestUnit(Filter::IsResourceDepot && Filter::IsCompleted && Filter::IsAlly);
 		for (auto& expand : m_expands)
 		{
 			if (expand.base == nearBase)
@@ -74,13 +70,14 @@ void WorkerManager::AddUnit(Unit unit)
 
 		
 	}
-	else if (unit->getType().isResourceDepot())
+	else if (unit->getType().isResourceDepot() && Filter::IsAlly(unit))
 	{
 		size_t end = m_expands.size();
 		m_expands.push_back(Expand());
 
 		m_expands[end].base = unit;
 		m_expands[end].minerals = unit->getUnitsInRadius(256, Filter::IsMineralField);
+		BalanceWorkerBetweenExpands();
 	}
 	else if (unit->getType().isRefinery())
 	{
